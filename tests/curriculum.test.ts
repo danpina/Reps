@@ -107,6 +107,32 @@ describe("curriculum seed content", () => {
         }
       });
 
+      // Options are shuffled at render, so seed position has no effect on the
+      // reader. This is a writing check: parking the answer in the same slot
+      // every time is a sign the options were written to a formula rather than
+      // as four genuinely plausible choices.
+      test("correct answers are not all written into the same slot", () => {
+        if (checks.length < 3) return;
+
+        const positions = checks.map((c) =>
+          c.options.findIndex((o) => o.correct),
+        );
+        const spread = new Set(positions);
+
+        assert.ok(
+          spread.size > 1,
+          `every correct answer sits at index ${positions[0]}. Vary where the right option is written.`,
+        );
+
+        const commonest = Math.max(
+          ...[...spread].map((p) => positions.filter((q) => q === p).length),
+        );
+        assert.ok(
+          commonest <= Math.ceil(checks.length * 0.6),
+          `${commonest} of ${checks.length} correct answers share one position`,
+        );
+      });
+
       test("rubric criteria keys are present and unique", () => {
         for (const rubric of rubrics) {
           assert.ok(rubric.criteria.length > 0);

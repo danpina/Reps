@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Prose } from "@/components/prose";
 import { requireUser } from "@/lib/auth/dal";
 import { getLesson, getSkillBySlug } from "@/lib/curriculum/queries";
+import { shuffle } from "@/lib/curriculum/shuffle";
 import { ComprehensionBeat } from "./comprehension-beat";
 
 export default async function LessonPage({
@@ -24,6 +25,12 @@ export default async function LessonPage({
   const track = await getSkillBySlug(slug);
   const total = track?.lessons.length ?? 0;
   const hasNext = sortOrder < total;
+
+  // Shuffled here rather than in the client component, so the browser hydrates
+  // with the same order the server rendered.
+  const check = lesson.check_json
+    ? { ...lesson.check_json, options: shuffle(lesson.check_json.options) }
+    : null;
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
@@ -69,9 +76,7 @@ export default async function LessonPage({
           </ol>
         </section>
 
-        {lesson.check_json ? (
-          <ComprehensionBeat check={lesson.check_json} />
-        ) : null}
+        {check ? <ComprehensionBeat check={check} /> : null}
 
         <section
           aria-labelledby="mission"

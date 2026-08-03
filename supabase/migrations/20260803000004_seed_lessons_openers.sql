@@ -43,14 +43,14 @@ That stop is the whole technique. A remark with no pause is a comment. A remark 
         "note": "This is about them rather than about the situation, so it arrives as a stranger asking for information. It can work, but it costs more than it needs to."
       },
       {
-        "text": "This is the second delay tonight, isn't it?",
-        "correct": true,
-        "note": "True, shared, and specific enough that they can either agree or correct you. Both of those are a turn."
-      },
-      {
         "text": "Terrible weather lately.",
         "correct": false,
         "note": "It is technically the environment, but it is so generic that there is nothing to actually reply to."
+      },
+      {
+        "text": "This is the second delay tonight, isn't it?",
+        "correct": true,
+        "note": "True, shared, and specific enough that they can either agree or correct you. Both of those are a turn."
       },
       {
         "text": "So what do you do for work?",
@@ -121,14 +121,14 @@ This is not caution for its own sake. Openers land far better on someone who has
     "prompt": "Which of these is the strongest sign that someone has room for a conversation?",
     "options": [
       {
-        "text": "They are standing on their own.",
-        "correct": false,
-        "note": "Being alone is not the same as being available. Plenty of people standing alone are deliberately taking a break."
-      },
-      {
         "text": "They lift their eyes and look around the room.",
         "correct": true,
         "note": "Eyes up and scanning means their attention is unspent and looking for somewhere to go. This is the single most reliable signal."
+      },
+      {
+        "text": "They are standing on their own.",
+        "correct": false,
+        "note": "Being alone is not the same as being available. Plenty of people standing alone are deliberately taking a break."
       },
       {
         "text": "They are standing close to you.",
@@ -209,11 +209,6 @@ You are not banning questions. You are making sure the first thing out of your m
         "note": "A perfectly fine question, but it puts them on the spot, tells them nothing about you, and can be answered in one word."
       },
       {
-        "text": "I have no idea what I have signed up for here.",
-        "correct": true,
-        "note": "It discloses something small, it is honest, and it gives them at least three ways in: reassurance, agreement, or their own story."
-      },
-      {
         "text": "What made you come to this?",
         "correct": false,
         "note": "A better question than the first, but it is still a request for disclosure before you have offered any."
@@ -222,6 +217,11 @@ You are not banning questions. You are making sure the first thing out of your m
         "text": "Is this seat taken?",
         "correct": false,
         "note": "Necessary logistics, not an opener. Say it, then open properly."
+      },
+      {
+        "text": "I have no idea what I have signed up for here.",
+        "correct": true,
+        "note": "It discloses something small, it is honest, and it gives them at least three ways in: reassurance, agreement, or their own story."
       }
     ],
     "explain": "Lead with a small offer about yourself. Questions work far better once something has already been given."
@@ -375,14 +375,14 @@ There is almost always one word carrying more weight than the rest — a place, 
         "note": "A complete reset. It throws away everything they just offered and starts the conversation again from cold."
       },
       {
-        "text": "Bailed on you? That is a bold move an hour before.",
-        "correct": true,
-        "note": "Goes straight at the loaded word, matches their wry tone, and lets them tell the story they were clearly ready to tell."
-      },
-      {
         "text": "That is a shame.",
         "correct": false,
         "note": "Sympathetic but terminal. It closes the thread rather than opening it, and now you need a whole new line."
+      },
+      {
+        "text": "Bailed on you? That is a bold move an hour before.",
+        "correct": true,
+        "note": "Goes straight at the loaded word, matches their wry tone, and lets them tell the story they were clearly ready to tell."
       },
       {
         "text": "Do you live with them?",
