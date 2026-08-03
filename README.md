@@ -7,8 +7,12 @@ repetitions — not a replacement for them.
 ## Status
 
 Phase 1 (foundations) is in place: auth, the `profiles` table with RLS, and the
-cross-user isolation test. The curriculum, field log, roleplay, and progress
-screens are still to come.
+cross-user isolation test.
+
+Phase 2 (curriculum) is partly done. The schema, all nine skill rows, and the
+five lessons of track 1 (Openers) are written, along with the skill picker and
+the theory card reader. The remaining eight tracks are still to be written. The
+field log, roleplay, and progress screens come after that.
 
 ## Stack
 
@@ -66,8 +70,23 @@ enabled on every table with no exceptions, and
 [`tests/rls.test.ts`](tests/rls.test.ts) asserts that one user cannot read or
 write another user's rows. Add a case to that file whenever you add a table.
 
-The tests need all three Supabase environment variables. Without them the suite
-skips rather than passing silently, so check the output says `pass`, not `skip`.
+The RLS tests need all three Supabase environment variables. Without them that
+suite skips rather than passing silently, so check the output says `pass`, not
+`skip`.
+
+## Curriculum
+
+Lessons live in `supabase/migrations/*_seed_lessons_*.sql`, one migration per
+track. Each lesson carries a theory card, exactly three worked examples, a
+comprehension beat, a rubric for the feedback engine, and a roleplay scenario
+whose partner has an `openness` of 1 to 5.
+
+[`tests/curriculum.test.ts`](tests/curriculum.test.ts) validates all of that
+without a database: it parses every `$j$` block, rejects malformed JSON, and
+enforces the rules the content has to follow — three examples per card, exactly
+one correct answer per check, openness within range, and a scenario that tells
+the roleplay partner never to coach mid-scene. Run `npm test` after writing a
+track.
 
 ## Design
 

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import { signOut } from "@/app/(auth)/actions";
 import { Button } from "@/components/ui";
 import { getProfile, requireUser } from "@/lib/auth/dal";
@@ -26,11 +28,17 @@ export default async function TodayPage() {
       </header>
 
       <section className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6">
-        <h2 className="text-sm font-semibold text-ink">Nothing to practise yet</h2>
+        <h2 className="text-sm font-semibold text-ink">Start a track</h2>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-          The curriculum lands in the next phase. Once it does, this is where
-          you&rsquo;ll pick a skill and get today&rsquo;s field mission.
+          Pick a skill, read the card, then go and have the conversation.
+          Logging your reps arrives in the next phase.
         </p>
+        <Link
+          href="/skills"
+          className="mt-4 inline-flex rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
+        >
+          Browse skills
+        </Link>
         <dl className="mt-6 grid grid-cols-3 gap-4 border-t border-rule pt-5">
           <Stat label="Reps logged" value="0" />
           <Stat label="Current streak" value="0" />
