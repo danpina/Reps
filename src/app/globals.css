@@ -1,0 +1,163 @@
+@import "tailwindcss";
+
+/*
+  "Ledger" — the app as a training diary, not a social app.
+  Cool paper and ink, hairline rules instead of cards, tabular numerals for
+  every metric so progress reads like an instrument, not a scoreboard.
+*/
+
+:root {
+  --paper: #f4f5f3;
+  --paper-raised: #fbfbfa;
+  --ink: #16181a;
+  --ink-muted: #5c6268;
+  --ink-faint: #8b9198;
+  --rule: #dfe1dd;
+  --rule-strong: #c6c9c4;
+
+  /* Sage means "recorded". Never celebratory. */
+  --accent: #4a6b52;
+  --accent-soft: #e4ebe4;
+  --accent-ink: #ffffff;
+
+  /* Amber means "look at this again". */
+  --flag: #8a6a2f;
+  --flag-soft: #f2ead9;
+
+  --danger: #8c3a35;
+  --danger-soft: #f3e3e2;
+
+  --focus: #2f6f8f;
+  --radius: 4px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --paper: #101214;
+    --paper-raised: #171a1d;
+    --ink: #e6e8e6;
+    --ink-muted: #9aa1a6;
+    --ink-faint: #6b7278;
+    --rule: #262a2e;
+    --rule-strong: #363b40;
+
+    --accent: #8fb397;
+    --accent-soft: #1e2620;
+    --accent-ink: #101214;
+
+    --flag: #d0ab6a;
+    --flag-soft: #262019;
+
+    --danger: #d3908b;
+    --danger-soft: #2a1d1c;
+
+    --focus: #7fb8d4;
+  }
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --paper: #f4f5f3;
+  --paper-raised: #fbfbfa;
+  --ink: #16181a;
+  --ink-muted: #5c6268;
+  --ink-faint: #8b9198;
+  --rule: #dfe1dd;
+  --rule-strong: #c6c9c4;
+  --accent: #4a6b52;
+  --accent-soft: #e4ebe4;
+  --accent-ink: #ffffff;
+  --flag: #8a6a2f;
+  --flag-soft: #f2ead9;
+  --danger: #8c3a35;
+  --danger-soft: #f3e3e2;
+  --focus: #2f6f8f;
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --paper: #101214;
+  --paper-raised: #171a1d;
+  --ink: #e6e8e6;
+  --ink-muted: #9aa1a6;
+  --ink-faint: #6b7278;
+  --rule: #262a2e;
+  --rule-strong: #363b40;
+  --accent: #8fb397;
+  --accent-soft: #1e2620;
+  --accent-ink: #101214;
+  --flag: #d0ab6a;
+  --flag-soft: #262019;
+  --danger: #d3908b;
+  --danger-soft: #2a1d1c;
+  --focus: #7fb8d4;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-raised: var(--paper-raised);
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-faint: var(--ink-faint);
+  --color-rule: var(--rule);
+  --color-rule-strong: var(--rule-strong);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-ink: var(--accent-ink);
+  --color-flag: var(--flag);
+  --color-flag-soft: var(--flag-soft);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+
+  --font-sans: var(--font-sans-stack);
+  --font-mono: var(--font-mono-stack);
+
+  --radius-sm: 3px;
+  --radius-DEFAULT: 4px;
+  --radius-md: 6px;
+}
+
+html {
+  color-scheme: light dark;
+  --font-sans-stack: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono-stack: ui-monospace, "SF Mono", "Cascadia Mono", "Roboto Mono",
+    Menlo, Consolas, monospace;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans-stack);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Metrics read as instrument readings: aligned, monospaced, never jumpy. */
+.tabular {
+  font-family: var(--font-mono-stack);
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--accent-soft);
+  color: var(--ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
