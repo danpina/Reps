@@ -1,14 +1,14 @@
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 
-import { SUPABASE_ANON_KEY, SUPABASE_URL } from "@/lib/env";
+import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/env";
 
 const PUBLIC_ROUTES = ["/sign-in", "/sign-up", "/check-email", "/auth/callback"];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
 
-  const supabase = createServerClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+  const supabase = createServerClient(SUPABASE_URL, SUPABASE_PUBLISHABLE_KEY, {
     cookies: {
       getAll() {
         return request.cookies.getAll();

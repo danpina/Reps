@@ -46,3 +46,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Convenience bundle of all migrations, regenerated on demand
+supabase/APPLY_ALL.local.sql

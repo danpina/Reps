@@ -4,10 +4,10 @@ import assert from "node:assert/strict";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const publishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+const secretKey = process.env.SUPABASE_SECRET_KEY;
 
-const configured = Boolean(url && anonKey && serviceKey);
+const configured = Boolean(url && publishableKey && secretKey);
 const password = "test-password-8chars!";
 
 type TestUser = {
@@ -20,10 +20,10 @@ describe(
   {
     skip: configured
       ? false
-      : "Set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY and SUPABASE_SERVICE_ROLE_KEY to run",
+      : "Set NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY and SUPABASE_SECRET_KEY to run",
   },
   () => {
-    const admin = createClient(url!, serviceKey!, {
+    const admin = createClient(url!, secretKey!, {
       auth: { persistSession: false, autoRefreshToken: false },
     });
 
@@ -43,7 +43,7 @@ describe(
       });
       if (error) throw error;
 
-      const client = createClient(url!, anonKey!, {
+      const client = createClient(url!, publishableKey!, {
         auth: { persistSession: false, autoRefreshToken: false },
       });
       const { error: signInError } = await client.auth.signInWithPassword({
@@ -133,7 +133,7 @@ describe(
     });
 
     test("rejects anonymous reads entirely", async () => {
-      const anon = createClient(url!, anonKey!, {
+      const anon = createClient(url!, publishableKey!, {
         auth: { persistSession: false, autoRefreshToken: false },
       });
 
