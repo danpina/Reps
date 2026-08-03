@@ -92,9 +92,14 @@ export default async function LessonPage({
             {lesson.mission_text}
           </p>
           <p className="mt-3 text-[13px] leading-relaxed text-ink-muted">
-            Logging comes in the next phase. For now, go and do it — the real
-            conversation is the part that counts.
+            Go and do it, then log what happened. It counts either way.
           </p>
+          <Link
+            href={`/log?lesson=${lesson.id}`}
+            className="mt-4 inline-flex rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
+          >
+            Log this rep
+          </Link>
         </section>
       </article>
 
