@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { requireUser } from "@/lib/auth/dal";
 import { getSkills } from "@/lib/curriculum/queries";
-import { getFieldLog, getTotals } from "@/lib/progress/queries";
+import { getBadges, getFieldLog, getTotals } from "@/lib/progress/queries";
 import { WENT_LABELS } from "@/lib/progress/rules";
 
 export const metadata = { title: "Field log — Reps" };
@@ -33,10 +33,21 @@ function dayLabel(iso: string): string {
 export default async function FieldLogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ skill?: string; went?: string; logged?: string }>;
+  searchParams: Promise<{
+    skill?: string;
+    went?: string;
+    logged?: string;
+    badges?: string;
+  }>;
 }) {
   await requireUser();
   const params = await searchParams;
+
+  const justEarned = params.badges
+    ? (await getBadges()).earned.filter((b) =>
+        params.badges!.split(",").includes(b.slug),
+      )
+    : [];
 
   const wentFilter = Number(params.went);
   const entries = await getFieldLog({
@@ -91,12 +102,30 @@ export default async function FieldLogPage({
       </header>
 
       {params.logged ? (
-        <p
+        <div
           role="status"
-          className="mt-5 rounded border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3 text-sm text-ink"
+          className="mt-5 rounded border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3"
         >
-          Logged. That one counts whether it went well or not.
-        </p>
+          <p className="text-sm text-ink">
+            Logged. That one counts whether it went well or not.
+          </p>
+
+          {justEarned.length > 0 ? (
+            <div className="mt-3 border-t border-[var(--accent)]/30 pt-3">
+              <p className="tabular text-xs uppercase tracking-[0.14em] text-[var(--accent)]">
+                {justEarned.length === 1 ? "Badge earned" : "Badges earned"}
+              </p>
+              <ul className="mt-2 flex flex-col gap-1.5">
+                {justEarned.map((badge) => (
+                  <li key={badge.id} className="text-sm text-ink">
+                    <span className="font-medium">{badge.name}</span>
+                    <span className="text-ink-muted"> — {badge.description}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </div>
       ) : null}
 
       {entries.length > 0 || isFiltered ? (
