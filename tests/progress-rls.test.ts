@@ -187,6 +187,61 @@ describe(
       assert.notEqual(error, null);
     });
 
+    test("does not let user A read user B's badges", async () => {
+      const { data: badge, error } = await admin
+        .from("badges")
+        .select("id")
+        .limit(1)
+        .single();
+
+      assert.equal(error, null, "the gamification migration must be applied");
+      assert.ok(badge);
+
+      await bob.client
+        .from("user_badges")
+        .insert({ user_id: bob.id, badge_id: badge.id });
+
+      const { data } = await alice.client
+        .from("user_badges")
+        .select("badge_id");
+
+      assert.deepEqual(data, [], "badges earned are private");
+    });
+
+    test("does not let user A award a badge to user B", async () => {
+      const { data: badge } = await admin
+        .from("badges")
+        .select("id")
+        .limit(1)
+        .single();
+
+      assert.ok(badge, "the gamification migration must be applied");
+
+      const { error } = await alice.client
+        .from("user_badges")
+        .insert({ user_id: bob.id, badge_id: badge.id });
+
+      assert.notEqual(error, null);
+    });
+
+    test("does not let user A rewrite user B's rep", async () => {
+      const { data } = await alice.client
+        .from("field_logs")
+        .update({ rewrite: "tampered rewrite" })
+        .eq("id", bobLogId)
+        .select();
+
+      assert.deepEqual(data, []);
+
+      const { data: after } = await bob.client
+        .from("field_logs")
+        .select("rewrite")
+        .eq("id", bobLogId)
+        .single();
+
+      assert.equal(after?.rewrite, null);
+    });
+
     test("rejects anonymous reads of the field log", async () => {
       const anon = createClient(url!, publishableKey!, {
         auth: { persistSession: false, autoRefreshToken: false },

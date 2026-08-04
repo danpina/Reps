@@ -37,6 +37,18 @@ describe("XP economy", () => {
       "reading and rehearsing everything must not be enough to reach level 10",
     );
   });
+
+  // Reflecting on a conversation must never be worth as much as having one.
+  test("a rewrite is worth far less than the rep it reflects on", () => {
+    assert.ok(
+      XP_AWARD.rewrite < XP_AWARD.mission / 4,
+      "a weekly review answer should not approach the value of a logged rep",
+    );
+    assert.ok(
+      XP_AWARD.rewrite > XP_AWARD.theory,
+      "writing a better line is worth more than reading a card",
+    );
+  });
 });
 
 describe("levels", () => {

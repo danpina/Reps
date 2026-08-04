@@ -1,7 +1,8 @@
 import "server-only";
 
 import { createClient } from "@/lib/supabase/server";
-import { levelProgress, type LevelProgress } from "./rules";
+import type { Badge } from "./badges";
+import { levelProgress, toIsoDate, weekStart, type LevelProgress } from "./rules";
 
 export type FieldLogEntry = {
   id: string;
@@ -110,4 +111,100 @@ export async function getSkillStandings(): Promise<SkillStanding[]> {
     reps: repsBySkill.get(skill.id) ?? 0,
     progress: levelProgress(xpBySkill.get(skill.id) ?? 0),
   }));
+}
+
+export type HeatmapDay = { date: string; count: number };
+
+/**
+ * One entry per day for the last `weeks` weeks, oldest first, starting on a
+ * Monday so the grid has clean columns.
+ */
+export async function getHeatmap(weeks = 12): Promise<HeatmapDay[]> {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("field_logs")
+    .select("logged_at")
+    .order("logged_at");
+
+  const counts = new Map<string, number>();
+  for (const row of data ?? []) {
+    const day = toIsoDate(new Date(row.logged_at));
+    counts.set(day, (counts.get(day) ?? 0) + 1);
+  }
+
+  const today = new Date();
+  const start = new Date(weekStart(toIsoDate(today)));
+  start.setDate(start.getDate() - (weeks - 1) * 7);
+
+  const days: HeatmapDay[] = [];
+  for (const cursor = new Date(start); cursor <= today; cursor.setDate(cursor.getDate() + 1)) {
+    const date = toIsoDate(cursor);
+    days.push({ date, count: counts.get(date) ?? 0 });
+  }
+
+  return days;
+}
+
+export type EarnedBadge = Badge & { earned_at: string };
+
+export async function getBadges(): Promise<{
+  earned: EarnedBadge[];
+  locked: Badge[];
+}> {
+  const supabase = await createClient();
+
+  const [{ data: all }, { data: mine }] = await Promise.all([
+    supabase.from("badges").select("*").order("sort_order"),
+    supabase.from("user_badges").select("badge_id, earned_at"),
+  ]);
+
+  const earnedAt = new Map(
+    (mine ?? []).map((r) => [r.badge_id, r.earned_at as string]),
+  );
+
+  const badges = (all ?? []) as Badge[];
+  return {
+    earned: badges
+      .filter((b) => earnedAt.has(b.id))
+      .map((b) => ({ ...b, earned_at: earnedAt.get(b.id)! })),
+    locked: badges.filter((b) => !earnedAt.has(b.id)),
+  };
+}
+
+export type WeeklyReview = {
+  weekStart: string;
+  reps: number;
+  skillsTouched: string[];
+  /** The worst-rated rep of the week that has not been rewritten yet. */
+  worstRep: FieldLogEntry | null;
+};
+
+export async function getWeeklyReview(): Promise<WeeklyReview> {
+  const supabase = await createClient();
+
+  const start = weekStart(toIsoDate(new Date()));
+
+  const { data } = await supabase
+    .from("field_logs")
+    .select(
+      "id, skill_id, lesson_id, mission_text, context_note, went, reflection, rewrite, xp_awarded, logged_at, skills(slug, name)",
+    )
+    .gte("logged_at", `${start}T00:00:00`)
+    .order("went")
+    .order("logged_at", { ascending: false });
+
+  const entries = (data ?? []) as unknown as (FieldLogEntry & {
+    rewrite: string | null;
+  })[];
+
+  return {
+    weekStart: start,
+    reps: entries.length,
+    skillsTouched: [
+      ...new Set(entries.map((e) => e.skills?.name).filter(Boolean) as string[]),
+    ],
+    // Ordered by `went` ascending, so the first unrewritten entry is the worst.
+    worstRep: entries.find((e) => !e.rewrite?.trim()) ?? null,
+  };
 }

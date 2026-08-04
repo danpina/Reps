@@ -12,6 +12,7 @@ import {
   toIsoDate,
   type StreakState,
 } from "@/lib/progress/rules";
+import { awardBadges } from "@/lib/progress/snapshot";
 
 export type LogRepState = { error?: string };
 
@@ -77,9 +78,16 @@ export async function logRep(
     advanceStreak(supabase, user.id, today),
   ]);
 
+  // Runs after the streak, so a streak badge can be earned by the rep that
+  // just extended it.
+  const earned = await awardBadges(supabase, user.id);
+
   revalidatePath("/field-log");
   revalidatePath("/today");
-  redirect("/field-log?logged=1");
+
+  const params = new URLSearchParams({ logged: "1" });
+  if (earned.length > 0) params.set("badges", earned.map((b) => b.slug).join(","));
+  redirect(`/field-log?${params}`);
 }
 
 type Client = Awaited<ReturnType<typeof createClient>>;

@@ -17,6 +17,8 @@ export const MAX_LEVEL = 10;
 export const XP_AWARD = {
   mission: 50,
   roleplay: 15,
+  /** Answering "what would you say instead?" in the weekly review. */
+  rewrite: 10,
   theory: 5,
 } as const;
 
