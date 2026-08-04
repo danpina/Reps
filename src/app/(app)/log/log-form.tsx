@@ -93,6 +93,9 @@ export function LogForm({
                 key={value}
                 className={[
                   "cursor-pointer rounded border px-3 py-3 text-center transition-colors",
+                  // The input itself is sr-only, so the focus ring has to be
+                  // drawn on the label or keyboard users see nothing.
+                  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-2 has-[:focus-visible]:outline-[var(--focus)]",
                   selected
                     ? "border-[var(--accent)] bg-[var(--accent-soft)]"
                     : "border-[var(--rule-strong)] hover:bg-[var(--paper-raised)]",

@@ -42,12 +42,20 @@ export function ComprehensionBeat({ check }: { check: ComprehensionCheck }) {
               >
                 <span className="flex items-baseline gap-2.5">
                   {answered ? (
-                    <span
-                      aria-hidden
-                      className="tabular text-xs text-ink-faint"
-                    >
-                      {option.correct ? "✓" : isPicked ? "×" : " "}
-                    </span>
+                    <>
+                      <span aria-hidden className="tabular text-xs text-ink-faint">
+                        {option.correct ? "✓" : isPicked ? "×" : " "}
+                      </span>
+                      {/* The tick and cross are the only visual signal, so the
+                          same information is given to screen readers here. */}
+                      <span className="sr-only">
+                        {option.correct
+                          ? isPicked
+                            ? "Correct, and this was your answer."
+                            : "This was the correct answer."
+                          : "Your answer, which was not correct."}
+                      </span>
+                    </>
                   ) : null}
                   <span className="text-ink">{option.text}</span>
                 </span>

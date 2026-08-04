@@ -1,5 +1,7 @@
+import { redirect } from "next/navigation";
+
 import { AppNav } from "@/components/app-nav";
-import { requireUser } from "@/lib/auth/dal";
+import { getProfile, requireUser } from "@/lib/auth/dal";
 
 export default async function AppLayout({
   children,
@@ -10,11 +12,18 @@ export default async function AppLayout({
   // every screen in this group is behind it, so a new page cannot forget.
   await requireUser();
 
+  // Onboarding lives outside this group precisely so this redirect cannot loop
+  // through its own layout.
+  const profile = await getProfile();
+  if (!profile?.onboarding_context) redirect("/welcome");
+
   return (
     <div className="min-h-dvh">
       <AppNav />
-      {/* Bottom padding clears the phone tab bar. */}
-      <div className="pb-24 sm:pb-0">{children}</div>
+      {/* Target for the skip link, and bottom padding clears the phone tabs. */}
+      <div id="main" className="pb-24 sm:pb-0">
+        {children}
+      </div>
     </div>
   );
 }

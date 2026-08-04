@@ -3,7 +3,15 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/env";
 
-const PUBLIC_ROUTES = ["/sign-in", "/sign-up", "/check-email", "/auth/callback"];
+// /offline is public because the service worker precaches it. If it redirected
+// to sign-in, the cached "offline" page would be a sign-in form.
+const PUBLIC_ROUTES = [
+  "/sign-in",
+  "/sign-up",
+  "/check-email",
+  "/auth/callback",
+  "/offline",
+];
 
 export async function proxy(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -56,5 +64,9 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
+  // sw.js is excluded because a service worker must be served from the origin
+  // root without a redirect, or registration fails.
+  matcher: [
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|sw.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)",
+  ],
 };
