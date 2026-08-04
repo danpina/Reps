@@ -23,5 +23,30 @@ export const SUPABASE_PUBLISHABLE_KEY = required(
   process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY,
 );
 
-export const SITE_URL =
-  process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+/**
+ * Where magic links and confirmation emails come back to.
+ *
+ * Only ever read on the server, in the auth actions, so the Vercel variables
+ * below do not need a NEXT_PUBLIC_ prefix. Do not use this in a client
+ * component: it would be undefined there.
+ *
+ * Vercel's production URL is preferred over VERCEL_URL because VERCEL_URL is
+ * unique per deployment, and Supabase only redirects to URLs on its allow
+ * list. Sending every preview deployment's links to production is far less
+ * confusing than links that silently fail.
+ */
+function resolveSiteUrl(): string {
+  const explicit = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+  if (explicit) return explicit.replace(/\/$/, "");
+
+  const production = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (production) return `https://${production}`;
+
+  const deployment = process.env.VERCEL_URL;
+  if (deployment) return `https://${deployment}`;
+
+  // Matches the port in .claude/launch.json, so magic links work in dev.
+  return `http://localhost:${process.env.PORT ?? 3002}`;
+}
+
+export const SITE_URL = resolveSiteUrl();

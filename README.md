@@ -6,13 +6,13 @@ repetitions — not a replacement for them.
 
 ## Status
 
-Phase 1 (foundations) is in place: auth, the `profiles` table with RLS, and the
-cross-user isolation test.
+Built: auth and RLS, the full nine-track curriculum (45 lessons), field
+missions and the field log, XP and streaks, badges, the dashboard with a
+calendar heatmap, and the weekly review.
 
-Phase 2 (curriculum) is partly done. The schema, all nine skill rows, and the
-five lessons of track 1 (Openers) are written, along with the skill picker and
-the theory card reader. The remaining eight tracks are still to be written. The
-field log, roleplay, and progress screens come after that.
+Remaining: roleplay and the feedback engine (the only part with a per-call
+cost), and polish — PWA manifest, offline shell, onboarding flow, and a
+systematic accessibility pass.
 
 ## Stack
 
@@ -30,9 +30,13 @@ lives in [`src/proxy.ts`](src/proxy.ts).
    cp .env.example .env.local
    ```
 
-   `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` come from the
-   project's API settings. `SUPABASE_SERVICE_ROLE_KEY` is only read by the test
-   suite — it bypasses RLS, so keep it out of any `NEXT_PUBLIC_` variable.
+   `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` come
+   from the project's API settings. `SUPABASE_SECRET_KEY` is only read by the
+   test suite — it bypasses RLS, so it must never gain a `NEXT_PUBLIC_` prefix.
+
+   The `NEXT_PUBLIC_` prefix is load-bearing rather than decorative: it is what
+   makes Next.js inline a value into the client bundle. Without it the browser
+   Supabase client receives `undefined` and sign-in fails at runtime.
 
 2. Apply the migrations:
 
@@ -62,6 +66,26 @@ lives in [`src/proxy.ts`](src/proxy.ts).
 | `npm test` | RLS and integration tests |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint |
+
+## Deploying
+
+Vercel, from the GitHub repo. Two things are easy to miss.
+
+**Environment variables.** Set `NEXT_PUBLIC_SUPABASE_URL`,
+`NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SUPABASE_SECRET_KEY` in the Vercel
+project. `NEXT_PUBLIC_SITE_URL` is optional: without it,
+[`src/lib/env.ts`](src/lib/env.ts) falls back to Vercel's own
+`VERCEL_PROJECT_PRODUCTION_URL`, so email links point at the production domain
+rather than at `localhost`.
+
+**Supabase redirect allow-list.** Authentication → URL Configuration. Set the
+Site URL to the production domain and add `https://<domain>/auth/callback` to
+the redirect list. Magic links and email confirmations fail silently without
+this, because Supabase will only redirect to URLs it has been told about.
+
+Preview deployments deliberately send their email links to the production
+domain. `VERCEL_URL` is unique per deployment, so preview links would never be
+on the allow-list and would fail every time.
 
 ## Security model
 
