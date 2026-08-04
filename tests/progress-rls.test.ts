@@ -80,6 +80,7 @@ describe(
           went: 2,
           reflection: "bob's private reflection",
           xp_awarded: 50,
+          logged_date: "2026-08-04",
         })
         .select("id")
         .single();
@@ -130,14 +131,22 @@ describe(
       assert.deepEqual(data, []);
     });
 
+    // logged_date is supplied so this fails on the RLS policy rather than on a
+    // NOT NULL constraint, which would pass for the wrong reason.
     test("does not let user A insert a log owned by user B", async () => {
       const { error } = await alice.client.from("field_logs").insert({
         user_id: bob.id,
         skill_id: skillId,
         went: 1,
+        logged_date: "2026-08-04",
       });
 
       assert.notEqual(error, null, "writing a row as another user must fail");
+      assert.match(
+        `${error?.code} ${error?.message}`,
+        /42501|row-level security/i,
+        "must be refused by RLS, not by a column constraint",
+      );
     });
 
     test("does not let user A edit user B's log", async () => {
