@@ -49,3 +49,4 @@ next-env.d.ts
 
 # Convenience bundle of all migrations, regenerated on demand
 supabase/APPLY_ALL.local.sql
+supabase/APPLY_TRACKS_2_9.local.sql
