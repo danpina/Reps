@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BackLink } from "@/components/back-link";
 import { requireUser } from "@/lib/auth/dal";
 import { getSkillBySlug } from "@/lib/curriculum/queries";
 
@@ -18,12 +19,7 @@ export default async function SkillPage({
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="border-b border-rule pb-5">
-        <Link
-          href="/skills"
-          className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint underline-offset-4 hover:underline"
-        >
-          All skills
-        </Link>
+        <BackLink href="/skills" label="All skills" />
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
           {skill.name}
         </h1>

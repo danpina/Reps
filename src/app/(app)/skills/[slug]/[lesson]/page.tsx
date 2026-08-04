@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { BackLink } from "@/components/back-link";
 import { Prose } from "@/components/prose";
 import { requireUser } from "@/lib/auth/dal";
 import { getLesson, getSkillBySlug } from "@/lib/curriculum/queries";
@@ -35,12 +36,7 @@ export default async function LessonPage({
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="border-b border-rule pb-5">
-        <Link
-          href={`/skills/${skill.slug}`}
-          className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint underline-offset-4 hover:underline"
-        >
-          {skill.name}
-        </Link>
+        <BackLink href={`/skills/${skill.slug}`} label={skill.name} />
         <p className="tabular mt-3 text-xs text-ink-faint">
           Lesson {sortOrder} of {total}
         </p>

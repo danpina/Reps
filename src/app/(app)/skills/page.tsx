@@ -12,13 +12,7 @@ export default async function SkillsPage() {
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="border-b border-rule pb-5">
-        <Link
-          href="/today"
-          className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint underline-offset-4 hover:underline"
-        >
-          Reps
-        </Link>
-        <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
+        <h1 className="text-xl font-semibold tracking-tight text-ink">
           Pick something to work on
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">

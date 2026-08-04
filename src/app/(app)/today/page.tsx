@@ -18,15 +18,10 @@ export default async function TodayPage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
-      <header className="flex items-baseline justify-between border-b border-rule pb-5">
-        <div>
-          <p className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
-            Reps
-          </p>
-          <h1 className="mt-2 text-xl font-semibold tracking-tight text-ink">
-            {name ? `Good to see you, ${name}` : "Good to see you"}
-          </h1>
-        </div>
+      <header className="flex items-baseline justify-between gap-4 border-b border-rule pb-5">
+        <h1 className="text-xl font-semibold tracking-tight text-ink">
+          {name ? `Good to see you, ${name}` : "Good to see you"}
+        </h1>
         <form action={signOut}>
           <Button variant="quiet" type="submit" className="px-3 py-1.5 text-xs">
             Sign out
@@ -54,16 +49,10 @@ export default async function TodayPage() {
             Log a rep
           </Link>
           <Link
-            href="/skills"
+            href={totals.repsLogged === 0 ? "/skills" : "/field-log"}
             className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper)]"
           >
-            Browse skills
-          </Link>
-          <Link
-            href="/field-log"
-            className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper)]"
-          >
-            Field log
+            {totals.repsLogged === 0 ? "Browse skills" : "See the log"}
           </Link>
         </div>
 
