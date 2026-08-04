@@ -67,11 +67,16 @@ export async function logRep(
     reflection,
     xp_awarded: xp,
     logged_at: new Date().toISOString(),
+    // The user's own calendar day, so grouping never depends on the server's
+    // timezone.
+    logged_date: today,
   });
 
   if (insertError) {
     return { error: `That did not save: ${insertError.message}` };
   }
+
+  await rememberTimezone(supabase, user.id, formData.get("timezone"));
 
   await Promise.all([
     awardSkillXp(supabase, user.id, skillId, xp, lessonId),
@@ -91,6 +96,30 @@ export async function logRep(
 }
 
 type Client = Awaited<ReturnType<typeof createClient>>;
+
+/**
+ * Stores the browser's IANA timezone on the profile, so the server can work out
+ * what "today" means for this user rather than for itself. Best effort: a
+ * failure here must never cost the user their rep.
+ */
+async function rememberTimezone(
+  supabase: Client,
+  userId: string,
+  submitted: FormDataEntryValue | null,
+) {
+  if (typeof submitted !== "string") return;
+  const timezone = submitted.trim();
+  // Loose sanity check on the IANA shape, e.g. Europe/Berlin.
+  if (!timezone || timezone.length > 64 || !/^[A-Za-z0-9+_\-/]+$/.test(timezone)) {
+    return;
+  }
+
+  try {
+    await supabase.from("profiles").update({ timezone }).eq("id", userId);
+  } catch {
+    // Ignored on purpose.
+  }
+}
 
 async function awardSkillXp(
   supabase: Client,

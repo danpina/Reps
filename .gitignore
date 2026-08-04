@@ -51,3 +51,4 @@ next-env.d.ts
 supabase/APPLY_ALL.local.sql
 supabase/APPLY_TRACKS_2_9.local.sql
 supabase/APPLY_PHASE5.local.sql
+supabase/APPLY_TIMEZONE_FIX.local.sql

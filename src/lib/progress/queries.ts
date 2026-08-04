@@ -14,6 +14,8 @@ export type FieldLogEntry = {
   reflection: string | null;
   xp_awarded: number;
   logged_at: string;
+  /** The user's own calendar day, independent of the server's timezone. */
+  logged_date: string;
   skills: { slug: string; name: string } | null;
 };
 
@@ -30,7 +32,7 @@ export async function getFieldLog(
   let query = supabase
     .from("field_logs")
     .select(
-      "id, skill_id, lesson_id, mission_text, context_note, went, reflection, xp_awarded, logged_at, skills(slug, name)",
+      "id, skill_id, lesson_id, mission_text, context_note, went, reflection, xp_awarded, logged_at, logged_date, skills(slug, name)",
     )
     .order("logged_at", { ascending: false });
 
@@ -124,13 +126,13 @@ export async function getHeatmap(weeks = 12): Promise<HeatmapDay[]> {
 
   const { data } = await supabase
     .from("field_logs")
-    .select("logged_at")
-    .order("logged_at");
+    .select("logged_date")
+    .order("logged_date");
 
+  // logged_date is already the user's own calendar day, so no conversion here.
   const counts = new Map<string, number>();
   for (const row of data ?? []) {
-    const day = toIsoDate(new Date(row.logged_at));
-    counts.set(day, (counts.get(day) ?? 0) + 1);
+    counts.set(row.logged_date, (counts.get(row.logged_date) ?? 0) + 1);
   }
 
   const today = new Date();
@@ -188,9 +190,11 @@ export async function getWeeklyReview(): Promise<WeeklyReview> {
   const { data } = await supabase
     .from("field_logs")
     .select(
-      "id, skill_id, lesson_id, mission_text, context_note, went, reflection, rewrite, xp_awarded, logged_at, skills(slug, name)",
+      "id, skill_id, lesson_id, mission_text, context_note, went, reflection, rewrite, xp_awarded, logged_at, logged_date, skills(slug, name)",
     )
-    .gte("logged_at", `${start}T00:00:00`)
+    // Compared against the user's own calendar day, so a rep logged late on a
+    // Sunday evening cannot fall into next week on a UTC host.
+    .gte("logged_date", start)
     .order("went")
     .order("logged_at", { ascending: false });
 

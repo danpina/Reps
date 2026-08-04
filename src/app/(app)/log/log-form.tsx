@@ -35,6 +35,11 @@ export function LogForm({
         name="local_date"
         value={new Date().toLocaleDateString("en-CA")}
       />
+      <input
+        type="hidden"
+        name="timezone"
+        value={Intl.DateTimeFormat().resolvedOptions().timeZone ?? ""}
+      />
       {lessonId ? <input type="hidden" name="lesson_id" value={lessonId} /> : null}
       {missionText ? (
         <input type="hidden" name="mission_text" value={missionText} />

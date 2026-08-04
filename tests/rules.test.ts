@@ -10,6 +10,7 @@ import {
   daysBetween,
   levelForXp,
   levelProgress,
+  toIsoDate,
   weekStart,
   type StreakState,
 } from "../src/lib/progress/rules.ts";
@@ -100,6 +101,24 @@ describe("levels", () => {
 });
 
 describe("date helpers", () => {
+  // The bug this guards against: a rep logged at 00:00 local is 22:00 UTC the
+  // previous day. Deriving the calendar day from a UTC timestamp put it in the
+  // wrong bucket on a UTC host, so the heatmap and the field log's day
+  // headings disagreed between a laptop and production.
+  test("toIsoDate uses local calendar fields, not UTC", () => {
+    const justAfterMidnight = new Date(2026, 7, 4, 0, 0, 1);
+    assert.equal(toIsoDate(justAfterMidnight), "2026-08-04");
+
+    const justBeforeMidnight = new Date(2026, 7, 4, 23, 59, 59);
+    assert.equal(toIsoDate(justBeforeMidnight), "2026-08-04");
+  });
+
+  test("a day is one day regardless of the time within it", () => {
+    const early = toIsoDate(new Date(2026, 7, 4, 0, 30));
+    const late = toIsoDate(new Date(2026, 7, 4, 23, 30));
+    assert.equal(daysBetween(early, late), 0, "same day, whatever the hour");
+  });
+
   test("counts days across a month boundary", () => {
     assert.equal(daysBetween("2026-01-31", "2026-02-01"), 1);
     assert.equal(daysBetween("2026-02-28", "2026-03-01"), 1); // 2026 is not a leap year

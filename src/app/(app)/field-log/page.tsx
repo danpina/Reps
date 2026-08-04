@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { requireUser } from "@/lib/auth/dal";
+import { getProfile, requireUser } from "@/lib/auth/dal";
 import { getSkills } from "@/lib/curriculum/queries";
 import { getBadges, getFieldLog, getTotals } from "@/lib/progress/queries";
 import { WENT_LABELS } from "@/lib/progress/rules";
@@ -13,15 +13,21 @@ const WENT_TONE: Record<number, string> = {
   3: "border-[var(--accent)] text-[var(--accent)]",
 };
 
-function dayLabel(iso: string): string {
-  const date = new Date(iso);
-  const today = new Date();
-  const yesterday = new Date();
-  yesterday.setDate(today.getDate() - 1);
+/**
+ * `loggedDate` is a plain yyyy-mm-dd in the user's own timezone. It is parsed
+ * as local rather than passed to `new Date(iso)`, which would read it as UTC
+ * and shift the label by a day for anyone west of Greenwich.
+ */
+function dayLabel(loggedDate: string, todayIso: string): string {
+  if (loggedDate === todayIso) return "Today";
 
-  const same = (a: Date, b: Date) => a.toDateString() === b.toDateString();
-  if (same(date, today)) return "Today";
-  if (same(date, yesterday)) return "Yesterday";
+  const [y, m, d] = loggedDate.split("-").map(Number);
+  const date = new Date(y, m - 1, d);
+
+  const [ty, tm, td] = todayIso.split("-").map(Number);
+  const yesterday = new Date(ty, tm - 1, td - 1);
+
+  if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
 
   return date.toLocaleDateString(undefined, {
     weekday: "long",
@@ -41,6 +47,7 @@ export default async function FieldLogPage({
   }>;
 }) {
   await requireUser();
+  const profile = await getProfile();
   const params = await searchParams;
 
   const justEarned = params.badges
@@ -58,12 +65,18 @@ export default async function FieldLogPage({
   const [totals, skills] = await Promise.all([getTotals(), getSkills()]);
   const isFiltered = Boolean(params.skill || params.went);
 
-  // Group by calendar day so the log reads as a diary rather than a list.
+  // Group by the user's own calendar day so the log reads as a diary rather
+  // than a list, and so the headings do not move with the server's timezone.
   const days = new Map<string, typeof entries>();
   for (const entry of entries) {
-    const key = new Date(entry.logged_at).toDateString();
+    const key = entry.logged_date;
     days.set(key, [...(days.get(key) ?? []), entry]);
   }
+
+  // "Today" has to mean the user's today, not the host's. The timezone is
+  // captured from the browser whenever a rep is logged.
+  const zone = profile?.timezone ?? undefined;
+  const todayIso = new Date().toLocaleDateString("en-CA", { timeZone: zone });
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
@@ -162,7 +175,7 @@ export default async function FieldLogPage({
           {[...days.entries()].map(([day, dayEntries]) => (
             <section key={day} className="border-b border-rule py-6">
               <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
-                {dayLabel(dayEntries[0].logged_at)}
+                {dayLabel(day, todayIso)}
               </h2>
 
               <ol className="mt-4 flex flex-col gap-5">
@@ -184,6 +197,7 @@ export default async function FieldLogPage({
                         {new Date(entry.logged_at).toLocaleTimeString(undefined, {
                           hour: "2-digit",
                           minute: "2-digit",
+                          timeZone: zone,
                         })}
                       </span>
                     </div>
