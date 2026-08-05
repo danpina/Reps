@@ -133,6 +133,23 @@ describe("curriculum seed content", () => {
         );
       });
 
+      // A mission is one real conversation. Across 45 lessons, asking for
+      // three each turns the curriculum into 135 reps and makes every mission
+      // read as a chore.
+      test("missions ask for one conversation, not several", () => {
+        const sql = readFileSync(join(MIGRATIONS, file), "utf8");
+        const missions = [...sql.matchAll(/\$md\$([^$]*?)\$md\$/g)]
+          .map(([, text]) => text.trim())
+          .filter((text) => /\blog\b/i.test(text) && text.length < 400);
+
+        for (const mission of missions) {
+          assert.ok(
+            !/\b(three|four|five)\s+(conversations|people)\b/i.test(mission),
+            `mission asks for several conversations: "${mission.slice(0, 80)}…"`,
+          );
+        }
+      });
+
       test("rubric criteria keys are present and unique", () => {
         for (const rubric of rubrics) {
           assert.ok(rubric.criteria.length > 0);

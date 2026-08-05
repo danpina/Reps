@@ -176,7 +176,7 @@ The warm part is where almost everyone underinvests. *Nice to meet you* is not w
       "If the user announces they are leaving and then keeps talking, become slightly confused and check whether they are staying."
     ]
   }$j$::jsonb,
-  $md$Today, end three conversations with a reason, one specific warm thing, and an actual departure. Log the specific thing you said in one of them.$md$
+  $md$Today, end one conversation with a reason, one specific warm thing, and an actual departure. Log the specific thing you said.$md$
 ),
 (
   (select id from public.skills where slug = 'exits'),

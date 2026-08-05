@@ -87,7 +87,7 @@ That stop is the whole technique. A remark with no pause is a comment. A remark 
       "Do not volunteer new topics in the first two turns. Let the user steer."
     ]
   }$j$::jsonb,
-  $md$Start three conversations today with an Environment opener, something you and the other person are both already in. Say it, then stop talking. Log all three, including the ones that went nowhere.$md$
+  $md$Start one conversation today with an Environment opener, something you and the other person are both already in. Say it, then stop talking. Log it even if it went nowhere.$md$
 ),
 (
   (select id from public.skills where slug = 'openers'),
@@ -170,7 +170,7 @@ This is not caution for its own sake. Openers land far better on someone who has
       "If the user pushes for a long conversation, stay polite but keep replies clipped."
     ]
   }$j$::jsonb,
-  $md$Today, before you open a single conversation, take two seconds to check whether the person is actually available. Do it three times. Log what signal you read and whether your read turned out to be right.$md$
+  $md$Before you open a conversation today, take two seconds to check whether the person is actually available. Log what signal you read and whether your read turned out to be right.$md$
 ),
 (
   (select id from public.skills where slug = 'openers'),
@@ -253,7 +253,7 @@ You are not banning questions. You are making sure the first thing out of your m
       "Never point out what the user should have done."
     ]
   }$j$::jsonb,
-  $md$Today, open three conversations with a statement rather than a question. No question marks in your first line. Log what you said and what came back.$md$
+  $md$Today, open one conversation with a statement rather than a question. No question mark in your first line. Log what you said and what came back.$md$
 ),
 (
   (select id from public.skills where slug = 'openers'),
@@ -419,5 +419,5 @@ There is almost always one word carrying more weight than the rest — a place, 
       "If the user ignores it and opens a new topic, answer flatly and briefly, and let the conversation cool a little."
     ]
   }$j$::jsonb,
-  $md$Today, in three conversations, make your second line come out of their answer instead of your head. Go for the word with feeling in it. Log the word you picked and where it led.$md$
+  $md$In one conversation today, make your second line come out of their answer instead of your head. Go for the word with feeling in it. Log the word you picked and where it led.$md$
 );

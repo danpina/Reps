@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth/dal";
 import { getLesson, getSkillBySlug } from "@/lib/curriculum/queries";
 import { shuffle } from "@/lib/curriculum/shuffle";
 import { ComprehensionBeat } from "./comprehension-beat";
+import { MarkRead } from "./mark-read";
 import { Rehearsal } from "./rehearsal";
 
 export default async function LessonPage({
@@ -36,6 +37,7 @@ export default async function LessonPage({
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
+      <MarkRead lessonId={lesson.id} />
       <header className="border-b border-rule pb-5">
         <BackLink href={`/skills/${skill.slug}`} label={skill.name} />
         <p className="tabular mt-3 text-xs text-ink-faint">

@@ -9,18 +9,20 @@ import {
   getHeatmap,
   getSkillStandings,
   getTotals,
+  getResumePoint,
   getWeeklyReview,
 } from "@/lib/progress/queries";
 
 export default async function TodayPage() {
   const user = await requireUser();
-  const [profile, totals, standings, heatmap, badges, review] = await Promise.all([
+  const [profile, totals, standings, heatmap, badges, review, resume] = await Promise.all([
     getProfile(),
     getTotals(),
     getSkillStandings(),
     getHeatmap(),
     getBadges(),
     getWeeklyReview(),
+    getResumePoint(),
   ]);
 
   const name = profile?.display_name?.trim();
@@ -93,6 +95,34 @@ export default async function TodayPage() {
           </div>
         ) : null}
       </section>
+
+      {resume ? (
+        <section className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-5">
+          <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
+            Pick up where you left off
+          </h2>
+          <p className="mt-3 text-sm text-ink-muted">{resume.skillName}</p>
+          <p className="mt-0.5 text-base font-medium text-ink">
+            Lesson {resume.lessonSortOrder} · {resume.lessonTitle}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <Link
+              href={`/skills/${resume.skillSlug}/${resume.lessonSortOrder}`}
+              className="rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
+            >
+              Back to this lesson
+            </Link>
+            {resume.nextSortOrder ? (
+              <Link
+                href={`/skills/${resume.skillSlug}/${resume.nextSortOrder}`}
+                className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper)]"
+              >
+                Next lesson
+              </Link>
+            ) : null}
+          </div>
+        </section>
+      ) : null}
 
       {hasReview ? (
         <section className="mt-8 rounded border border-[var(--flag)] bg-[var(--flag-soft)] p-5">

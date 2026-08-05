@@ -115,6 +115,63 @@ export async function getSkillStandings(): Promise<SkillStanding[]> {
   }));
 }
 
+export type ResumePoint = {
+  skillSlug: string;
+  skillName: string;
+  lessonTitle: string;
+  lessonSortOrder: number;
+  /** The next lesson in the track, when there is one. */
+  nextSortOrder: number | null;
+};
+
+/**
+ * The lesson to offer getting back into.
+ *
+ * Without this the dashboard gave no way back to whatever you were part-way
+ * through, and the only route was remembering the URL.
+ */
+export async function getResumePoint(): Promise<ResumePoint | null> {
+  const supabase = await createClient();
+
+  const { data } = await supabase
+    .from("user_skill_state")
+    .select(
+      "updated_at, current_lesson_id, lessons!user_skill_state_current_lesson_id_fkey(title, sort_order, skill_id, skills(slug, name))",
+    )
+    .not("current_lesson_id", "is", null)
+    .order("updated_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!data?.current_lesson_id) return null;
+
+  const lesson = (data as unknown as {
+    lessons: {
+      title: string;
+      sort_order: number;
+      skill_id: string;
+      skills: { slug: string; name: string };
+    } | null;
+  }).lessons;
+
+  if (!lesson) return null;
+
+  const { count } = await supabase
+    .from("lessons")
+    .select("id", { count: "exact", head: true })
+    .eq("skill_id", lesson.skill_id);
+
+  const total = count ?? 0;
+
+  return {
+    skillSlug: lesson.skills.slug,
+    skillName: lesson.skills.name,
+    lessonTitle: lesson.title,
+    lessonSortOrder: lesson.sort_order,
+    nextSortOrder: lesson.sort_order < total ? lesson.sort_order + 1 : null,
+  };
+}
+
 export type HeatmapDay = { date: string; count: number };
 
 /**
