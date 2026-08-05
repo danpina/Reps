@@ -4,6 +4,7 @@ import {
   requiredLevelForLesson,
 } from "@/lib/roleplay/limits";
 import { startRehearsal } from "@/app/(app)/rehearse/start/actions";
+import { XP_AWARD } from "@/lib/progress/rules";
 
 /**
  * The rehearsal entry point on a lesson.
@@ -67,7 +68,7 @@ export async function Rehearsal({
               ? " They are hard work on purpose."
               : ""}
           </p>
-          <form action={startRehearsal} className="mt-4">
+          <form action={startRehearsal} className="mt-4 flex items-center gap-3">
             <input type="hidden" name="lesson_id" value={lessonId} />
             <button
               type="submit"
@@ -75,6 +76,9 @@ export async function Rehearsal({
             >
               {open ? "Carry on the rehearsal" : "Start a rehearsal"}
             </button>
+            <span className="tabular text-xs text-ink-faint">
+              +{XP_AWARD.roleplay} XP
+            </span>
           </form>
           {completed > 0 ? (
             <p className="tabular mt-3 text-xs text-ink-faint">

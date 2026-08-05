@@ -3,7 +3,7 @@
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
-import { WENT_LABELS } from "@/lib/progress/rules";
+import { WENT_LABELS, XP_AWARD } from "@/lib/progress/rules";
 import { logRep, type LogRepState } from "./actions";
 
 type SkillOption = { id: string; name: string };
@@ -164,7 +164,14 @@ export function LogForm({
         </p>
       ) : null}
 
-      <Submit />
+      <div className="flex items-center gap-3">
+        <Submit />
+        {/* Stated before the action, not just after it, so the ratio between a
+            real conversation and everything else is visible where it matters. */}
+        <span className="tabular text-xs text-ink-faint">
+          +{XP_AWARD.mission} XP, the most anything is worth here
+        </span>
+      </div>
     </form>
   );
 }

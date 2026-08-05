@@ -12,6 +12,11 @@ import {
   getResumePoint,
   getWeeklyReview,
 } from "@/lib/progress/queries";
+import {
+  REPS_TO_THEORY_RATIO,
+  XP_TABLE,
+  describeNextLevel,
+} from "@/lib/progress/explain";
 
 export default async function TodayPage() {
   const user = await requireUser();
@@ -83,17 +88,44 @@ export default async function TodayPage() {
 
         {!totals.global.isMax ? (
           <div className="mt-5">
-            <div className="flex items-baseline justify-between">
+            <div className="flex items-baseline justify-between gap-3">
               <p className="tabular text-xs text-ink-faint">
                 Level {totals.global.level}
               </p>
+              {/* Reps, not points. "90 XP" is not something anyone can act on. */}
               <p className="tabular text-xs text-ink-faint">
-                {totals.global.toNextLevel} XP to {totals.global.level + 1}
+                {describeNextLevel(totals.global)}
               </p>
             </div>
             <Bar fraction={totals.global.fraction} label="Progress to the next level" />
           </div>
         ) : null}
+
+        <details className="mt-5 border-t border-rule pt-4">
+          <summary className="cursor-pointer text-xs text-ink-faint underline-offset-4 hover:underline">
+            How progress works
+          </summary>
+
+          <dl className="mt-3 flex flex-col gap-2.5">
+            {XP_TABLE.map((row) => (
+              <div key={row.label} className="flex items-baseline gap-3">
+                <dt className="flex-1 text-[13px] leading-snug text-ink">
+                  {row.label}
+                  <span className="block text-[12px] text-ink-muted">
+                    {row.note}
+                  </span>
+                </dt>
+                <dd className="tabular shrink-0 text-sm text-ink">+{row.xp}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <p className="mt-3 border-t border-rule pt-3 text-[12px] leading-relaxed text-ink-muted">
+            One real conversation is worth {REPS_TO_THEORY_RATIO} theory cards.
+            That ratio is deliberate: you cannot get good at this from the sofa,
+            so the app will not let you level up from there either.
+          </p>
+        </details>
       </section>
 
       {resume ? (

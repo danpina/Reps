@@ -3,7 +3,7 @@ import Link from "next/link";
 import { getProfile, requireUser } from "@/lib/auth/dal";
 import { getSkills } from "@/lib/curriculum/queries";
 import { getBadges, getFieldLog, getTotals } from "@/lib/progress/queries";
-import { WENT_LABELS } from "@/lib/progress/rules";
+import { WENT_LABELS, XP_AWARD } from "@/lib/progress/rules";
 
 export const metadata = { title: "Field log — Reps" };
 
@@ -120,7 +120,8 @@ export default async function FieldLogPage({
           className="mt-5 rounded border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3"
         >
           <p className="text-sm text-ink">
-            Logged. That one counts whether it went well or not.
+            Logged, +{XP_AWARD.mission} XP. That one counts whether it went well
+            or not.
           </p>
 
           {justEarned.length > 0 ? (

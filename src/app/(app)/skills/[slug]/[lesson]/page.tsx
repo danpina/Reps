@@ -6,6 +6,7 @@ import { Prose } from "@/components/prose";
 import { requireUser } from "@/lib/auth/dal";
 import { getLesson, getSkillBySlug } from "@/lib/curriculum/queries";
 import { shuffle } from "@/lib/curriculum/shuffle";
+import { XP_AWARD } from "@/lib/progress/rules";
 import { ComprehensionBeat } from "./comprehension-beat";
 import { MarkRead } from "./mark-read";
 import { Rehearsal } from "./rehearsal";
@@ -107,6 +108,9 @@ export default async function LessonPage({
           >
             Log this rep
           </Link>
+          <span className="tabular ml-3 text-xs text-ink-faint">
+            +{XP_AWARD.mission} XP
+          </span>
         </section>
       </article>
 
