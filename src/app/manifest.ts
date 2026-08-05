@@ -2,10 +2,10 @@ import type { MetadataRoute } from "next";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Reps — small talk practice log",
+    name: "Reps — learn to talk to anyone",
     short_name: "Reps",
     description:
-      "Practise conversation deliberately. Learn the idea, rehearse it, then do it for real and log the rep.",
+      "Talking to people is a skill, not a personality. Reps teaches you one idea at a time, gives you somewhere to practise it, and keeps a record of every real conversation you use it on.",
     // Opens on the dashboard rather than the marketing page, since anyone who
     // installed this is already signed in.
     start_url: "/today",

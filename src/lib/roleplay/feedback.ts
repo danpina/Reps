@@ -16,7 +16,13 @@ export type Feedback = {
   scores: Record<string, number>;
   worked: [string, string];
   fix: string;
-  rewrite: Rewrite;
+  /**
+   * Optional, because a rewrite is only worth showing when it is a real
+   * improvement. The AI engine is required to produce one — parseFeedback
+   * rejects a response without it — but the scripted stand-in omits it rather
+   * than inventing a mangled line.
+   */
+  rewrite?: Rewrite;
 };
 
 export type ParseResult =

@@ -1,5 +1,5 @@
 import type { Rubric, Scenario } from "@/lib/curriculum/types";
-import type { Feedback } from "./feedback";
+import type { Feedback, Rewrite } from "./feedback";
 
 export type Turn = { role: "user" | "partner"; content: string; at: string };
 
@@ -46,19 +46,26 @@ function asksAQuestion(text: string): boolean {
 }
 
 /**
- * Produces a rewrite that is genuinely different from the line it rewrites.
+ * Rewrites a line, but only when it can do so without mangling it.
  *
- * "You said X, try X" is not advice, and the parser now rejects it, so the
- * stand-in has to actually change something. Shortening is the safest
- * transformation to apply blindly: most over-long conversational lines improve
- * by losing their second half.
+ * An earlier version truncated any long line to its first eight words, which
+ * produced fragments like "i know, looking forward to get to the." Chopping
+ * arbitrary English at a word count cannot work, and a suggestion that is not
+ * a sentence is worse than no suggestion at all — it makes the whole review
+ * look careless.
+ *
+ * So this only performs transformations that are safe by construction, and
+ * returns null when none apply. Rewriting a line properly means understanding
+ * it, which is what the real engine is for.
  */
-function rewriteOf(line: string): { original: string; better: string; why: string } {
+function rewriteOf(line: string): Rewrite | null {
   const original = ends(line);
 
+  // A question becomes a statement. Always grammatical, and it is the single
+  // most common fix in this curriculum.
   if (asksAQuestion(original)) {
     const statement = original.replace(/\s*\?/g, ".").replace(/\.+$/, ".");
-    if (statement !== original) {
+    if (statement !== original && countWords(statement) >= 3) {
       return {
         original: line,
         better: statement,
@@ -67,30 +74,18 @@ function rewriteOf(line: string): { original: string; better: string; why: strin
     }
   }
 
-  // Keep the first sentence only, where there is more than one.
+  // More than one sentence: keep the first. A whole sentence is always
+  // grammatical, unlike a slice of one.
   const sentences = original.split(/(?<=[.!?])\s+/).filter(Boolean);
-  if (sentences.length > 1) {
+  if (sentences.length > 1 && countWords(sentences[0]) >= 4) {
     return {
       original: line,
       better: sentences[0],
-      why: "The first half was the good half. The rest explained something they had not asked about.",
+      why: "The first sentence was the good one. The rest explained something they had not asked about.",
     };
   }
 
-  const words = original.split(" ");
-  if (words.length > 8) {
-    return {
-      original: line,
-      better: words.slice(0, 8).join(" ").replace(/[,;:]$/, "") + ".",
-      why: "Shorter, so there is room for them to pick it up.",
-    };
-  }
-
-  return {
-    original: line,
-    better: `${original.replace(/[.!?]+$/, "")}. Then stop and let them fill it.`,
-    why: "The line was fine. The silence after it is what does the work.",
-  };
+  return null;
 }
 
 /**
@@ -194,6 +189,8 @@ export class ScriptedPartner implements PartnerEngine {
     const askedCount = userTurns.filter((t) => asksAQuestion(t.content)).length;
     const questionRatio = askedCount / userTurns.length;
 
+    const rewrite = rewriteOf(longest.content);
+
     const scores: Record<string, number> = {};
     rubric.criteria.forEach((criterion, i) => {
       const base = questionRatio > 0.8 ? 2 : questionRatio < 0.3 ? 4 : 3;
@@ -215,7 +212,8 @@ export class ScriptedPartner implements PartnerEngine {
           questionRatio > 0.8
             ? "You asked a question nearly every turn. Put something of your own in before the third one."
             : "Leave a beat after your best line instead of filling the silence yourself.",
-        rewrite: rewriteOf(longest.content),
+        // Omitted rather than mangled when no safe transformation applies.
+        ...(rewrite ? { rewrite } : {}),
       },
     };
   }

@@ -163,36 +163,35 @@ describe("scripted partner", () => {
     }
   });
 
-  test("feedback quotes a line the user actually said", async () => {
-    const rubric = {
-      scale: { min: 1, max: 5 },
-      criteria: [{ key: "opened_well", label: "Opened", description: "" }],
-    };
-    const history = [turn("That machine is working hard this morning.")];
+  const rubric = {
+    scale: { min: 1, max: 5 },
+    criteria: [{ key: "opened_well", label: "Opened", description: "" }],
+  };
 
-    const result = await partner.feedback(scenario(3), rubric, history);
+  test("scores and positives are always produced", async () => {
+    const result = await partner.feedback(scenario(3), rubric, [
+      turn("That machine is working hard this morning."),
+    ]);
     assert.equal(result.ok, true);
     if (!result.ok) return;
-    assert.equal(
-      result.feedback.rewrite.original,
-      "That machine is working hard this morning.",
-    );
     assert.equal(result.feedback.worked.length, 2);
+    assert.ok(result.feedback.fix.trim().length > 0);
   });
 
-  // Whatever the user said, the rewrite has to differ from it, or the parser
-  // will reject the whole review as useless.
-  test("always rewrites into something actually different", async () => {
-    const rubric = {
-      scale: { min: 1, max: 5 },
-      criteria: [{ key: "opened_well", label: "Opened", description: "" }],
-    };
-
+  /**
+   * The bug this replaces: any line over eight words was truncated to its
+   * first eight, producing fragments like "i know, looking forward to get to
+   * the." A suggestion that is not a sentence makes the whole review look
+   * careless, so the stand-in now offers one only when it can do it safely.
+   */
+  test("never suggests a fragment, and quotes a real line when it does suggest", async () => {
     const lines = [
       "So what do you do for work?",
       "Morning.",
       "That machine is really working for its money this morning.",
       "I have been standing here a while. Longer than I meant to, honestly.",
+      "i know, looking forward to get to the hotel and catch a break",
+      "this is a long taxi ride, reminds me to a bus",
       "Hi",
     ];
 
@@ -200,10 +199,37 @@ describe("scripted partner", () => {
       const result = await partner.feedback(scenario(3), rubric, [turn(line)]);
       assert.equal(result.ok, true, line);
       if (!result.ok) continue;
-      const { original, better } = result.feedback.rewrite;
-      assert.notEqual(better.trim(), original.trim(), `unchanged for: ${line}`);
-      assert.ok(better.trim().length > 0);
+
+      const { rewrite } = result.feedback;
+      if (!rewrite) continue; // Declining to suggest is a valid outcome.
+
+      assert.equal(rewrite.original, line, "must quote what was actually said");
+      assert.notEqual(rewrite.better.trim(), rewrite.original.trim());
+
+      // A suggestion has to be a whole sentence: ends in punctuation, and
+      // never stops on a word that leaves the reader hanging.
+      assert.match(rewrite.better.trim(), /[.!?]$/, `no final stop: ${rewrite.better}`);
+      assert.ok(
+        rewrite.better.trim().split(" ").length >= 3,
+        `too short to be a sentence: ${rewrite.better}`,
+      );
+      assert.ok(
+        !/\b(the|a|an|to|and|of|for|with|my|your)\.$/i.test(rewrite.better.trim()),
+        `ends mid-thought: ${rewrite.better}`,
+      );
     }
+  });
+
+  test("declines to rewrite the line that produced the fragment bug", async () => {
+    const line = "i know, looking forward to get to the hotel and catch a break";
+    const result = await partner.feedback(scenario(3), rubric, [turn(line)]);
+    assert.equal(result.ok, true);
+    if (!result.ok) return;
+    assert.equal(
+      result.feedback.rewrite,
+      undefined,
+      "a single long clause has no safe transformation, so none should be offered",
+    );
   });
 
   test("refuses to score a conversation with nothing in it", async () => {

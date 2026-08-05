@@ -26,7 +26,7 @@ export default async function RehearsePage({
   const { data } = await supabase
     .from("roleplays")
     .select(
-      "id, status, transcript_json, feedback_json, lesson_id, lessons(title, sort_order, theory_md, scenario_json, rubric_json, mission_text, skills(slug, name))",
+      "id, status, transcript_json, feedback_json, lesson_id, lessons(title, sort_order, theory_md, rehearsal_note, scenario_json, rubric_json, mission_text, skills(slug, name))",
     )
     .eq("id", id)
     .maybeSingle();
@@ -42,6 +42,7 @@ export default async function RehearsePage({
       title: string;
       sort_order: number;
       theory_md: string;
+      rehearsal_note: string | null;
       scenario_json: Scenario;
       rubric_json: Rubric;
       mission_text: string;
@@ -96,6 +97,12 @@ export default async function RehearsePage({
             What you are practising
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-ink">{theMove}</p>
+          {lesson.rehearsal_note ? (
+            <p className="mt-3 border-t border-[var(--accent)]/30 pt-3 text-[13px] leading-relaxed text-ink-muted">
+              {lesson.rehearsal_note}
+            </p>
+          ) : null}
+
           <ul className="mt-3 flex flex-col gap-1">
             {lesson.rubric_json.criteria.map((criterion) => (
               <li
@@ -228,29 +235,42 @@ function CompletedScene({
             </p>
           </section>
 
-          <section aria-labelledby="rewrite">
-            <h2
-              id="rewrite"
-              className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
-            >
-              One line, rewritten
-            </h2>
-            <div className="mt-4 border-l-2 border-rule-strong pl-4">
-              <p className="text-[13px] text-ink-muted">You said</p>
-              <p className="mt-1 text-[15px] leading-[1.55] text-ink">
-                &ldquo;{feedback.rewrite.original}&rdquo;
-              </p>
-              <p className="mt-3 text-[13px] text-ink-muted">Try</p>
-              <p className="mt-1 text-[15px] leading-[1.55] text-ink">
-                &ldquo;{feedback.rewrite.better}&rdquo;
-              </p>
-              {feedback.rewrite.why ? (
-                <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
-                  {feedback.rewrite.why}
+          {/* Shown only when there is a real improvement to show. A mangled
+              suggestion is worse than none, so the stand-in omits it rather
+              than inventing one. */}
+          {feedback.rewrite ? (
+            <section aria-labelledby="rewrite">
+              <h2
+                id="rewrite"
+                className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
+              >
+                One line, rewritten
+              </h2>
+              <div className="mt-4 border-l-2 border-rule-strong pl-4">
+                <p className="text-[13px] text-ink-muted">You said</p>
+                <p className="mt-1 text-[15px] leading-[1.55] text-ink">
+                  &ldquo;{feedback.rewrite.original}&rdquo;
                 </p>
-              ) : null}
-            </div>
-          </section>
+                <p className="mt-3 text-[13px] text-ink-muted">Try</p>
+                <p className="mt-1 text-[15px] leading-[1.55] text-ink">
+                  &ldquo;{feedback.rewrite.better}&rdquo;
+                </p>
+                {feedback.rewrite.why ? (
+                  <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
+                    {feedback.rewrite.why}
+                  </p>
+                ) : null}
+              </div>
+            </section>
+          ) : (
+            <section className="border-l-2 border-rule pl-4">
+              <p className="text-[13px] leading-relaxed text-ink-muted">
+                No line-level rewrite for this one. Rewriting a specific
+                sentence well means understanding it, which arrives with the AI
+                partner.
+              </p>
+            </section>
+          )}
         </>
       ) : (
         <section className="rounded border border-rule bg-[var(--paper-raised)] p-5">

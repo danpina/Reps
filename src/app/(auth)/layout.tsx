@@ -10,9 +10,14 @@ export default function AuthLayout({
           <p className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
             Reps
           </p>
+          <h1 className="mt-2 text-lg font-semibold leading-snug tracking-tight text-ink">
+            Talking to people is a skill, not a personality
+          </h1>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            A practice log for small talk. Learn the idea, rehearse it, then go
-            and do it for real.
+            It decides who you meet, who hires you, and who you end up close to
+            — and almost nobody is ever taught it. Reps gives you one idea at a
+            time, somewhere to practise it, and a record of every real
+            conversation you use it on.
           </p>
         </div>
         {children}
