@@ -23,9 +23,18 @@ export interface PartnerEngine {
 
 const ends = (text: string) => text.trim().replace(/\s+/g, " ");
 
-/** Cheap deterministic hash, so a given conversation always plays out the same. */
-function pick<T>(options: T[], seed: number): T {
-  return options[Math.abs(seed) % options.length];
+/**
+ * Deterministic choice that avoids repeating something already said.
+ *
+ * Without the exclusion the same line comes up twice in a short scene, which
+ * is the one thing that makes a stand-in impossible to read past — a real
+ * person never says the identical sentence twice in three turns. Falls back to
+ * the plain seeded pick once every option has been used.
+ */
+function pick(options: string[], seed: number, alreadySaid: string[] = []): string {
+  const fresh = options.filter((o) => !alreadySaid.includes(o));
+  const pool = fresh.length > 0 ? fresh : options;
+  return pool[Math.abs(seed) % pool.length];
 }
 
 function countWords(text: string): number {
@@ -34,6 +43,54 @@ function countWords(text: string): number {
 
 function asksAQuestion(text: string): boolean {
   return text.includes("?");
+}
+
+/**
+ * Produces a rewrite that is genuinely different from the line it rewrites.
+ *
+ * "You said X, try X" is not advice, and the parser now rejects it, so the
+ * stand-in has to actually change something. Shortening is the safest
+ * transformation to apply blindly: most over-long conversational lines improve
+ * by losing their second half.
+ */
+function rewriteOf(line: string): { original: string; better: string; why: string } {
+  const original = ends(line);
+
+  if (asksAQuestion(original)) {
+    const statement = original.replace(/\s*\?/g, ".").replace(/\.+$/, ".");
+    if (statement !== original) {
+      return {
+        original: line,
+        better: statement,
+        why: "The same thing as a statement, which invites a reply rather than demanding one.",
+      };
+    }
+  }
+
+  // Keep the first sentence only, where there is more than one.
+  const sentences = original.split(/(?<=[.!?])\s+/).filter(Boolean);
+  if (sentences.length > 1) {
+    return {
+      original: line,
+      better: sentences[0],
+      why: "The first half was the good half. The rest explained something they had not asked about.",
+    };
+  }
+
+  const words = original.split(" ");
+  if (words.length > 8) {
+    return {
+      original: line,
+      better: words.slice(0, 8).join(" ").replace(/[,;:]$/, "") + ".",
+      why: "Shorter, so there is room for them to pick it up.",
+    };
+  }
+
+  return {
+    original: line,
+    better: `${original.replace(/[.!?]+$/, "")}. Then stop and let them fill it.`,
+    why: "The line was fine. The silence after it is what does the work.",
+  };
 }
 
 /**
@@ -53,6 +110,9 @@ export class ScriptedPartner implements PartnerEngine {
     const last = userTurns.at(-1)?.content ?? "";
     const seed = userTurns.length * 7 + last.length;
 
+    // Everything this character has already said, so it does not repeat itself.
+    const said = history.filter((t) => t.role === "partner").map((t) => t.content);
+
     if (userTurns.length === 0) return scenario.opening_beat;
 
     if (openness <= 1) {
@@ -60,6 +120,7 @@ export class ScriptedPartner implements PartnerEngine {
       return pick(
         ["Yeah.", "Suppose so.", "Mm.", "Not really.", "Right."],
         seed,
+        said,
       );
     }
 
@@ -69,11 +130,13 @@ export class ScriptedPartner implements PartnerEngine {
         return pick(
           ["Bit busy actually.", "Yeah, maybe.", "Sorry, miles away."],
           seed,
+          said,
         );
       }
       return pick(
         ["It's fine, thanks.", "Not too bad.", "Yeah, same as ever."],
         seed,
+        said,
       );
     }
 
@@ -85,16 +148,20 @@ export class ScriptedPartner implements PartnerEngine {
               `Yeah, actually — that's more or less it. Took me a while to admit that.`,
               `That's a fair way of putting it. Most people assume the opposite.`,
               `Honestly, yes. I don't say that out loud very often.`,
+              `Suppose so. Nobody's put it quite like that before.`,
             ],
             seed,
+            said,
           )
         : pick(
             [
               "Yeah, it's alright.",
               "Something like that.",
               "Bit of both, really.",
+              "Can't complain.",
             ],
             seed,
+            said,
           );
     }
 
@@ -105,8 +172,10 @@ export class ScriptedPartner implements PartnerEngine {
         `Yeah — and the odd thing is I didn't expect to miss it. ${name} the optimist, apparently.`,
         `It was chaos, but the good kind. I'd do it again tomorrow.`,
         `That's exactly it. Nobody ever asks that bit, they just ask what I do.`,
+        `I keep telling people it was planned. It absolutely was not.`,
       ],
       seed,
+      said,
     );
   }
 
@@ -146,11 +215,7 @@ export class ScriptedPartner implements PartnerEngine {
           questionRatio > 0.8
             ? "You asked a question nearly every turn. Put something of your own in before the third one."
             : "Leave a beat after your best line instead of filling the silence yourself.",
-        rewrite: {
-          original: longest.content,
-          better: ends(longest.content).replace(/\?$/, "."),
-          why: "Same content as a statement, which invites more than it demands.",
-        },
+        rewrite: rewriteOf(longest.content),
       },
     };
   }

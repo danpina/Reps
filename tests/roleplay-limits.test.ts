@@ -7,7 +7,7 @@ import {
   isRehearsalUnlocked,
   requiredLevelForLesson,
 } from "../src/lib/roleplay/limits.ts";
-import { ScriptedPartner } from "../src/lib/roleplay/partner.ts";
+import { ScriptedPartner, type Turn } from "../src/lib/roleplay/partner.ts";
 
 const NOW = new Date("2026-08-05T12:00:00Z");
 const minutesAgo = (n: number) => new Date(NOW.getTime() - n * 60_000);
@@ -141,6 +141,28 @@ describe("scripted partner", () => {
     assert.equal(a, b);
   });
 
+  // A real person never says the identical sentence twice in three turns, and
+  // seeing it happen makes a stand-in impossible to read past.
+  test("does not repeat itself while it still has fresh lines", async () => {
+    for (const openness of [1, 2, 3, 4, 5]) {
+      const history: Turn[] = [];
+      const replies: string[] = [];
+
+      for (let i = 0; i < 3; i++) {
+        history.push(turn(`A reasonably long remark, number ${i}, with content.`));
+        const reply = await partner.nextTurn(scenario(openness), history);
+        replies.push(reply);
+        history.push({ role: "partner", content: reply, at: "" });
+      }
+
+      assert.equal(
+        new Set(replies).size,
+        replies.length,
+        `openness ${openness} repeated itself: ${JSON.stringify(replies)}`,
+      );
+    }
+  });
+
   test("feedback quotes a line the user actually said", async () => {
     const rubric = {
       scale: { min: 1, max: 5 },
@@ -156,6 +178,32 @@ describe("scripted partner", () => {
       "That machine is working hard this morning.",
     );
     assert.equal(result.feedback.worked.length, 2);
+  });
+
+  // Whatever the user said, the rewrite has to differ from it, or the parser
+  // will reject the whole review as useless.
+  test("always rewrites into something actually different", async () => {
+    const rubric = {
+      scale: { min: 1, max: 5 },
+      criteria: [{ key: "opened_well", label: "Opened", description: "" }],
+    };
+
+    const lines = [
+      "So what do you do for work?",
+      "Morning.",
+      "That machine is really working for its money this morning.",
+      "I have been standing here a while. Longer than I meant to, honestly.",
+      "Hi",
+    ];
+
+    for (const line of lines) {
+      const result = await partner.feedback(scenario(3), rubric, [turn(line)]);
+      assert.equal(result.ok, true, line);
+      if (!result.ok) continue;
+      const { original, better } = result.feedback.rewrite;
+      assert.notEqual(better.trim(), original.trim(), `unchanged for: ${line}`);
+      assert.ok(better.trim().length > 0);
+    }
   });
 
   test("refuses to score a conversation with nothing in it", async () => {

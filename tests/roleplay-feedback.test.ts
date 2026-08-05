@@ -190,6 +190,34 @@ describe("parseFeedback", () => {
   // The brief asks for a rewrite of a line the user actually wrote. A
   // hallucinated quote makes the feedback about a conversation that never
   // happened, which is worse than no feedback.
+  // "You said X, try X" is not advice.
+  test("rejects a rewrite identical to the original", () => {
+    const line = userTurns[0];
+    const result = parse(
+      JSON.stringify({
+        ...good,
+        rewrite: { original: line, better: line, why: "no change" },
+      }),
+    );
+    assert.equal(result.ok, false);
+    if (result.ok) return;
+    assert.match(result.reason, /same as the original/);
+  });
+
+  test("rejects a rewrite that only changes punctuation", () => {
+    const result = parse(
+      JSON.stringify({
+        ...good,
+        rewrite: {
+          original: userTurns[0],
+          better: userTurns[0].replace(".", "!"),
+          why: "louder",
+        },
+      }),
+    );
+    assert.equal(result.ok, false);
+  });
+
   test("rejects a rewrite quoting a line the user never said", () => {
     const result = parse(
       JSON.stringify({

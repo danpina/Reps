@@ -147,6 +147,15 @@ export function parseFeedback(
     };
   }
 
+  // "You said X, try X" is not advice. Compared after normalising so a change
+  // of punctuation alone does not count as a rewrite either.
+  if (normalise(original) === normalise(better)) {
+    return {
+      ok: false,
+      reason: "The rewrite was the same as the original line.",
+    };
+  }
+
   return {
     ok: true,
     warnings,
