@@ -1,9 +1,11 @@
 import Link from "next/link";
 
 import { signOut } from "@/app/(auth)/actions";
+import { FactBanner } from "@/components/fact-banner";
 import { Heatmap } from "@/components/heatmap";
 import { Button } from "@/components/ui";
 import { getProfile, requireUser } from "@/lib/auth/dal";
+import { randomFact } from "@/lib/facts";
 import {
   getBadges,
   getHeatmap,
@@ -30,6 +32,7 @@ export default async function TodayPage() {
     getResumePoint(),
   ]);
 
+  const fact = randomFact();
   const name = profile?.display_name?.trim();
   const started = standings.filter((s) => s.progress.xp > 0);
   const hasReview = review.reps > 0;
@@ -46,6 +49,10 @@ export default async function TodayPage() {
           </Button>
         </form>
       </header>
+
+      <div className="mt-7">
+        <FactBanner fact={fact} />
+      </div>
 
       <section className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6">
         <h2 className="text-sm font-semibold text-ink">

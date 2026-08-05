@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackLink } from "@/components/back-link";
+import { extractTheMove } from "@/lib/curriculum/the-move";
 import { requireUser } from "@/lib/auth/dal";
 import { createClient } from "@/lib/supabase/server";
 import type { Rubric, Scenario } from "@/lib/curriculum/types";
@@ -25,7 +26,7 @@ export default async function RehearsePage({
   const { data } = await supabase
     .from("roleplays")
     .select(
-      "id, status, transcript_json, feedback_json, lesson_id, lessons(title, sort_order, scenario_json, rubric_json, mission_text, skills(slug, name))",
+      "id, status, transcript_json, feedback_json, lesson_id, lessons(title, sort_order, theory_md, scenario_json, rubric_json, mission_text, skills(slug, name))",
     )
     .eq("id", id)
     .maybeSingle();
@@ -40,6 +41,7 @@ export default async function RehearsePage({
     lessons: {
       title: string;
       sort_order: number;
+      theory_md: string;
       scenario_json: Scenario;
       rubric_json: Rubric;
       mission_text: string;
@@ -49,6 +51,7 @@ export default async function RehearsePage({
 
   const { lessons: lesson } = roleplay;
   const scenario = lesson.scenario_json;
+  const theMove = extractTheMove(lesson.theory_md, lesson.title);
   const complete = roleplay.status === "complete";
   const hasSpoken = roleplay.transcript_json.some((t) => t.role === "user");
 
@@ -78,6 +81,34 @@ export default async function RehearsePage({
               : ""}
           </p>
         </div>
+
+        {/* Without this you enter the scene cold, with no idea which skill is
+            being drilled or what the review will look at. The rubric is the
+            same list the scoring uses, so the target and the marking agree. */}
+        <section
+          aria-labelledby="target"
+          className="mt-3 rounded border border-[var(--accent)] bg-[var(--accent-soft)] p-4"
+        >
+          <h2
+            id="target"
+            className="tabular text-xs uppercase tracking-[0.18em] text-[var(--accent)]"
+          >
+            What you are practising
+          </h2>
+          <p className="mt-2 text-sm leading-relaxed text-ink">{theMove}</p>
+          <ul className="mt-3 flex flex-col gap-1">
+            {lesson.rubric_json.criteria.map((criterion) => (
+              <li
+                key={criterion.key}
+                className="text-[13px] leading-snug text-ink-muted"
+              >
+                <span className="text-ink">{criterion.label}</span>
+                {" — "}
+                {criterion.description}
+              </li>
+            ))}
+          </ul>
+        </section>
 
         {!isUsingRealModel() ? (
           <p className="mt-3 text-[12px] leading-relaxed text-ink-faint">
