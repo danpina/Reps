@@ -2,7 +2,9 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { BackLink } from "@/components/back-link";
+import { DoneMark, stateLabel, type LessonState } from "@/components/done-mark";
 import { requireUser } from "@/lib/auth/dal";
+import { getCurriculumProgress } from "@/lib/curriculum/progress";
 import { getSkillBySlug } from "@/lib/curriculum/queries";
 
 export default async function SkillPage({
@@ -12,7 +14,10 @@ export default async function SkillPage({
 }) {
   await requireUser();
   const { slug } = await params;
-  const skill = await getSkillBySlug(slug);
+  const [skill, progress] = await Promise.all([
+    getSkillBySlug(slug),
+    getCurriculumProgress(),
+  ]);
 
   if (!skill) notFound();
 
@@ -42,19 +47,43 @@ export default async function SkillPage({
         </p>
       ) : (
         <ol className="mt-2">
-          {skill.lessons.map((lesson) => (
-            <li key={lesson.id} className="border-b border-rule">
-              <Link
-                href={`/skills/${skill.slug}/${lesson.sort_order}`}
-                className="flex items-baseline gap-3 py-5 transition-colors hover:bg-[var(--paper-raised)]"
-              >
-                <span className="tabular text-xs text-ink-faint">
-                  {String(lesson.sort_order).padStart(2, "0")}
-                </span>
-                <span className="text-base text-ink">{lesson.title}</span>
-              </Link>
-            </li>
-          ))}
+          {skill.lessons.map((lesson) => {
+            const state: LessonState = progress.usedLessonIds.has(lesson.id)
+              ? "used"
+              : progress.readLessonIds.has(lesson.id)
+                ? "read"
+                : "unread";
+
+            return (
+              <li key={lesson.id} className="border-b border-rule">
+                <Link
+                  href={`/skills/${skill.slug}/${lesson.sort_order}`}
+                  className="flex items-start gap-3 py-5 transition-colors hover:bg-[var(--paper-raised)]"
+                >
+                  <DoneMark state={state} />
+                  <span className="tabular mt-px text-xs text-ink-faint">
+                    {String(lesson.sort_order).padStart(2, "0")}
+                  </span>
+                  <span
+                    className={[
+                      "text-base",
+                      state === "unread" ? "text-ink-muted" : "text-ink",
+                    ].join(" ")}
+                  >
+                    {lesson.title}
+                  </span>
+                  <span
+                    className={[
+                      "tabular ml-auto shrink-0 pl-3 text-[11px]",
+                      state === "used" ? "text-[var(--accent)]" : "text-ink-faint",
+                    ].join(" ")}
+                  >
+                    {stateLabel(state)}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ol>
       )}
     </main>

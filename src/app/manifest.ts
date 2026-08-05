@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "Reps — learn to talk to anyone",
     short_name: "Reps",
     description:
-      "Talking to people is a skill, not a personality. Reps teaches you one idea at a time, gives you somewhere to practise it, and keeps a record of every real conversation you use it on.",
+      "Talking to people is a skill, not a personality. REPS teaches you one idea at a time, gives you somewhere to practise it, and keeps a record of every real conversation you use it on.",
     // Opens on the dashboard rather than the marketing page, since anyone who
     // installed this is already signed in.
     start_url: "/today",
