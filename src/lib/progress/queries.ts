@@ -50,10 +50,17 @@ export async function getFieldLog(
     : entries;
 }
 
+/**
+ * There is deliberately no global level here.
+ *
+ * Two level numbers on one screen, with nothing explaining how they relate,
+ * was more confusing than either alone. Levels are per-skill, which is the one
+ * that means something: it says how far you have got at labeling, or at exits,
+ * rather than averaging nine separate skills into a number.
+ */
 export type Totals = {
   repsLogged: number;
   totalXp: number;
-  global: LevelProgress;
   currentStreak: number;
   longestStreak: number;
 };
@@ -75,7 +82,6 @@ export async function getTotals(): Promise<Totals> {
   return {
     repsLogged: count ?? 0,
     totalXp,
-    global: levelProgress(totalXp),
     currentStreak: streak?.current ?? 0,
     longestStreak: streak?.longest ?? 0,
   };

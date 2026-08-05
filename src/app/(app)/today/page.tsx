@@ -72,7 +72,10 @@ export default async function TodayPage() {
           </Link>
         </div>
 
-        <dl className="mt-6 grid grid-cols-3 gap-4 border-t border-rule pt-5">
+        {/* No global level. Levels are per-skill, further down, where they say
+            something specific rather than averaging nine skills into one
+            number. */}
+        <dl className="mt-6 grid grid-cols-2 gap-4 border-t border-rule pt-5">
           <Stat label="Reps logged" value={totals.repsLogged} />
           <Stat
             label="Current streak"
@@ -83,23 +86,7 @@ export default async function TodayPage() {
                 : undefined
             }
           />
-          <Stat label="Level" value={totals.global.level} />
         </dl>
-
-        {!totals.global.isMax ? (
-          <div className="mt-5">
-            <div className="flex items-baseline justify-between gap-3">
-              <p className="tabular text-xs text-ink-faint">
-                Level {totals.global.level}
-              </p>
-              {/* Reps, not points. "90 XP" is not something anyone can act on. */}
-              <p className="tabular text-xs text-ink-faint">
-                {describeNextLevel(totals.global)}
-              </p>
-            </div>
-            <Bar fraction={totals.global.fraction} label="Progress to the next level" />
-          </div>
-        ) : null}
 
         <details className="mt-5 border-t border-rule pt-4">
           <summary className="cursor-pointer text-xs text-ink-faint underline-offset-4 hover:underline">
@@ -200,7 +187,7 @@ export default async function TodayPage() {
                     Level {skill.progress.level}
                     {skill.progress.isMax
                       ? ""
-                      : ` · ${skill.progress.toNextLevel} XP to go`}
+                      : ` · ${describeNextLevel(skill.progress)}`}
                   </span>
                 </div>
                 <Bar
