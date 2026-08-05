@@ -1,22 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 
 import type { ComprehensionCheck } from "@/lib/curriculum/types";
 
-export function ComprehensionBeat({ check }: { check: ComprehensionCheck }) {
+export function ComprehensionBeat({
+  check,
+  label = "One check",
+}: {
+  check: ComprehensionCheck;
+  label?: string;
+}) {
   const [picked, setPicked] = useState<number | null>(null);
+  // Unique per check, since a lesson now renders more than one.
+  const promptId = useId();
   const answered = picked !== null;
 
   return (
     <section
-      aria-labelledby="beat-prompt"
+      aria-labelledby={promptId}
       className="rounded border border-rule bg-[var(--paper-raised)] p-5"
     >
       <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
-        One check
+        {label}
       </h2>
-      <p id="beat-prompt" className="mt-3 text-[15px] leading-[1.6] text-ink">
+      <p id={promptId} className="mt-3 text-[15px] leading-[1.6] text-ink">
         {check.prompt}
       </p>
 

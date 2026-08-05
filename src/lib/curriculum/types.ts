@@ -58,7 +58,9 @@ export type Lesson = {
   title: string;
   theory_md: string;
   examples_json: WorkedExample[];
+  /** Superseded by checks_json. Kept because the seed migrations still write it. */
   check_json: ComprehensionCheck | null;
+  checks_json: ComprehensionCheck[];
   rubric_json: Rubric;
   scenario_json: Scenario;
   mission_text: string;

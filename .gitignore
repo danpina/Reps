@@ -54,3 +54,4 @@ supabase/APPLY_PHASE5.local.sql
 supabase/APPLY_TIMEZONE_FIX.local.sql
 supabase/APPLY_ROLEPLAY.local.sql
 supabase/APPLY_MISSIONS.local.sql
+supabase/APPLY_SUMMARIES_AND_CHECKS.local.sql

@@ -31,10 +31,19 @@ export default async function LessonPage({
   const hasNext = sortOrder < total;
 
   // Shuffled here rather than in the client component, so the browser hydrates
-  // with the same order the server rendered.
-  const check = lesson.check_json
-    ? { ...lesson.check_json, options: shuffle(lesson.check_json.options) }
-    : null;
+  // with the same order the server rendered. Falls back to the single legacy
+  // check for any lesson the two-check migrations have not reached.
+  const source =
+    lesson.checks_json?.length > 0
+      ? lesson.checks_json
+      : lesson.check_json
+        ? [lesson.check_json]
+        : [];
+
+  const checks = source.map((check) => ({
+    ...check,
+    options: shuffle(check.options),
+  }));
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
@@ -76,7 +85,13 @@ export default async function LessonPage({
           </ol>
         </section>
 
-        {check ? <ComprehensionBeat check={check} /> : null}
+        {checks.map((check, i) => (
+          <ComprehensionBeat
+            key={i}
+            check={check}
+            label={checks.length > 1 ? `Check ${i + 1} of ${checks.length}` : "One check"}
+          />
+        ))}
 
         <Rehearsal
           lessonId={lesson.id}
@@ -133,7 +148,13 @@ export default async function LessonPage({
             Next lesson →
           </Link>
         ) : (
-          <span className="text-ink-faint">End of this track</span>
+          // The end of a track is exactly where a summary is worth most.
+          <Link
+            href={`/skills/${skill.slug}/recap`}
+            className="font-medium text-ink underline-offset-4 hover:underline"
+          >
+            What you learned →
+          </Link>
         )}
       </nav>
     </main>

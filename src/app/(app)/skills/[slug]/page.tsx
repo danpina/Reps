@@ -26,6 +26,14 @@ export default async function SkillPage({
         <p className="mt-3 border-l-2 border-[var(--accent)] pl-4 text-sm leading-relaxed text-ink">
           {skill.core_idea}
         </p>
+        {skill.lessons.length > 0 ? (
+          <Link
+            href={`/skills/${skill.slug}/recap`}
+            className="mt-4 inline-block text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline"
+          >
+            What this track covers, in one page
+          </Link>
+        ) : null}
       </header>
 
       {skill.lessons.length === 0 ? (
