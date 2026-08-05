@@ -1,0 +1,100 @@
+import { createClient } from "@/lib/supabase/server";
+import {
+  isRehearsalUnlocked,
+  requiredLevelForLesson,
+} from "@/lib/roleplay/limits";
+import { startRehearsal } from "@/app/(app)/rehearse/start/actions";
+
+/**
+ * The rehearsal entry point on a lesson.
+ *
+ * Locked scenarios say plainly what unlocks them, and the answer is always
+ * logged reps rather than more reading. That is the brief's ordering made
+ * visible at the moment someone might otherwise settle for rehearsing.
+ */
+export async function Rehearsal({
+  lessonId,
+  sortOrder,
+  skillId,
+  partnerName,
+  openness,
+}: {
+  lessonId: string;
+  sortOrder: number;
+  skillId: string;
+  partnerName: string;
+  openness: number;
+}) {
+  const supabase = await createClient();
+
+  const [{ data: state }, { data: past }] = await Promise.all([
+    supabase
+      .from("user_skill_state")
+      .select("level")
+      .eq("skill_id", skillId)
+      .maybeSingle(),
+    supabase
+      .from("roleplays")
+      .select("id, status")
+      .eq("lesson_id", lessonId)
+      .order("started_at", { ascending: false })
+      .limit(5),
+  ]);
+
+  const level = state?.level ?? 1;
+  const unlocked = isRehearsalUnlocked(sortOrder, level);
+  const required = requiredLevelForLesson(sortOrder);
+  const open = (past ?? []).find((r) => r.status === "open");
+  const completed = (past ?? []).filter((r) => r.status === "complete").length;
+
+  return (
+    <section
+      aria-labelledby="rehearse"
+      className="rounded border border-rule bg-[var(--paper-raised)] p-5"
+    >
+      <h2
+        id="rehearse"
+        className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
+      >
+        Rehearse it first
+      </h2>
+
+      {unlocked ? (
+        <>
+          <p className="mt-3 text-sm leading-relaxed text-ink">
+            Practise this on {partnerName} before you try it on anyone real.
+            {openness <= 2
+              ? " They are hard work on purpose."
+              : ""}
+          </p>
+          <form action={startRehearsal} className="mt-4">
+            <input type="hidden" name="lesson_id" value={lessonId} />
+            <button
+              type="submit"
+              className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper)]"
+            >
+              {open ? "Carry on the rehearsal" : "Start a rehearsal"}
+            </button>
+          </form>
+          {completed > 0 ? (
+            <p className="tabular mt-3 text-xs text-ink-faint">
+              {completed} rehearsed {completed === 1 ? "scene" : "scenes"} on this
+              lesson
+            </p>
+          ) : null}
+        </>
+      ) : (
+        <>
+          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+            Locked until level {required} in this skill. You are level {level}.
+          </p>
+          <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
+            Levels come from logging real conversations, so the way to open this
+            is to go and have some. That is deliberate — rehearsal is the warm
+            up, not the work.
+          </p>
+        </>
+      )}
+    </section>
+  );
+}

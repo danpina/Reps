@@ -7,6 +7,7 @@ import { requireUser } from "@/lib/auth/dal";
 import { getLesson, getSkillBySlug } from "@/lib/curriculum/queries";
 import { shuffle } from "@/lib/curriculum/shuffle";
 import { ComprehensionBeat } from "./comprehension-beat";
+import { Rehearsal } from "./rehearsal";
 
 export default async function LessonPage({
   params,
@@ -73,6 +74,14 @@ export default async function LessonPage({
         </section>
 
         {check ? <ComprehensionBeat check={check} /> : null}
+
+        <Rehearsal
+          lessonId={lesson.id}
+          sortOrder={sortOrder}
+          skillId={skill.id}
+          partnerName={lesson.scenario_json.partner.name}
+          openness={lesson.scenario_json.partner.openness}
+        />
 
         <section
           aria-labelledby="mission"
