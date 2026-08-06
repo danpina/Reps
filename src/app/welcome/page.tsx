@@ -24,13 +24,24 @@ export default async function WelcomePage() {
         <p className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
           Reps
         </p>
-        <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
-          Two questions, then you are in
+        {/* The sign-in page promises you will be able to walk into any room.
+            This screen used to answer that by describing the mechanism —
+            read, do, log — which is true, and reads like being handed a
+            manual thirty seconds after being sold a car. Keep the promise
+            alive through the form. */}
+        <h1 className="mt-3 text-2xl font-semibold leading-[1.15] tracking-tight text-ink">
+          Pick the room you want
+          <br />
+          to walk into
         </h1>
-        <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-          This is a training tool, not a course. You read one short idea, go
-          and have a real conversation, and record what happened. The
-          conversations are the part that counts.
+        <p className="mt-4 text-[15px] leading-[1.6] text-ink">
+          Every topic here is written for one situation and nothing else,
+          because the line that opens a party will lose you an interview.
+          Start where it is costing you most.
+        </p>
+        <p className="mt-3 text-[15px] leading-[1.6] text-ink-muted">
+          You will be reading your first idea in about thirty seconds, and
+          using it on a real person today.
         </p>
       </header>
 
