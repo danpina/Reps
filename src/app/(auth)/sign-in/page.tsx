@@ -28,15 +28,27 @@ export default async function SignInPage({
         linkError={params.error === "link_invalid"}
       />
 
-      <p className="border-t border-rule pt-5 text-sm text-ink-muted">
-        No account yet?{" "}
+      {/* Its own block rather than a sentence under the fold. Anyone signing
+          up is by definition someone who cannot get in with the form above, so
+          the way out has to be visible without reading past two other forms.
+          Quiet rather than primary: signing in is still the common case. */}
+      <section
+        aria-labelledby="new-here"
+        className="rounded border border-[var(--rule-strong)] bg-[var(--paper-raised)] p-5"
+      >
+        <h2 id="new-here" className="text-sm font-semibold text-ink">
+          New here?
+        </h2>
+        <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+          Anyone can create a REPS account. It takes an email and a password.
+        </p>
         <Link
           href="/sign-up"
-          className="font-medium text-ink underline underline-offset-4"
+          className="mt-4 inline-flex w-full items-center justify-center rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper-raised)]"
         >
-          Create one
+          Create an account
         </Link>
-      </p>
+      </section>
     </div>
   );
 }

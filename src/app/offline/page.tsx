@@ -10,8 +10,8 @@ export default function OfflinePage() {
         No connection
       </h1>
       <p className="text-sm leading-relaxed text-ink-muted">
-        Your reps are stored on the server, so the log needs a connection to
-        load. Nothing has been lost.
+        Your reps are stored on the server, so your REPS account needs a
+        connection to load. Nothing has been lost.
       </p>
       <p className="text-sm leading-relaxed text-ink-muted">
         If you have just had a conversation you want to record, write the note

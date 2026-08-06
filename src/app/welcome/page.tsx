@@ -22,8 +22,8 @@ export default async function WelcomePage() {
           Two questions, then you are in
         </h1>
         <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-          This is a practice log, not a course. You read one short idea, go and
-          have a real conversation, and write down what happened. The
+          This is a training tool, not a course. You read one short idea, go
+          and have a real conversation, and record what happened. The
           conversations are the part that counts.
         </p>
       </header>

@@ -144,7 +144,7 @@ export default async function FieldLogPage({
 
       {entries.length > 0 || isFiltered ? (
         <nav
-          aria-label="Filter the log"
+          aria-label="Filter the field log"
           className="mt-6 flex flex-wrap items-center gap-2 border-b border-rule pb-5"
         >
           <FilterChip href="/field-log" active={!isFiltered} label="Everything" />

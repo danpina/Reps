@@ -70,6 +70,23 @@ const ITEMS: Item[] = [
       </svg>
     ),
   },
+  {
+    href: "/settings",
+    label: "Settings",
+    // Admin lives behind settings rather than in the nav: it is not a place
+    // most accounts can go, and a tab that only some people have is a tab that
+    // has to explain itself.
+    match: (p) => p.startsWith("/settings") || p.startsWith("/admin"),
+    icon: (
+      <svg viewBox="0 0 20 20" aria-hidden className="h-5 w-5">
+        <circle cx="10" cy="10" r="2.5" {...stroke} />
+        <path
+          d="M10 2.5v2M10 15.5v2M17.5 10h-2M4.5 10h-2M15.3 4.7l-1.4 1.4M6.1 13.9l-1.4 1.4M15.3 15.3l-1.4-1.4M6.1 6.1 4.7 4.7"
+          {...stroke}
+        />
+      </svg>
+    ),
+  },
 ];
 
 export function AppNav() {

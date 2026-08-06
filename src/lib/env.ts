@@ -46,7 +46,7 @@ function resolveSiteUrl(): string {
   if (deployment) return `https://${deployment}`;
 
   // Matches the port in .claude/launch.json, so magic links work in dev.
-  return `http://localhost:${process.env.PORT ?? 3002}`;
+  return `http://localhost:${process.env.PORT ?? 3000}`;
 }
 
 export const SITE_URL = resolveSiteUrl();

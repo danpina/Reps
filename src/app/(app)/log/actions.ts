@@ -54,7 +54,7 @@ export async function logRep(
   const today = resolveLoggedDate(formData.get("local_date"));
 
   // A logged failure earns the same as a logged success. If a bad rep cost
-  // points, people would stop logging honestly and the log would be worthless.
+  // points, people would stop logging honestly and the record would be worthless.
   const xp = XP_AWARD.mission;
 
   const { error: insertError } = await supabase.from("field_logs").insert({

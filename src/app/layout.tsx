@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 
 import { ServiceWorker } from "@/components/service-worker";
+import { getProfile } from "@/lib/auth/dal";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -20,7 +21,7 @@ export const metadata: Metadata = {
     title: "Reps",
     statusBarStyle: "black-translucent",
   },
-  // A private practice log has no business in search results.
+  // A private record of someone's practice has no business in search results.
   robots: { index: false, follow: false },
 };
 
@@ -33,13 +34,25 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Rendered into the initial HTML rather than applied on the client, so the
+  // first paint is already the right palette. A theme restored in an effect
+  // shows the wrong one for a frame, and on this app that flash lands on every
+  // navigation. "system" writes no attribute at all, which is exactly what the
+  // stylesheet's prefers-color-scheme block is already there to handle.
+  const profile = await getProfile();
+  const theme = profile?.theme ?? "system";
+
   return (
-    <html lang="en" className="h-full antialiased">
+    <html
+      lang="en"
+      className="h-full antialiased"
+      data-theme={theme === "system" ? undefined : theme}
+    >
       <body className="flex min-h-full flex-col">
         {/* Visible only once focused, so a keyboard user can jump the nav. */}
         <a
