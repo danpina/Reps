@@ -1,6 +1,6 @@
 import { BackLink } from "@/components/back-link";
 import { requireAdmin, type Theme } from "@/lib/auth/dal";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { adminIsConfigured, createAdminClient } from "@/lib/supabase/admin";
 import { AddUser } from "./add-user";
 import { UserRow } from "./user-row";
 
@@ -19,6 +19,14 @@ export type ManagedUser = {
 
 export default async function AdminPage() {
   const actor = await requireAdmin();
+
+  // Asked before the client is built. Without this the page throws during
+  // render, and an error page at that moment names no environment variable
+  // and offers no way forward — which is the whole failure mode this screen
+  // has, because the key is set per environment and production is the one
+  // most likely to be missing it.
+  if (!adminIsConfigured()) return <NotConfigured />;
+
   const admin = createAdminClient();
 
   // Email lives on the auth user and everything else lives on the profile, so
@@ -74,6 +82,42 @@ export default async function AdminPage() {
           <UserRow key={user.id} user={user} isSelf={user.id === actor.id} />
         ))}
       </ol>
+    </main>
+  );
+}
+
+/**
+ * Shown when the deployment has no secret key.
+ *
+ * Names the variable, because the person reading this is the person who can
+ * set it, and "something went wrong" would send them to the logs to find out
+ * what this sentence could have told them.
+ */
+function NotConfigured() {
+  return (
+    <main className="mx-auto w-full max-w-2xl px-5 py-12">
+      <header className="border-b border-rule pb-5">
+        <BackLink href="/settings" label="Settings" />
+        <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
+          Users
+        </h1>
+      </header>
+
+      <div className="mt-8 rounded border border-[var(--flag)] bg-[var(--flag-soft)] p-5">
+        <h2 className="text-sm font-semibold text-ink">
+          Admin is not configured on this deployment
+        </h2>
+        <p className="mt-2 text-sm leading-relaxed text-ink">
+          Managing users needs the Supabase secret key, and this environment
+          does not have one. Set <code>SUPABASE_SECRET_KEY</code> and redeploy —
+          environment variables are read at deploy time, so adding it without
+          redeploying changes nothing.
+        </p>
+        <p className="mt-3 text-[13px] leading-relaxed text-ink-muted">
+          Nothing else in the app depends on it. Your account and everyone
+          else&rsquo;s are unaffected.
+        </p>
+      </div>
     </main>
   );
 }

@@ -4,9 +4,30 @@ import { revalidatePath } from "next/cache";
 
 import { SITE_URL } from "@/lib/env";
 import { requireAdmin, type Theme } from "@/lib/auth/dal";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { adminIsConfigured, createAdminClient } from "@/lib/supabase/admin";
 
 export type AdminState = { error?: string; done?: string };
+
+// Not exported: a "use server" file may only export async functions, since
+// every export becomes a callable endpoint.
+const NOT_CONFIGURED =
+  "Admin is not configured on this deployment: SUPABASE_SECRET_KEY is missing. Set it and redeploy.";
+
+/**
+ * Proves admin, then proves the deployment can actually act.
+ *
+ * Both checks belong together because every action needs both, and an action
+ * that forgets either is an action with no access control or a stack trace
+ * where an explanation should be.
+ */
+async function begin(): Promise<
+  | { ok: true; admin: ReturnType<typeof createAdminClient>; actorId: string }
+  | { ok: false; error: string }
+> {
+  const actor = await requireAdmin();
+  if (!adminIsConfigured()) return { ok: false, error: NOT_CONFIGURED };
+  return { ok: true, admin: createAdminClient(), actorId: actor.id };
+}
 
 /** Supabase takes a Go duration. A century is "indefinite" in practice. */
 const FOREVER = "876000h";
@@ -45,13 +66,13 @@ export async function inviteUser(
   _prev: AdminState,
   formData: FormData,
 ): Promise<AdminState> {
-  await requireAdmin();
+  const session = await begin();
+  if (!session.ok) return { error: session.error };
 
   const email = String(formData.get("email") ?? "").trim();
   if (!email) return { error: "Enter an email address." };
 
-  const admin = createAdminClient();
-  const { error } = await admin.auth.admin.inviteUserByEmail(email, {
+  const { error } = await session.admin.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${SITE_URL}/auth/callback`,
   });
 
@@ -71,7 +92,8 @@ export async function createUser(
   _prev: AdminState,
   formData: FormData,
 ): Promise<AdminState> {
-  await requireAdmin();
+  const session = await begin();
+  if (!session.ok) return { error: session.error };
 
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
@@ -81,8 +103,7 @@ export async function createUser(
     return { error: "Use a password of at least 8 characters." };
   }
 
-  const admin = createAdminClient();
-  const { error } = await admin.auth.admin.createUser({
+  const { error } = await session.admin.auth.admin.createUser({
     email,
     password,
     // No confirmation email is coming, so the address has to start confirmed
@@ -100,13 +121,14 @@ export async function blockUser(
   _prev: AdminState,
   formData: FormData,
 ): Promise<AdminState> {
-  const actor = await requireAdmin();
+  const session = await begin();
+  if (!session.ok) return { error: session.error };
+  const { admin } = session;
 
   const userId = String(formData.get("user_id") ?? "");
   const reason = String(formData.get("reason") ?? "").trim();
 
-  const admin = createAdminClient();
-  const refusal = await assertActionable(admin, actor.id, userId);
+  const refusal = await assertActionable(admin, session.actorId, userId);
   if (refusal) return { error: refusal };
 
   // Both halves matter. The ban stops a new session being issued; the column
@@ -136,12 +158,12 @@ export async function unblockUser(
   _prev: AdminState,
   formData: FormData,
 ): Promise<AdminState> {
-  await requireAdmin();
+  const session = await begin();
+  if (!session.ok) return { error: session.error };
+  const { admin } = session;
 
   const userId = String(formData.get("user_id") ?? "");
   if (!userId) return { error: "No user was given." };
-
-  const admin = createAdminClient();
 
   // Clear the column first here, for the same reason the ban went first when
   // blocking: whichever write lands alone, the account stays blocked.
@@ -168,13 +190,14 @@ export async function deleteUser(
   _prev: AdminState,
   formData: FormData,
 ): Promise<AdminState> {
-  const actor = await requireAdmin();
+  const session = await begin();
+  if (!session.ok) return { error: session.error };
+  const { admin } = session;
 
   const userId = String(formData.get("user_id") ?? "");
   const confirmation = String(formData.get("confirm") ?? "").trim();
 
-  const admin = createAdminClient();
-  const refusal = await assertActionable(admin, actor.id, userId);
+  const refusal = await assertActionable(admin, session.actorId, userId);
   if (refusal) return { error: refusal };
 
   // Typed, not clicked. This is the one action in the app that cannot be
@@ -195,7 +218,8 @@ export async function updateUserSettings(
   _prev: AdminState,
   formData: FormData,
 ): Promise<AdminState> {
-  await requireAdmin();
+  const session = await begin();
+  if (!session.ok) return { error: session.error };
 
   const userId = String(formData.get("user_id") ?? "");
   const displayName = String(formData.get("display_name") ?? "").trim();
@@ -209,8 +233,7 @@ export async function updateUserSettings(
     return { error: "That display name is too long." };
   }
 
-  const admin = createAdminClient();
-  const { error } = await admin
+  const { error } = await session.admin
     .from("profiles")
     .update({ display_name: displayName || null, theme })
     .eq("id", userId);
