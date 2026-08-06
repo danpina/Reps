@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { getProfile, requireUser } from "@/lib/auth/dal";
-import { getSkills } from "@/lib/curriculum/queries";
+import { MIN_REPS_FOR_REVIEW } from "@/lib/coach/eligibility";
 import { getBadges, getFieldLog, getTotals } from "@/lib/progress/queries";
 import { WENT_LABELS, XP_AWARD } from "@/lib/progress/rules";
 
@@ -41,6 +41,7 @@ export default async function FieldLogPage({
 }: {
   searchParams: Promise<{
     skill?: string;
+    topic?: string;
     went?: string;
     logged?: string;
     badges?: string;
@@ -60,13 +61,44 @@ export default async function FieldLogPage({
     : [];
 
   const wentFilter = Number(params.went);
-  const entries = await getFieldLog({
-    skillSlug: params.skill,
-    went: [1, 2, 3].includes(wentFilter) ? wentFilter : undefined,
-  });
 
-  const [totals, skills] = await Promise.all([getTotals(), getSkills()]);
-  const isFiltered = Boolean(params.skill || params.went);
+  // Everything, once. The chips are built from the whole log rather than from
+  // the filtered view, so choosing a topic does not make every other topic's
+  // chip disappear — which is what happens when a filter is built from its own
+  // results.
+  const [everything, totals] = await Promise.all([getFieldLog({}), getTotals()]);
+
+  const entries = everything.filter(
+    (e) =>
+      (!params.topic || e.skills?.topics?.slug === params.topic) &&
+      (!params.skill || e.skills?.slug === params.skill) &&
+      (![1, 2, 3].includes(wentFilter) || e.went === wentFilter),
+  );
+
+  const isFiltered = Boolean(params.skill || params.went || params.topic);
+
+  // Topics that actually appear in the log, in the order they first appear.
+  const topics = [
+    ...new Map(
+      everything
+        .map((e) => e.skills?.topics)
+        .filter((t): t is { slug: string; name: string } => Boolean(t))
+        .map((t) => [t.slug, t] as const),
+    ).values(),
+  ];
+
+  // Skills are only offered once a topic is chosen. Across every topic this
+  // row would run to fifty chips, and half of them would say Openers.
+  const skillsInTopic = params.topic
+    ? [
+        ...new Map(
+          everything
+            .filter((e) => e.skills?.topics?.slug === params.topic)
+            .map((e) => e.skills!)
+            .map((s) => [s.slug, s] as const),
+        ).values(),
+      ]
+    : [];
 
   // Group by the user's own calendar day so the log reads as a diary rather
   // than a list, and so the headings do not move with the server's timezone.
@@ -90,6 +122,18 @@ export default async function FieldLogPage({
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">
           Every real conversation you have logged. This is the part that counts.
         </p>
+
+        {/* The threshold is stated here rather than only on the page behind
+            it, so the number is something to aim at while you are looking at
+            how many you have. */}
+        <Link
+          href="/coach"
+          className="mt-3 inline-block text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline"
+        >
+          {totals.repsLogged >= MIN_REPS_FOR_REVIEW
+            ? "Have this log read for patterns →"
+            : `Have this log read for patterns — ${MIN_REPS_FOR_REVIEW - totals.repsLogged} more reps →`}
+        </Link>
 
         <dl className="mt-5 flex gap-8">
           <div>
@@ -166,27 +210,51 @@ export default async function FieldLogPage({
       {entries.length > 0 || isFiltered ? (
         <nav
           aria-label="Filter the field log"
-          className="mt-6 flex flex-wrap items-center gap-2 border-b border-rule pb-5"
+          className="mt-6 flex flex-col gap-3 border-b border-rule pb-5"
         >
-          <FilterChip href="/field-log" active={!isFiltered} label="Everything" />
-          {[3, 2, 1].map((value) => (
+          <div className="flex flex-wrap items-center gap-2">
             <FilterChip
-              key={value}
-              href={`/field-log?went=${value}`}
-              active={wentFilter === value}
-              label={WENT_LABELS[value]}
+              href="/field-log"
+              active={!isFiltered}
+              label="Everything"
             />
-          ))}
-          {skills
-            .filter((s) => entries.some((e) => e.skills?.slug === s.slug))
-            .map((skill) => (
+            {[3, 2, 1].map((value) => (
               <FilterChip
-                key={skill.id}
-                href={`/field-log?skill=${skill.slug}`}
-                active={params.skill === skill.slug}
-                label={skill.name}
+                key={value}
+                href={`/field-log?went=${value}`}
+                active={wentFilter === value}
+                label={WENT_LABELS[value]}
               />
             ))}
+          </div>
+
+          {topics.length > 1 || params.topic ? (
+            <div className="flex flex-wrap items-center gap-2">
+              {topics.map((topic) => (
+                <FilterChip
+                  key={topic.slug}
+                  href={`/field-log?topic=${topic.slug}`}
+                  active={params.topic === topic.slug}
+                  label={topic.name}
+                />
+              ))}
+            </div>
+          ) : null}
+
+          {/* Only once a topic is chosen — a second row of chips is fine, a
+              second row of fifty is not. */}
+          {skillsInTopic.length > 1 ? (
+            <div className="flex flex-wrap items-center gap-2 pl-1">
+              {skillsInTopic.map((skill) => (
+                <FilterChip
+                  key={skill.slug}
+                  href={`/field-log?topic=${params.topic}&skill=${skill.slug}`}
+                  active={params.skill === skill.slug}
+                  label={skill.name}
+                />
+              ))}
+            </div>
+          ) : null}
         </nav>
       ) : null}
 
@@ -206,7 +274,16 @@ export default async function FieldLogPage({
                     key={entry.id}
                     className="border-l-2 border-rule-strong pl-4"
                   >
-                    <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                    {/* The topic sits above the skill rather than beside it.
+                        A skill name alone stopped identifying a rep the moment
+                        two topics could both have an "Openers". */}
+                    {entry.skills?.topics ? (
+                      <p className="tabular text-[11px] uppercase tracking-[0.14em] text-ink-faint">
+                        {entry.skills.topics.name}
+                      </p>
+                    ) : null}
+
+                    <div className="mt-0.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                       <span className="text-sm font-medium text-ink">
                         {entry.skills?.name ?? "A rep"}
                       </span>

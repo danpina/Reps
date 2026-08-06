@@ -7,7 +7,11 @@
  * not to ration honest use.
  */
 
-export type AiKind = "partner_turn" | "feedback" | "refused_turn";
+export type AiKind =
+  | "partner_turn"
+  | "feedback"
+  | "refused_turn"
+  | "rep_review";
 
 export const LIMITS: Record<AiKind, { max: number; windowMinutes: number }> = {
   // A long rehearsal is perhaps thirty turns. Two of those an hour is plenty.
@@ -19,6 +23,12 @@ export const LIMITS: Record<AiKind, { max: number; windowMinutes: number }> = {
   // someone working the model rather than practising, and the cheapest answer
   // is to stop answering. The call has already been paid for either way.
   refused_turn: { max: 5, windowMinutes: 60 },
+  // A read of the whole log is the most expensive call the app makes, and it
+  // is also the one there is least reason to repeat: the answer cannot change
+  // until more conversations have happened. The eligibility rules already
+  // require new material, so this is the backstop for a button pressed twice
+  // rather than a ration.
+  rep_review: { max: 3, windowMinutes: 24 * 60 },
 };
 
 /**

@@ -16,11 +16,16 @@ export type FieldLogEntry = {
   logged_at: string;
   /** The user's own calendar day, independent of the server's timezone. */
   logged_date: string;
-  skills: { slug: string; name: string } | null;
+  skills: {
+    slug: string;
+    name: string;
+    topics: { slug: string; name: string } | null;
+  } | null;
 };
 
 export type FieldLogFilters = {
   skillSlug?: string;
+  topicSlug?: string;
   went?: number;
 };
 
@@ -32,7 +37,7 @@ export async function getFieldLog(
   let query = supabase
     .from("field_logs")
     .select(
-      "id, skill_id, lesson_id, mission_text, context_note, went, reflection, xp_awarded, logged_at, logged_date, skills(slug, name)",
+      "id, skill_id, lesson_id, mission_text, context_note, went, reflection, xp_awarded, logged_at, logged_date, skills(slug, name, topics(slug, name))",
     )
     .order("logged_at", { ascending: false });
 
@@ -41,22 +46,32 @@ export async function getFieldLog(
   const { data, error } = await query;
   if (error) throw new Error(`Could not load the field log: ${error.message}`);
 
-  const entries = (data ?? []) as unknown as FieldLogEntry[];
+  let entries = (data ?? []) as unknown as FieldLogEntry[];
 
   // Filtering by slug after the fact keeps the query simple, and a personal
   // log is never large enough for this to matter.
-  return filters.skillSlug
-    ? entries.filter((e) => e.skills?.slug === filters.skillSlug)
-    : entries;
+  if (filters.topicSlug) {
+    entries = entries.filter(
+      (e) => e.skills?.topics?.slug === filters.topicSlug,
+    );
+  }
+  if (filters.skillSlug) {
+    entries = entries.filter((e) => e.skills?.slug === filters.skillSlug);
+  }
+
+  return entries;
 }
 
 /**
- * There is deliberately no global level here.
+ * There is deliberately no global *level* here — but there is a global rank.
  *
  * Two level numbers on one screen, with nothing explaining how they relate,
- * was more confusing than either alone. Levels are per-skill, which is the one
- * that means something: it says how far you have got at labeling, or at exits,
- * rather than averaging nine separate skills into a number.
+ * was more confusing than either alone. Levels stay per-skill, which is the
+ * number that means something: how far you have got at labeling, or at exits.
+ *
+ * `totalXp` feeds the rank in `lib/progress/ranks`, which is named rather than
+ * numbered for exactly that reason. Skills have levels, you have a rank, and
+ * nobody tries to add a name to a number.
  */
 export type Totals = {
   repsLogged: number;

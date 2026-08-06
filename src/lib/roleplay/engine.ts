@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 
 import { AnthropicPartner } from "./anthropic";
 import {
+  LIMITS,
   checkLimit,
   checkSceneLimit,
   type AiKind,
@@ -42,7 +43,12 @@ export async function checkRateLimit(
   client: SupabaseClient,
   kind: AiKind,
 ): Promise<LimitVerdict> {
-  const since = new Date(Date.now() - 60 * 60_000).toISOString();
+  // Read back as far as this kind's own window. It used to be a flat hour,
+  // which was right while every limit was hourly and would quietly cap a
+  // daily limit at three an hour the moment one existed.
+  const since = new Date(
+    Date.now() - LIMITS[kind].windowMinutes * 60_000,
+  ).toISOString();
 
   const { data, error } = await client
     .from("ai_requests")

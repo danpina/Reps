@@ -95,6 +95,10 @@ const ITEMS: Item[] = [
 export function AppNav() {
   const pathname = usePathname();
 
+  // Pulled out by name rather than by index, so reordering ITEMS cannot
+  // silently promote something else into the corner.
+  const settings = ITEMS.find((i) => i.href === "/settings")!;
+
   return (
     <>
       {/* Wide screens: a quiet bar across the top. */}
@@ -110,7 +114,9 @@ export function AppNav() {
             Reps
           </Link>
 
-          {ITEMS.filter((i) => i.href !== "/log").map((item) => {
+          {ITEMS.filter(
+            (i) => i.href !== "/log" && i.href !== "/settings",
+          ).map((item) => {
             const active = item.match(pathname);
             return (
               <Link
@@ -135,6 +141,25 @@ export function AppNav() {
             className="ml-auto rounded bg-[var(--accent)] px-3.5 py-1.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
           >
             Log a rep
+          </Link>
+
+          {/* Off to the side rather than in the run of tabs. Settings is
+              somewhere you go twice a year, and sitting it beside the places
+              you go daily gave it a weight it has not earned. Icon only, with
+              its name carried by the label for anyone who cannot see it. */}
+          <Link
+            href="/settings"
+            aria-label="Settings"
+            aria-current={settings.match(pathname) ? "page" : undefined}
+            title="Settings"
+            className={[
+              "ml-1 rounded p-1.5 transition-colors",
+              settings.match(pathname)
+                ? "bg-[var(--accent-soft)] text-ink"
+                : "text-ink-faint hover:bg-[var(--paper-raised)] hover:text-ink",
+            ].join(" ")}
+          >
+            {settings.icon}
           </Link>
         </nav>
       </header>
