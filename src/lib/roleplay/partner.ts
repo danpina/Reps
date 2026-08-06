@@ -4,6 +4,26 @@ import type { Feedback, Rewrite } from "./feedback";
 export type Turn = { role: "user" | "partner"; content: string; at: string };
 
 /**
+ * A failure the user is allowed to read.
+ *
+ * Lives here rather than beside the Anthropic client so that the server
+ * actions can catch it without importing the SDK, and so the message shown
+ * mid-rehearsal is decided next to the thing that failed rather than guessed
+ * at by the caller.
+ */
+export class PartnerError extends Error {
+  // Written as a plain field rather than a constructor parameter property,
+  // which Node's type-stripping test runner cannot parse.
+  readonly userMessage: string;
+
+  constructor(userMessage: string, options?: { cause?: unknown }) {
+    super(userMessage, options);
+    this.name = "PartnerError";
+    this.userMessage = userMessage;
+  }
+}
+
+/**
  * The seam between the rehearsal logic and whatever produces the words.
  *
  * Everything in the app is written against this, so adding the real model is a

@@ -2,23 +2,31 @@ import "server-only";
 
 import type { SupabaseClient } from "@supabase/supabase-js";
 
+import { AnthropicPartner } from "./anthropic";
 import { checkLimit, type AiKind, type LimitVerdict } from "./limits";
 import { ScriptedPartner, type PartnerEngine } from "./partner";
 
 /**
- * Chooses which partner produces the words.
+ * Whether real, paid calls are being made.
  *
- * Until an Anthropic key is configured this is always the scripted partner,
- * which costs nothing and behaves correctly with respect to openness. Adding
- * the real engine means returning a different implementation here; nothing
- * that calls this needs to change.
+ * The key's presence is the switch. There is deliberately no separate feature
+ * flag: a flag can disagree with reality, and the failure mode of that
+ * disagreement is either a dead screen or a surprise bill.
  */
-export function getPartnerEngine(): PartnerEngine {
-  return new ScriptedPartner();
+export function isUsingRealModel(): boolean {
+  return Boolean(process.env.ANTHROPIC_API_KEY?.trim());
 }
 
-export function isUsingRealModel(): boolean {
-  return false;
+/**
+ * Chooses which partner produces the words.
+ *
+ * Without a key this falls back to the scripted partner rather than failing.
+ * That keeps the app usable for anyone running it locally without an Anthropic
+ * account, and it keeps the test suite free — the scripted stand-in is
+ * behaviourally correct about openness even though its prose is thin.
+ */
+export function getPartnerEngine(): PartnerEngine {
+  return isUsingRealModel() ? new AnthropicPartner() : new ScriptedPartner();
 }
 
 /**
@@ -37,10 +45,15 @@ export async function checkRateLimit(
     .eq("kind", kind)
     .gte("created_at", since);
 
-  // Failing open on a read error is the right trade here: the scripted engine
-  // costs nothing, and the alternative is blocking a user over a hiccup. This
-  // must be revisited when real calls start costing money.
-  if (error) return { allowed: true, remaining: 0 };
+  // Which way to fail depends on what a call costs. With the scripted engine a
+  // read error should not block anybody, since the worst case is free. With
+  // the real engine the ledger is the only thing standing between a bug in a
+  // loop and a bill, so an unreadable ledger has to mean no.
+  if (error) {
+    return isUsingRealModel()
+      ? { allowed: false, retryAfterMinutes: 1 }
+      : { allowed: true, remaining: 0 };
+  }
 
   return checkLimit(kind, (data ?? []).map((r) => new Date(r.created_at)));
 }

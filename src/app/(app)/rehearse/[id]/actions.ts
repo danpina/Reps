@@ -10,7 +10,7 @@ import {
   getPartnerEngine,
   recordAiRequest,
 } from "@/lib/roleplay/engine";
-import type { Turn } from "@/lib/roleplay/partner";
+import { PartnerError, type Turn } from "@/lib/roleplay/partner";
 import { XP_AWARD, levelForXp } from "@/lib/progress/rules";
 import { awardBadges } from "@/lib/progress/snapshot";
 
@@ -66,15 +66,23 @@ export async function say(
     { role: "user", content: message, at: new Date().toISOString() },
   ];
 
+  // Recorded before the call, not after. A call that fails may still have cost
+  // money, and a failure that does not count against the budget is exactly the
+  // shape of bug that runs up a bill in a retry loop.
+  await recordAiRequest(supabase, user.id, "partner_turn");
+
   let reply: string;
   try {
     const engine = getPartnerEngine();
     reply = await engine.nextTurn(roleplay.lessons.scenario_json, history);
-  } catch {
-    return { error: "Your partner did not respond. Try that line again." };
+  } catch (error) {
+    return {
+      error:
+        error instanceof PartnerError
+          ? error.userMessage
+          : "Your partner did not respond. Try that line again.",
+    };
   }
-
-  await recordAiRequest(supabase, user.id, "partner_turn");
 
   const transcript: Turn[] = [
     ...history,
@@ -117,14 +125,28 @@ export async function endScene(
     };
   }
 
-  const engine = getPartnerEngine();
-  const result = await engine.feedback(
-    roleplay.lessons.scenario_json,
-    roleplay.lessons.rubric_json,
-    roleplay.transcript_json,
-  );
-
   await recordAiRequest(supabase, user.id, "feedback");
+
+  // A thrown error and a review the parser rejected are the same thing from
+  // here: the scene ends, and the user is told why. Letting a network failure
+  // escape would lose the transcript to an error page.
+  const engine = getPartnerEngine();
+  let result: Awaited<ReturnType<typeof engine.feedback>>;
+  try {
+    result = await engine.feedback(
+      roleplay.lessons.scenario_json,
+      roleplay.lessons.rubric_json,
+      roleplay.transcript_json,
+    );
+  } catch (error) {
+    result = {
+      ok: false,
+      reason:
+        error instanceof PartnerError
+          ? error.userMessage
+          : "The reviewer could not be reached.",
+    };
+  }
 
   if (!result.ok) {
     // The scene still closes. Losing the transcript because the review failed
