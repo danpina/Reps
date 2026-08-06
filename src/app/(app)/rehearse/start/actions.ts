@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/dal";
 import { createClient } from "@/lib/supabase/server";
+import { checkSceneStartLimit } from "@/lib/roleplay/engine";
 import { isRehearsalUnlocked } from "@/lib/roleplay/limits";
 
 /**
@@ -50,6 +51,12 @@ export async function startRehearsal(formData: FormData): Promise<void> {
     .maybeSingle();
 
   if (open) redirect(`/rehearse/${open.id}`);
+
+  // Deliberately below the reuse check. Resuming a scene you already started
+  // costs nothing new, and locking someone out of a conversation they are in
+  // the middle of would punish the wrong thing.
+  const scenes = await checkSceneStartLimit(supabase);
+  if (!scenes.allowed) redirect("/rehearse?limit=1");
 
   const { data: created, error } = await supabase
     .from("roleplays")

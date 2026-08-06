@@ -58,6 +58,12 @@ export function buildSystemPrompt(scenario: Scenario): string {
  * The instruction given to the feedback pass. Kept separate from the partner
  * prompt because the two calls must not share a context: the partner must
  * never know it is being scored.
+ *
+ * One vocabulary throughout: learner and partner, matching the transcript's
+ * labels. The reviewer is a third party to both, so every word for either
+ * person is third-person here — while the feedback it writes is addressed to
+ * the learner as "you", which is the voice the scripted engine uses and the
+ * voice the UI renders.
  */
 export function buildFeedbackPrompt(
   rubric: { scale: { min: number; max: number }; criteria: { key: string; label: string; description: string }[] },
@@ -67,7 +73,9 @@ export function buildFeedbackPrompt(
     .join("\n");
 
   return [
-    `You are reviewing a practice conversation. The user was working on a specific skill. Score what they actually did.`,
+    `You are reviewing a practice conversation between two people. The learner is a person deliberately working on their small talk; the partner is a character who was played for them. Score what the learner actually did.`,
+    ``,
+    `Every line of the transcript is labelled. LEARNER is the person you are reviewing. PARTNER is the character they were talking to. Score only the LEARNER lines — how the partner behaved is the situation the learner was handed, not part of their performance.`,
     ``,
     `# Criteria, scored ${rubric.scale.min} to ${rubric.scale.max}`,
     criteria,
@@ -89,7 +97,8 @@ export function buildFeedbackPrompt(
     `# Rules`,
     `- Exactly two entries in "worked". Not one, not three.`,
     `- Exactly one "fix". People can only act on one thing at a time, so choose the change that would have made the most difference.`,
-    `- "original" must be copied verbatim from something the user said in this transcript. Never invent a line, and never quote the partner.`,
+    `- "original" must be copied verbatim from a LEARNER line in this transcript. Never invent a line, and never quote the PARTNER.`,
+    `- Write to the learner in the second person: "you asked", not "the learner asked". Never address them by the partner's name, and never use a name for them at all — you have not been told theirs.`,
     `- Be specific and plain. No praise for its own sake.`,
   ].join("\n");
 }

@@ -130,6 +130,7 @@ function assertNotRefused(message: Anthropic.Message, what: "reply" | "review") 
       what === "reply"
         ? "Your partner would not answer that. Try a different line."
         : "The review could not be produced for this conversation.",
+      { refused: true },
     );
   }
 }
@@ -204,14 +205,12 @@ export class AnthropicPartner implements PartnerEngine {
             role: "user",
             content: [
               `# The scene`,
-              `${scenario.setting} The other person is ${scenario.partner.name}, ${scenario.partner.role}.`,
+              `${scenario.setting} The partner is ${scenario.partner.name}, ${scenario.partner.role}.`,
               ``,
               `# What good looks like here`,
               scenario.success_looks_like,
               ``,
               `# The transcript`,
-              `"YOU" is the character. "THEM" is the person you are reviewing.`,
-              ``,
               renderTranscript(history),
             ].join("\n"),
           },

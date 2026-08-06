@@ -51,13 +51,19 @@ export function toMessages(history: Turn[]): ApiMessage[] {
  * conversation to continue. That keeps the two calls' contexts genuinely
  * separate — the partner must never learn it is being scored — and sidesteps
  * the trailing-turn rule above, since the transcript often ends on the partner.
+ *
+ * Both labels are third-person on purpose. The reviewer is neither party, so a
+ * second-person label points at someone it is not, and the review then
+ * attributes the learner's lines to the only name in its context — the
+ * partner's. Naming both roles outright is what keeps the feedback about the
+ * right person.
  */
 export function renderTranscript(history: Turn[]): string {
   return history
     .filter((turn) => turn.content.trim().length > 0)
     .map(
       (turn) =>
-        `${turn.role === "user" ? "THEM" : "YOU"}: ${turn.content.trim()}`,
+        `${turn.role === "user" ? "LEARNER" : "PARTNER"}: ${turn.content.trim()}`,
     )
     .join("\n");
 }
@@ -96,7 +102,7 @@ export function feedbackSchema(rubric: Rubric): Record<string, unknown> {
       worked: {
         type: "array",
         items: { type: "string" },
-        description: "Exactly two things the person actually did well.",
+        description: "Exactly two things the learner actually did well.",
       },
       fix: {
         type: "string",
@@ -108,7 +114,7 @@ export function feedbackSchema(rubric: Rubric): Record<string, unknown> {
           original: {
             type: "string",
             description:
-              "A line the person actually said, copied verbatim from the transcript.",
+              "A LEARNER line, copied verbatim from the transcript.",
           },
           better: { type: "string" },
           why: { type: "string" },

@@ -67,16 +67,16 @@ describe("toMessages", () => {
 });
 
 describe("renderTranscript", () => {
-  test("labels the person being reviewed as THEM", () => {
-    // The reviewer reads the scene from the character's side, so the person
-    // under review is the other party. Getting this backwards would score the
-    // partner's lines as if the user had written them.
+  test("names both roles in the third person", () => {
+    // The reviewer is neither party. A second-person label points at someone it
+    // is not, and the review then reaches for the only name in its context —
+    // the partner's — and pins the learner's lines on them.
     const text = renderTranscript([user("Nice weather"), partner("Suppose so.")]);
-    assert.equal(text, "THEM: Nice weather\nYOU: Suppose so.");
+    assert.equal(text, "LEARNER: Nice weather\nPARTNER: Suppose so.");
   });
 
   test("skips blank turns", () => {
-    assert.equal(renderTranscript([user("A"), partner("  ")]), "THEM: A");
+    assert.equal(renderTranscript([user("A"), partner("  ")]), "LEARNER: A");
   });
 });
 

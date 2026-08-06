@@ -4,6 +4,7 @@ import { BackLink } from "@/components/back-link";
 import { requireUser } from "@/lib/auth/dal";
 import { createClient } from "@/lib/supabase/server";
 import { averageScore, type Feedback } from "@/lib/roleplay/feedback";
+import { MAX_SCENES_PER_DAY } from "@/lib/roleplay/limits";
 
 export const metadata = { title: "Rehearsals — Reps" };
 
@@ -17,9 +18,14 @@ type Row = {
   lessons: { title: string; sort_order: number; skills: { slug: string; name: string } };
 };
 
-export default async function RehearsalsPage() {
+export default async function RehearsalsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ limit?: string }>;
+}) {
   await requireUser();
   const supabase = await createClient();
+  const atLimit = (await searchParams).limit === "1";
 
   const { data } = await supabase
     .from("roleplays")
@@ -42,6 +48,19 @@ export default async function RehearsalsPage() {
           than one real conversation.
         </p>
       </header>
+
+      {/* Reached by redirect from the start action, so the message has to
+          explain a thing that just happened rather than warn about one. */}
+      {atLimit ? (
+        <p
+          role="status"
+          className="mt-6 rounded border border-[var(--flag)] bg-[var(--flag-soft)] px-4 py-3 text-sm leading-relaxed text-ink"
+        >
+          That is {MAX_SCENES_PER_DAY} scenes today, which is the daily cap.
+          Unfinished ones above are still open. The real reps do not have a
+          limit — go and have one.
+        </p>
+      ) : null}
 
       {rows.length === 0 ? (
         <div className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6">

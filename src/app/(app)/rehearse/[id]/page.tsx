@@ -9,6 +9,7 @@ import type { Rubric, Scenario } from "@/lib/curriculum/types";
 import type { Feedback } from "@/lib/roleplay/feedback";
 import type { Turn } from "@/lib/roleplay/partner";
 import { isUsingRealModel } from "@/lib/roleplay/engine";
+import { turnsLeftInScene } from "@/lib/roleplay/limits";
 import { Chat } from "./chat";
 import { EndScene } from "./end-scene";
 
@@ -54,7 +55,8 @@ export default async function RehearsePage({
   const scenario = lesson.scenario_json;
   const theMove = extractTheMove(lesson.theory_md, lesson.title);
   const complete = roleplay.status === "complete";
-  const hasSpoken = roleplay.transcript_json.some((t) => t.role === "user");
+  const said = roleplay.transcript_json.filter((t) => t.role === "user").length;
+  const hasSpoken = said > 0;
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
@@ -133,6 +135,7 @@ export default async function RehearsePage({
             roleplayId={roleplay.id}
             partnerName={scenario.partner.name}
             transcript={roleplay.transcript_json}
+            turnsLeft={turnsLeftInScene(said)}
           />
           <EndScene roleplayId={roleplay.id} hasSpoken={hasSpoken} />
         </>

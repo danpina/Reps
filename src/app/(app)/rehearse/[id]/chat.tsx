@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useRef } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { MAX_LINE_CHARS } from "@/lib/roleplay/limits";
 import type { Turn } from "@/lib/roleplay/partner";
 import { say, type SayState } from "./actions";
 
@@ -10,18 +11,19 @@ export function Chat({
   roleplayId,
   partnerName,
   transcript,
+  turnsLeft,
 }: {
   roleplayId: string;
   partnerName: string;
   transcript: Turn[];
+  turnsLeft: number;
 }) {
   const [state, formAction] = useActionState<SayState, FormData>(say, {});
-  const formRef = useRef<HTMLFormElement>(null);
   const endRef = useRef<HTMLDivElement>(null);
+  const full = turnsLeft === 0;
 
-  // Clear the box once a line has been sent, and keep the latest turn in view.
+  // Keep the latest turn in view.
   useEffect(() => {
-    if (!state.error) formRef.current?.reset();
     endRef.current?.scrollIntoView({ block: "end" });
   }, [transcript.length, state.error]);
 
@@ -57,20 +59,16 @@ export function Chat({
         <div ref={endRef} />
       </ol>
 
-      <form ref={formRef} action={formAction} className="mt-6">
+      <form action={formAction} className="mt-6">
         <input type="hidden" name="roleplay_id" value={roleplayId} />
         <label htmlFor="message" className="sr-only">
           What you say next
         </label>
-        <textarea
-          id="message"
-          name="message"
-          rows={2}
-          maxLength={600}
-          required
-          placeholder="What do you say?"
-          className="w-full resize-none rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-[15px] leading-relaxed text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-        />
+
+        {/* Keyed on the transcript so a landed line remounts the box, clearing
+            the text and its counter together. A rejected line leaves the
+            transcript untouched, so what they wrote survives for another go. */}
+        <LineBox key={transcript.length} full={full} turnsLeft={turnsLeft} />
 
         {state.error ? (
           <p
@@ -81,8 +79,58 @@ export function Chat({
           </p>
         ) : null}
 
-        <Send />
+        {full ? null : <Send />}
       </form>
+    </>
+  );
+}
+
+/**
+ * The input and the two things it has to tell you: how much of this line is
+ * left, and how much of this scene is.
+ */
+function LineBox({ full, turnsLeft }: { full: boolean; turnsLeft: number }) {
+  // A hard maxLength on its own just stops accepting keystrokes, which reads
+  // as a broken keyboard rather than as a limit.
+  const [used, setUsed] = useState(0);
+  const charsLeft = MAX_LINE_CHARS - used;
+
+  return (
+    <>
+      <textarea
+        id="message"
+        name="message"
+        rows={2}
+        maxLength={MAX_LINE_CHARS}
+        required
+        disabled={full}
+        onChange={(e) => setUsed(e.target.value.length)}
+        placeholder={full ? "This scene is done." : "What do you say?"}
+        className="w-full resize-none rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-[15px] leading-relaxed text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)] disabled:opacity-60"
+      />
+
+      {/* Both counters appear only once they are close. Showing either from the
+          first keystroke would make this feel like a test with a word limit,
+          which is the opposite of the thing being practised. */}
+      {full ? (
+        <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
+          That is as far as this scene goes. End it below and read the review —
+          that part is where the lesson is.
+        </p>
+      ) : (
+        <div className="tabular mt-2 flex items-baseline justify-between gap-3 text-xs text-ink-faint">
+          <span>
+            {turnsLeft <= 4
+              ? `${turnsLeft} ${turnsLeft === 1 ? "line" : "lines"} left in this scene`
+              : ""}
+          </span>
+          {charsLeft <= 40 ? (
+            <span aria-live="polite">
+              {charsLeft} {charsLeft === 1 ? "character" : "characters"} left
+            </span>
+          ) : null}
+        </div>
+      )}
     </>
   );
 }

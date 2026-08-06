@@ -3,9 +3,16 @@ import assert from "node:assert/strict";
 
 import {
   LIMITS,
+  MAX_LINE_CHARS,
+  MAX_SCENES_PER_DAY,
+  MAX_TURNS_PER_SCENE,
   checkLimit,
+  checkSceneLimit,
+  describeWait,
   isRehearsalUnlocked,
   requiredLevelForLesson,
+  sceneIsFull,
+  turnsLeftInScene,
 } from "../src/lib/roleplay/limits.ts";
 import { ScriptedPartner, type Turn } from "../src/lib/roleplay/partner.ts";
 
@@ -57,6 +64,98 @@ describe("rate limits", () => {
 
   test("feedback is limited more tightly than turns, being the costlier call", () => {
     assert.ok(LIMITS.feedback.max < LIMITS.partner_turn.max);
+  });
+
+  test("refusals are limited far more tightly than ordinary turns", () => {
+    // A handful of refusals is a person having a bad go at it. Sixty is
+    // somebody working the model, and that is the case this bound is for.
+    assert.ok(LIMITS.refused_turn.max < LIMITS.feedback.max);
+  });
+
+  test("a run of refusals pauses the rehearsal", () => {
+    const refused = Array.from({ length: LIMITS.refused_turn.max }, () =>
+      minutesAgo(5),
+    );
+    assert.equal(checkLimit("refused_turn", refused, NOW).allowed, false);
+  });
+});
+
+describe("scene length", () => {
+  test("a fresh scene has its full allowance", () => {
+    assert.equal(turnsLeftInScene(0), MAX_TURNS_PER_SCENE);
+    assert.equal(sceneIsFull(0), false);
+  });
+
+  test("fills up exactly at the cap", () => {
+    assert.equal(sceneIsFull(MAX_TURNS_PER_SCENE - 1), false);
+    assert.equal(sceneIsFull(MAX_TURNS_PER_SCENE), true);
+  });
+
+  test("never reports a negative allowance", () => {
+    // The count comes from a stored transcript, and stored data drifts. A
+    // scene somehow over the cap is still just finished.
+    assert.equal(turnsLeftInScene(MAX_TURNS_PER_SCENE + 20), 0);
+    assert.equal(sceneIsFull(MAX_TURNS_PER_SCENE + 20), true);
+  });
+
+  test("a line is one SMS, and no longer", () => {
+    // The whole scene is bounded by these two numbers together: fourteen
+    // lines of a hundred and sixty characters is the most a user can put in
+    // front of the model, however they behave.
+    assert.equal(MAX_LINE_CHARS, 160);
+    assert.ok(MAX_LINE_CHARS * MAX_TURNS_PER_SCENE < 2500);
+  });
+
+  test("is short enough to be small talk", () => {
+    // The cap is a product decision as much as a cost one: past this it is no
+    // longer the thing the app is teaching.
+    assert.ok(MAX_TURNS_PER_SCENE <= 20);
+  });
+});
+
+describe("scenes per day", () => {
+  const hoursAgo = (n: number) => new Date(NOW.getTime() - n * 60 * 60_000);
+
+  test("allows the first scene of the day", () => {
+    const verdict = checkSceneLimit([], NOW);
+    assert.equal(verdict.allowed, true);
+    if (!verdict.allowed) return;
+    assert.equal(verdict.remaining, MAX_SCENES_PER_DAY);
+  });
+
+  test("refuses once the day's scenes are used up", () => {
+    const today = Array.from({ length: MAX_SCENES_PER_DAY }, () => hoursAgo(2));
+    assert.equal(checkSceneLimit(today, NOW).allowed, false);
+  });
+
+  test("scenes older than a day do not count", () => {
+    const old = Array.from({ length: 50 }, () => hoursAgo(25));
+    assert.equal(checkSceneLimit(old, NOW).allowed, true);
+  });
+
+  test("the window slides rather than resetting at midnight", () => {
+    // Full day, but the oldest started 23 hours ago, so one frees up in an
+    // hour rather than at some fixed hour of the clock.
+    const scenes = [
+      hoursAgo(23),
+      ...Array.from({ length: MAX_SCENES_PER_DAY - 1 }, () => hoursAgo(1)),
+    ];
+    const verdict = checkSceneLimit(scenes, NOW);
+    assert.equal(verdict.allowed, false);
+    if (verdict.allowed) return;
+    assert.equal(verdict.retryAfterMinutes, 60);
+  });
+});
+
+describe("describeWait", () => {
+  test("keeps short waits in minutes", () => {
+    assert.equal(describeWait(10), "about 10 minutes");
+    assert.equal(describeWait(1), "about a minute");
+  });
+
+  test("turns long waits into hours, since nobody counts 800 minutes", () => {
+    assert.equal(describeWait(60), "about an hour");
+    assert.equal(describeWait(150), "about 3 hours");
   });
 });
 

@@ -10,6 +10,11 @@ import {
   getPartnerEngine,
   recordAiRequest,
 } from "@/lib/roleplay/engine";
+import {
+  MAX_LINE_CHARS,
+  describeWait,
+  sceneIsFull,
+} from "@/lib/roleplay/limits";
 import { PartnerError, type Turn } from "@/lib/roleplay/partner";
 import { XP_AWARD, levelForXp } from "@/lib/progress/rules";
 import { awardBadges } from "@/lib/progress/snapshot";
@@ -46,7 +51,9 @@ export async function say(
   const message = String(formData.get("message") ?? "").trim();
 
   if (!message) return { error: "Say something first." };
-  if (message.length > 600) return { error: "That is longer than anyone speaks." };
+  if (message.length > MAX_LINE_CHARS) {
+    return { error: "That is longer than anyone speaks. Say it in fewer words." };
+  }
 
   const roleplay = await loadRoleplay(id);
   if (!roleplay) return { error: "That rehearsal could not be found." };
@@ -54,10 +61,29 @@ export async function say(
     return { error: "This scene has already ended." };
   }
 
+  // Checked here and not only in the UI: a disabled textarea is a courtesy,
+  // not a limit. This is the only place the count cannot be got around.
+  const said = roleplay.transcript_json.filter((t) => t.role === "user").length;
+  if (sceneIsFull(said)) {
+    return {
+      error: "This scene has run its course. End it and read the review.",
+    };
+  }
+
   const limit = await checkRateLimit(supabase, "partner_turn");
   if (!limit.allowed) {
     return {
-      error: `You have hit the limit for now. Try again in about ${limit.retryAfterMinutes} minutes.`,
+      error: `You have hit the limit for now. Try again in ${describeWait(limit.retryAfterMinutes)}.`,
+    };
+  }
+
+  // Someone who has had five lines refused in an hour is not rehearsing. The
+  // refusals themselves are harmless — the model declined — but each one was a
+  // paid call, and the pattern is worth stopping rather than serving.
+  const refusals = await checkRateLimit(supabase, "refused_turn");
+  if (!refusals.allowed) {
+    return {
+      error: `Your partner has declined too many of these. Rehearsal is paused for ${describeWait(refusals.retryAfterMinutes)}.`,
     };
   }
 
@@ -68,14 +94,26 @@ export async function say(
 
   // Recorded before the call, not after. A call that fails may still have cost
   // money, and a failure that does not count against the budget is exactly the
-  // shape of bug that runs up a bill in a retry loop.
-  await recordAiRequest(supabase, user.id, "partner_turn");
+  // shape of bug that runs up a bill in a retry loop. If it cannot be recorded
+  // at all, the call does not happen — an uncounted turn is an unlimited one.
+  const recorded = await recordAiRequest(supabase, user.id, "partner_turn");
+  if (!recorded.ok) {
+    return { error: "Rehearsal is unavailable right now. Try again shortly." };
+  }
 
   let reply: string;
   try {
     const engine = getPartnerEngine();
     reply = await engine.nextTurn(roleplay.lessons.scenario_json, history);
   } catch (error) {
+    // A refusal is recorded as well as reported. Without the row the limit
+    // above can never trip, since nothing else remembers that it happened.
+    // The result is not checked here on purpose: the turn has already failed
+    // and the user is about to be told so, and recordAiRequest has already
+    // logged anything that went wrong with the write itself.
+    if (error instanceof PartnerError && error.refused) {
+      await recordAiRequest(supabase, user.id, "refused_turn");
+    }
     return {
       error:
         error instanceof PartnerError
@@ -121,11 +159,14 @@ export async function endScene(
   const limit = await checkRateLimit(supabase, "feedback");
   if (!limit.allowed) {
     return {
-      error: `You have hit the review limit. Try again in about ${limit.retryAfterMinutes} minutes.`,
+      error: `You have hit the review limit. Try again in ${describeWait(limit.retryAfterMinutes)}.`,
     };
   }
 
-  await recordAiRequest(supabase, user.id, "feedback");
+  const recorded = await recordAiRequest(supabase, user.id, "feedback");
+  if (!recorded.ok) {
+    return { error: "The review is unavailable right now. Try again shortly." };
+  }
 
   // A thrown error and a review the parser rejected are the same thing from
   // here: the scene ends, and the user is told why. Letting a network failure

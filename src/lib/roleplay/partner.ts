@@ -16,10 +16,24 @@ export class PartnerError extends Error {
   // which Node's type-stripping test runner cannot parse.
   readonly userMessage: string;
 
-  constructor(userMessage: string, options?: { cause?: unknown }) {
+  /**
+   * True when the model declined to answer rather than failing to.
+   *
+   * The caller has to tell these apart. A timeout is nobody's fault and should
+   * cost the user nothing; a refusal is a response to what they wrote, and a
+   * run of them is the thing the refusal limit exists to stop. Carried on the
+   * error because that is the only channel out of the engine.
+   */
+  readonly refused: boolean;
+
+  constructor(
+    userMessage: string,
+    options?: { cause?: unknown; refused?: boolean },
+  ) {
     super(userMessage, options);
     this.name = "PartnerError";
     this.userMessage = userMessage;
+    this.refused = options?.refused ?? false;
   }
 }
 
