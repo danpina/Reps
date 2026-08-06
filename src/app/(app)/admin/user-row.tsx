@@ -41,7 +41,16 @@ export function UserRow({
           <span className="text-sm text-ink">{user.email ?? "no email"}</span>
 
           {user.isAdmin ? <Tag tone="accent">Admin</Tag> : null}
-          {user.isPro && !user.isAdmin ? <Tag tone="accent">Pro</Tag> : null}
+
+          {/* Every non-admin row says which side of the paywall it is on.
+              Tagging only the subscribers made a free account and an account
+              nobody had looked at yet render identically. */}
+          {user.isAdmin ? null : user.isPro ? (
+            <Tag tone="accent">{accessLabel(user)}</Tag>
+          ) : (
+            <Tag tone="muted">{accessLabel(user)}</Tag>
+          )}
+
           {isSelf ? <Tag tone="muted">You</Tag> : null}
           {blocked ? <Tag tone="flag">Blocked</Tag> : null}
 
@@ -134,6 +143,35 @@ function SettingsForm({ user }: { user: ManagedUser }) {
 }
 
 /**
+ * The word on the tag.
+ *
+ * Four states rather than two, because "Free" covers three different
+ * situations and only one of them means nobody ever paid. A subscription that
+ * ran out and one that was revoked need telling apart when someone asks why
+ * they lost access.
+ */
+function accessLabel(user: ManagedUser): string {
+  if (user.isPro) return "Pro";
+  if (!user.subscription) return "Free";
+  if (user.subscription.status === "canceled") return "Cancelled";
+  if (
+    user.subscription.currentPeriodEnd &&
+    new Date(user.subscription.currentPeriodEnd) <= new Date()
+  ) {
+    return "Expired";
+  }
+  return user.subscription.status === "past_due" ? "Past due" : "Free";
+}
+
+function formatDate(iso: string): string {
+  return new Date(iso).toLocaleDateString(undefined, {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+}
+
+/**
  * Grant or revoke the paid product.
  *
  * Two separate forms rather than one toggle, because a toggle whose current
@@ -155,21 +193,54 @@ function SubscriptionForm({ user }: { user: ManagedUser }) {
       <h3 className="text-xs uppercase tracking-[0.14em] text-ink-faint">
         Subscription
       </h3>
-      <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
-        {user.isPro
-          ? "Every lesson and unlimited rehearsals are open to this account."
-          : "This account can read two lessons per topic and has one free rehearsal."}
-      </p>
+
+      <dl className="mt-2 flex flex-col gap-1 text-[13px] leading-relaxed">
+        <Row label="Access">
+          {user.isPro
+            ? "Every lesson, unlimited rehearsals"
+            : "Two lessons per topic, one rehearsal"}
+        </Row>
+        <Row label="Status">
+          {user.subscription
+            ? `${user.subscription.status} · ${user.subscription.source === "manual" ? "granted by hand" : "Stripe"}`
+            : "no subscription record"}
+        </Row>
+        <Row label={user.isPro ? "Runs until" : "Ended"}>
+          {user.subscription?.currentPeriodEnd
+            ? formatDate(user.subscription.currentPeriodEnd)
+            : user.subscription
+              ? "no end date"
+              : "—"}
+        </Row>
+      </dl>
 
       {user.isPro ? (
-        <form action={revokeAction}>
+        <form action={revokeAction} className="mt-3">
           <input type="hidden" name="user_id" value={user.id} />
           <Feedback state={revokeState} />
           <Button idle="Revoke access" busy="Revoking…" />
         </form>
       ) : (
-        <form action={grantAction}>
+        <form action={grantAction} className="mt-3">
           <input type="hidden" name="user_id" value={user.id} />
+
+          {/* Until Stripe exists this is the only way a subscription with an
+              end date gets created, which makes it the only way to test what
+              happens when one runs out. */}
+          <label className="block">
+            <span className="block text-[13px] text-ink-muted">For how long</span>
+            <select
+              name="duration"
+              defaultValue="none"
+              className="mt-1 rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+            >
+              <option value="none">No end date</option>
+              <option value="week">One week</option>
+              <option value="month">One month</option>
+              <option value="year">One year</option>
+            </select>
+          </label>
+
           <input
             name="note"
             placeholder="Why, for your own records (optional)"
@@ -286,6 +357,21 @@ function Button({
     >
       {pending ? busy : idle}
     </button>
+  );
+}
+
+function Row({
+  label,
+  children,
+}: {
+  label: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="flex gap-3">
+      <dt className="w-24 shrink-0 text-ink-faint">{label}</dt>
+      <dd className="text-ink-muted">{children}</dd>
+    </div>
   );
 }
 

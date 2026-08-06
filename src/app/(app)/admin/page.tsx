@@ -16,6 +16,12 @@ export type ManagedUser = {
   isAdmin: boolean;
   /** A live subscription row, however it got there. */
   isPro: boolean;
+  /** The row itself, live or not, so a lapsed one can be told from none. */
+  subscription: {
+    status: string;
+    source: string;
+    currentPeriodEnd: string | null;
+  } | null;
   createdAt: string;
 };
 
@@ -43,7 +49,7 @@ export default async function AdminPage() {
       admin.from("admins").select("user_id"),
       admin
         .from("subscriptions")
-        .select("user_id, status, current_period_end"),
+        .select("user_id, status, source, current_period_end"),
     ]);
 
   const byId = new Map(
@@ -54,19 +60,17 @@ export default async function AdminPage() {
   // The same three conditions the is_pro() function applies, because this list
   // should show what the database would answer rather than merely that a row
   // exists — a cancelled or lapsed subscription is a row too.
-  const proIds = new Set(
-    (subs ?? [])
-      .filter(
-        (s) =>
-          ["active", "trialing"].includes(s.status as string) &&
-          (!s.current_period_end ||
-            new Date(s.current_period_end as string) > new Date()),
-      )
-      .map((s) => s.user_id as string),
+  const isLive = (s: { status: string; current_period_end: string | null }) =>
+    ["active", "trialing"].includes(s.status) &&
+    (!s.current_period_end || new Date(s.current_period_end) > new Date());
+
+  const subscriptionsByUser = new Map(
+    (subs ?? []).map((s) => [s.user_id as string, s] as const),
   );
 
   const users: ManagedUser[] = (authUsers?.users ?? []).map((u) => {
     const profile = byId.get(u.id);
+    const sub = subscriptionsByUser.get(u.id);
     return {
       id: u.id,
       email: u.email ?? null,
@@ -75,7 +79,20 @@ export default async function AdminPage() {
       blockedAt: (profile?.blocked_at as string | null) ?? null,
       blockedReason: (profile?.blocked_reason as string | null) ?? null,
       isAdmin: adminIds.has(u.id),
-      isPro: proIds.has(u.id),
+      isPro: Boolean(
+        sub &&
+          isLive({
+            status: sub.status as string,
+            current_period_end: sub.current_period_end as string | null,
+          }),
+      ),
+      subscription: sub
+        ? {
+            status: sub.status as string,
+            source: sub.source as string,
+            currentPeriodEnd: (sub.current_period_end as string | null) ?? null,
+          }
+        : null,
       createdAt: u.created_at,
     };
   });
@@ -90,8 +107,9 @@ export default async function AdminPage() {
           Users
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-          {users.length} {users.length === 1 ? "account" : "accounts"}. Admin
-          access is granted in SQL, not here.
+          {users.length} {users.length === 1 ? "account" : "accounts"},{" "}
+          {users.filter((u) => u.isPro || u.isAdmin).length} with full access.
+          Admin access is granted in SQL, not here.
         </p>
       </header>
 

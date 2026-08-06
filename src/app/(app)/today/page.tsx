@@ -13,6 +13,7 @@ import {
   getTotals,
   getResumePoint,
   getWeeklyReview,
+  groupByTopic,
 } from "@/lib/progress/queries";
 import {
   REPS_TO_THEORY_RATIO,
@@ -34,7 +35,9 @@ export default async function TodayPage() {
 
   const fact = randomFact();
   const name = profile?.display_name?.trim();
-  const started = standings.filter((s) => s.progress.xp > 0);
+  // Only skills with something in them, then grouped, so a topic heading only
+  // appears once there is something under it.
+  const started = groupByTopic(standings.filter((s) => s.progress.xp > 0));
   const hasReview = review.reps > 0;
 
   return (
@@ -127,8 +130,13 @@ export default async function TodayPage() {
           <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
             Pick up where you left off
           </h2>
-          <p className="mt-3 text-sm text-ink-muted">{resume.skillName}</p>
-          <p className="mt-0.5 text-base font-medium text-ink">
+          {/* Topic, then skill, then lesson. With one topic the skill name was
+              enough to place you; with seven, "Openers" could be three
+              different tracks. */}
+          <p className="mt-3 text-xs text-ink-faint">
+            {resume.topicName} · {resume.skillName}
+          </p>
+          <p className="mt-1 text-base font-medium text-ink">
             Lesson {resume.lessonSortOrder} · {resume.lessonTitle}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
@@ -180,30 +188,50 @@ export default async function TodayPage() {
           <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
             Where you are
           </h2>
-          <ol className="mt-4 flex flex-col gap-4">
-            {started.map((skill) => (
-              <li key={skill.skill_id}>
-                <div className="flex items-baseline justify-between gap-3">
+          <div className="mt-4 flex flex-col gap-7">
+            {started.map((topic) => (
+              <section key={topic.slug}>
+                <div className="flex items-baseline justify-between gap-3 border-b border-rule pb-1.5">
                   <Link
-                    href={`/skills/${skill.slug}`}
-                    className="text-sm text-ink underline-offset-4 hover:underline"
+                    href={`/topics/${topic.slug}`}
+                    className="text-sm font-medium text-ink underline-offset-4 hover:underline"
                   >
-                    {skill.name}
+                    {topic.name}
                   </Link>
                   <span className="tabular text-xs text-ink-faint">
-                    Level {skill.progress.level}
-                    {skill.progress.isMax
-                      ? ""
-                      : ` · ${describeNextLevel(skill.progress)}`}
+                    {topic.reps} {topic.reps === 1 ? "rep" : "reps"} ·{" "}
+                    {topic.skills.length}{" "}
+                    {topic.skills.length === 1 ? "skill" : "skills"}
                   </span>
                 </div>
-                <Bar
-                  fraction={skill.progress.fraction}
-                  label={`${skill.name} progress to the next level`}
-                />
-              </li>
+
+                <ol className="mt-3 flex flex-col gap-4">
+                  {topic.skills.map((skill) => (
+                    <li key={skill.skill_id}>
+                      <div className="flex items-baseline justify-between gap-3">
+                        <Link
+                          href={`/skills/${skill.slug}`}
+                          className="text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline"
+                        >
+                          {skill.name}
+                        </Link>
+                        <span className="tabular text-xs text-ink-faint">
+                          Level {skill.progress.level}
+                          {skill.progress.isMax
+                            ? ""
+                            : ` · ${describeNextLevel(skill.progress)}`}
+                        </span>
+                      </div>
+                      <Bar
+                        fraction={skill.progress.fraction}
+                        label={`${skill.name} progress to the next level`}
+                      />
+                    </li>
+                  ))}
+                </ol>
+              </section>
             ))}
-          </ol>
+          </div>
         </section>
       ) : null}
 
@@ -252,9 +280,12 @@ export default async function TodayPage() {
         </section>
       ) : null}
 
-      <p className="mt-10 text-xs text-ink-faint">
-        Signed in as {user.email ?? "your account"}.
-      </p>
+      {/* Wraps rather than truncating: a long email on a narrow phone would
+          otherwise push the credit off the edge of the screen. */}
+      <footer className="mt-10 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-xs text-ink-faint">
+        <p>Signed in as {user.email ?? "your account"}.</p>
+        <p>Designed by DR-P</p>
+      </footer>
     </main>
   );
 }

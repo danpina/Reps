@@ -44,6 +44,9 @@ export default async function FieldLogPage({
     went?: string;
     logged?: string;
     badges?: string;
+    edited?: string;
+    deleted?: string;
+    error?: string;
   }>;
 }) {
   await requireUser();
@@ -142,6 +145,24 @@ export default async function FieldLogPage({
         </div>
       ) : null}
 
+      {params.error ? (
+        <p
+          role="alert"
+          className="mt-5 rounded border border-[var(--flag)] bg-[var(--flag-soft)] px-4 py-3 text-sm text-ink"
+        >
+          That rep could not be deleted, so nothing has changed. Try again.
+        </p>
+      ) : params.edited || params.deleted ? (
+        <p
+          role="status"
+          className="mt-5 rounded border border-rule bg-[var(--paper-raised)] px-4 py-3 text-sm text-ink"
+        >
+          {params.deleted
+            ? "Rep deleted. The XP and the streak have been put back the way they were."
+            : "Rep updated."}
+        </p>
+      ) : null}
+
       {entries.length > 0 || isFiltered ? (
         <nav
           aria-label="Filter the field log"
@@ -220,6 +241,16 @@ export default async function FieldLogPage({
                         {entry.mission_text}
                       </p>
                     ) : null}
+
+                    {/* Quiet on purpose. A diary of real conversations should
+                        read as a record first, and offer to be corrected
+                        second. */}
+                    <Link
+                      href={`/field-log/${entry.id}`}
+                      className="mt-2 inline-block text-[12px] text-ink-faint underline-offset-4 hover:text-ink hover:underline"
+                    >
+                      Edit
+                    </Link>
                   </li>
                 ))}
               </ol>

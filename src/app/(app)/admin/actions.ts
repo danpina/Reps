@@ -214,16 +214,38 @@ export async function deleteUser(
 }
 
 /**
+ * How long a hand-granted subscription lasts.
+ *
+ * Not a pricing model — there is no billing yet, and paid plans will arrive
+ * with their own table when there is something to charge for. These exist so
+ * that a subscription with an end date can be created at all, which is the
+ * only way to see what the app does when one runs out.
+ *
+ * Calendar arithmetic rather than a count of days, so "one month" granted on
+ * the 3rd ends on the 3rd. Granting on the 31st lands wherever Date decides,
+ * which is close enough for a comp.
+ */
+const DURATIONS = ["none", "week", "month", "year"] as const;
+type Duration = (typeof DURATIONS)[number];
+
+function periodEndFor(duration: Duration): string | null {
+  if (duration === "none") return null;
+
+  const end = new Date();
+  if (duration === "week") end.setDate(end.getDate() + 7);
+  if (duration === "month") end.setMonth(end.getMonth() + 1);
+  if (duration === "year") end.setFullYear(end.getFullYear() + 1);
+
+  return end.toISOString();
+}
+
+/**
  * Opens the paid product for an account, by hand.
  *
  * This is the only writer of `subscriptions` until Stripe exists, and it works
  * because the secret key bypasses row level security — the table has no insert
  * policy at all, so nothing reachable with a user's own session can grant
  * entitlement, including a user granting it to themselves.
- *
- * A grant made here has no end date. That is right for the people this is for:
- * friends, testers, and anyone owed a comp. Stripe's rows will carry a period
- * end and expire on their own.
  */
 export async function grantPro(
   _prev: AdminState,
@@ -234,14 +256,21 @@ export async function grantPro(
 
   const userId = String(formData.get("user_id") ?? "");
   const note = String(formData.get("note") ?? "").trim();
+  const duration = String(formData.get("duration") ?? "none");
+
   if (!userId) return { error: "No user was given." };
+  if (!(DURATIONS as readonly string[]).includes(duration)) {
+    return { error: "That is not one of the durations." };
+  }
+
+  const endsAt = periodEndFor(duration as Duration);
 
   const { error } = await session.admin.from("subscriptions").upsert(
     {
       user_id: userId,
       status: "active",
       source: "manual",
-      current_period_end: null,
+      current_period_end: endsAt,
       granted_by: session.actorId,
       note: note || null,
     },
@@ -251,7 +280,11 @@ export async function grantPro(
   if (error) return { error: `That did not save: ${error.message}` };
 
   revalidatePath("/admin");
-  return { done: "Subscription granted." };
+  return {
+    done: endsAt
+      ? `Granted until ${new Date(endsAt).toLocaleDateString()}.`
+      : "Granted, with no end date.",
+  };
 }
 
 /**

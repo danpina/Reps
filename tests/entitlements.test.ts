@@ -134,6 +134,38 @@ describe(
       assert.equal(mine, all);
     });
 
+    // Grants can now carry an end date, so the interesting case is a row that
+    // exists and has run out. is_pro() checks the date; if it ever stopped,
+    // every lapsed subscriber would keep the product silently and forever.
+    test("a subscription that has run out grants nothing", async () => {
+      const yesterday = new Date(Date.now() - 24 * 3600_000).toISOString();
+
+      await admin
+        .from("subscriptions")
+        .update({ current_period_end: yesterday })
+        .eq("user_id", paid.id);
+
+      const { count } = await paid.client
+        .from("lessons")
+        .select("id", { count: "exact", head: true });
+
+      const { count: preview } = await admin
+        .from("lesson_index")
+        .select("id", { count: "exact", head: true })
+        .eq("is_preview", true);
+
+      assert.equal(
+        count,
+        preview,
+        "an expired subscription still opened the paid lessons",
+      );
+
+      await admin
+        .from("subscriptions")
+        .update({ current_period_end: null })
+        .eq("user_id", paid.id);
+    });
+
     test("locked titles stay visible so a lock can be shown", async () => {
       const [{ count: all }, { count: visible }] = await Promise.all([
         admin.from("lessons").select("id", { count: "exact", head: true }),

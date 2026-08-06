@@ -92,6 +92,9 @@ export type SkillStanding = {
   slug: string;
   name: string;
   sort_order: number;
+  topic_slug: string;
+  topic_name: string;
+  topic_sort_order: number;
   reps: number;
   progress: LevelProgress;
 };
@@ -100,7 +103,9 @@ export async function getSkillStandings(): Promise<SkillStanding[]> {
   const supabase = await createClient();
 
   const [{ data: skills }, { data: states }, { data: logs }] = await Promise.all([
-    supabase.from("skills").select("id, slug, name, sort_order").order("sort_order"),
+    supabase
+      .from("skills")
+      .select("id, slug, name, sort_order, topics!inner(slug, name, sort_order)"),
     supabase.from("user_skill_state").select("skill_id, xp"),
     supabase.from("field_logs").select("skill_id"),
   ]);
@@ -111,17 +116,62 @@ export async function getSkillStandings(): Promise<SkillStanding[]> {
     repsBySkill.set(log.skill_id, (repsBySkill.get(log.skill_id) ?? 0) + 1);
   }
 
-  return (skills ?? []).map((skill) => ({
-    skill_id: skill.id,
-    slug: skill.slug,
-    name: skill.name,
-    sort_order: skill.sort_order,
-    reps: repsBySkill.get(skill.id) ?? 0,
-    progress: levelProgress(xpBySkill.get(skill.id) ?? 0),
-  }));
+  const rows = (skills ?? []) as unknown as {
+    id: string;
+    slug: string;
+    name: string;
+    sort_order: number;
+    topics: { slug: string; name: string; sort_order: number };
+  }[];
+
+  return rows
+    .map((skill) => ({
+      skill_id: skill.id,
+      slug: skill.slug,
+      name: skill.name,
+      sort_order: skill.sort_order,
+      topic_slug: skill.topics.slug,
+      topic_name: skill.topics.name,
+      topic_sort_order: skill.topics.sort_order,
+      reps: repsBySkill.get(skill.id) ?? 0,
+      progress: levelProgress(xpBySkill.get(skill.id) ?? 0),
+    }))
+    // Sorted here rather than in the query: skills are now ordered within a
+    // topic, so a single ORDER BY on the skill's own position would interleave
+    // every topic's first skill together at the top.
+    .sort(
+      (a, b) =>
+        a.topic_sort_order - b.topic_sort_order || a.sort_order - b.sort_order,
+    );
+}
+
+/** Skills grouped under the topic they belong to, topics in order. */
+export type TopicStanding = {
+  slug: string;
+  name: string;
+  reps: number;
+  skills: SkillStanding[];
+};
+
+export function groupByTopic(standings: SkillStanding[]): TopicStanding[] {
+  const topics: TopicStanding[] = [];
+
+  for (const skill of standings) {
+    let topic = topics.find((t) => t.slug === skill.topic_slug);
+    if (!topic) {
+      topic = { slug: skill.topic_slug, name: skill.topic_name, reps: 0, skills: [] };
+      topics.push(topic);
+    }
+    topic.skills.push(skill);
+    topic.reps += skill.reps;
+  }
+
+  return topics;
 }
 
 export type ResumePoint = {
+  topicName: string;
+  topicSlug: string;
   skillSlug: string;
   skillName: string;
   lessonTitle: string;
@@ -142,7 +192,7 @@ export async function getResumePoint(): Promise<ResumePoint | null> {
   const { data } = await supabase
     .from("user_skill_state")
     .select(
-      "updated_at, current_lesson_id, lessons!user_skill_state_current_lesson_id_fkey(title, sort_order, skill_id, skills(slug, name))",
+      "updated_at, current_lesson_id, lessons!user_skill_state_current_lesson_id_fkey(title, sort_order, skill_id, skills(slug, name, topics(slug, name)))",
     )
     .not("current_lesson_id", "is", null)
     .order("updated_at", { ascending: false })
@@ -156,7 +206,11 @@ export async function getResumePoint(): Promise<ResumePoint | null> {
       title: string;
       sort_order: number;
       skill_id: string;
-      skills: { slug: string; name: string };
+      skills: {
+        slug: string;
+        name: string;
+        topics: { slug: string; name: string };
+      };
     } | null;
   }).lessons;
 
@@ -170,6 +224,8 @@ export async function getResumePoint(): Promise<ResumePoint | null> {
   const total = count ?? 0;
 
   return {
+    topicName: lesson.skills.topics.name,
+    topicSlug: lesson.skills.topics.slug,
     skillSlug: lesson.skills.slug,
     skillName: lesson.skills.name,
     lessonTitle: lesson.title,

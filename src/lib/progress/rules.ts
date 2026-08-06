@@ -217,6 +217,36 @@ export function applyActivity(
   };
 }
 
+/**
+ * The streak that a given set of active days adds up to.
+ *
+ * Needed because a rep can be deleted, and a streak cannot be un-applied: it
+ * depends on the gaps between days and on how many rest days each week had
+ * left, so there is no correct way to subtract one day from the middle of it.
+ * Replaying every remaining day through `applyActivity` gives exactly the
+ * streak the user would have had if the deleted rep had never existed.
+ *
+ * Days may arrive in any order and may repeat — two reps on one day are one
+ * active day.
+ */
+export function replayStreak(days: string[]): StreakState {
+  const distinct = [...new Set(days)].sort();
+
+  let state: StreakState = {
+    current: 0,
+    longest: 0,
+    lastActiveDate: null,
+    restDaysUsedThisWeek: 0,
+    weekStartDate: null,
+  };
+
+  for (const day of distinct) {
+    state = applyActivity(state, day);
+  }
+
+  return state;
+}
+
 export const WENT_LABELS: Record<number, string> = {
   1: "Not well",
   2: "Mixed",
