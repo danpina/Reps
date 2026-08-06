@@ -72,10 +72,10 @@ export default async function TodayPage() {
             Log a rep
           </Link>
           <Link
-            href={totals.repsLogged === 0 ? "/skills" : "/field-log"}
+            href={totals.repsLogged === 0 ? "/topics" : "/field-log"}
             className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper)]"
           >
-            {totals.repsLogged === 0 ? "Browse skills" : "See your reps"}
+            {totals.repsLogged === 0 ? "Browse topics" : "See your reps"}
           </Link>
         </div>
 

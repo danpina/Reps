@@ -4,10 +4,16 @@ import { notFound } from "next/navigation";
 import { BackLink } from "@/components/back-link";
 import { Prose } from "@/components/prose";
 import { requireUser } from "@/lib/auth/dal";
-import { getLesson, getSkillBySlug } from "@/lib/curriculum/queries";
+import { isPro } from "@/lib/billing/entitlement";
+import {
+  getLesson,
+  getSkillBySlug,
+  getTopicForSkill,
+} from "@/lib/curriculum/queries";
 import { shuffle } from "@/lib/curriculum/shuffle";
 import { XP_AWARD } from "@/lib/progress/rules";
 import { ComprehensionBeat } from "./comprehension-beat";
+import { LockedLesson } from "./locked";
 import { MarkRead } from "./mark-read";
 import { Rehearsal } from "./rehearsal";
 
@@ -22,12 +28,37 @@ export default async function LessonPage({
   const sortOrder = Number(lessonParam);
   if (!Number.isInteger(sortOrder) || sortOrder < 1) notFound();
 
+  // The index first, because it is the only thing that can tell a lesson that
+  // does not exist from one this account may not read. `lessons` answers both
+  // with nothing, by design.
+  const [track, topic, pro] = await Promise.all([
+    getSkillBySlug(slug),
+    getTopicForSkill(slug),
+    isPro(),
+  ]);
+
+  const entry = track?.lessons.find((l) => l.sort_order === sortOrder);
+  if (!track || !entry) notFound();
+
+  const total = track.lessons.length;
+
+  if (!pro && !entry.is_preview) {
+    return (
+      <LockedLesson
+        skillName={track.name}
+        skillSlug={track.slug}
+        topicName={topic?.name ?? "this topic"}
+        lessonTitle={entry.title}
+        sortOrder={sortOrder}
+        total={total}
+      />
+    );
+  }
+
   const result = await getLesson(slug, sortOrder);
   if (!result) notFound();
 
   const { skill, lesson } = result;
-  const track = await getSkillBySlug(slug);
-  const total = track?.lessons.length ?? 0;
   const hasNext = sortOrder < total;
 
   // Shuffled here rather than in the client component, so the browser hydrates

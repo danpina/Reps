@@ -1,3 +1,6 @@
+import Link from "next/link";
+
+import { rehearsalsLeft } from "@/lib/billing/entitlement";
 import { createClient } from "@/lib/supabase/server";
 import {
   isRehearsalUnlocked,
@@ -28,6 +31,7 @@ export async function Rehearsal({
 }) {
   const supabase = await createClient();
 
+  const left = await rehearsalsLeft();
   const [{ data: state }, { data: past }] = await Promise.all([
     supabase
       .from("user_skill_state")
@@ -48,6 +52,12 @@ export async function Rehearsal({
   const open = (past ?? []).find((r) => r.status === "open");
   const completed = (past ?? []).filter((r) => r.status === "complete").length;
 
+  // A free account gets a fixed number of scenes rather than a daily
+  // allowance, because this is the one feature that costs real money every
+  // time it runs. Carrying on a scene already open is always allowed: it has
+  // been paid for and abandoning someone mid-conversation teaches nothing.
+  const spent = left !== null && left <= 0 && !open;
+
   return (
     <section
       aria-labelledby="rehearse"
@@ -60,7 +70,20 @@ export async function Rehearsal({
         Rehearse it first
       </h2>
 
-      {unlocked ? (
+      {spent ? (
+        <>
+          <p className="mt-3 text-sm leading-relaxed text-ink-muted">
+            You have used your free rehearsal. {partnerName} is waiting on this
+            one, and every other scene in the app, with a subscription.
+          </p>
+          <Link
+            href="/pro"
+            className="mt-4 inline-flex rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper)]"
+          >
+            What a subscription unlocks
+          </Link>
+        </>
+      ) : unlocked ? (
         <>
           <p className="mt-3 text-sm leading-relaxed text-ink">
             Practise this on {partnerName} before you try it on anyone real.
@@ -68,6 +91,11 @@ export async function Rehearsal({
               ? " They are hard work on purpose."
               : ""}
           </p>
+          {left !== null ? (
+            <p className="tabular mt-2 text-xs text-ink-faint">
+              {left} free {left === 1 ? "rehearsal" : "rehearsals"} left
+            </p>
+          ) : null}
           <form action={startRehearsal} className="mt-4 flex items-center gap-3">
             <input type="hidden" name="lesson_id" value={lessonId} />
             <button

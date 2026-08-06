@@ -1,9 +1,21 @@
+export type Topic = {
+  id: string;
+  slug: string;
+  name: string;
+  description: string;
+  /** What you can do once you have worked through it. */
+  promise: string;
+  sort_order: number;
+};
+
 export type Skill = {
   id: string;
   slug: string;
   name: string;
   description: string;
   core_idea: string;
+  topic_id: string;
+  /** Position within its topic, not within the app. */
   sort_order: number;
 };
 
@@ -66,4 +78,15 @@ export type Lesson = {
   mission_text: string;
 };
 
-export type LessonSummary = Pick<Lesson, "id" | "sort_order" | "title">;
+/**
+ * A row of the table of contents.
+ *
+ * Read from the `lesson_index` view rather than from `lessons`, because a
+ * gated lesson has to appear in a list in order to be shown as locked, and the
+ * policy on `lessons` correctly makes it invisible.
+ */
+export type LessonSummary = Pick<Lesson, "id" | "sort_order" | "title"> & {
+  skill_id: string;
+  /** Inside the free sample, so readable without a subscription. */
+  is_preview: boolean;
+};

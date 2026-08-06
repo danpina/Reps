@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 
 import { BackLink } from "@/components/back-link";
 import { Prose } from "@/components/prose";
 import { requireUser } from "@/lib/auth/dal";
+import { isPro } from "@/lib/billing/entitlement";
 import { getRecap } from "@/lib/curriculum/recap";
 
 export const metadata = { title: "Recap — Reps" };
@@ -15,6 +16,13 @@ export default async function RecapPage({
 }) {
   await requireUser();
   const { slug } = await params;
+
+  // A recap is assembled from the lessons themselves, so on a free account it
+  // would quietly become a two-line summary of the sample rather than a
+  // summary of the track. Redirecting is more honest than rendering a page
+  // that looks complete and is not.
+  if (!(await isPro())) redirect("/pro");
+
   const recap = await getRecap(slug);
 
   if (!recap) notFound();

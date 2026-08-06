@@ -4,8 +4,8 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth/dal";
+import { getTopics } from "@/lib/curriculum/queries";
 import { createClient } from "@/lib/supabase/server";
-import { CONTEXTS, FIRST_TRACK, type Context } from "./first-track";
 
 export type WelcomeState = { error?: string };
 
@@ -17,18 +17,21 @@ export async function completeOnboarding(
   const supabase = await createClient();
 
   const displayName = String(formData.get("display_name") ?? "").trim();
-  const context = String(formData.get("onboarding_context") ?? "");
+  const topicSlug = String(formData.get("topic") ?? "");
   const timezone = String(formData.get("timezone") ?? "").trim();
 
   if (!displayName) return { error: "What should the app call you?" };
   if (displayName.length > 60) return { error: "That name is a bit long." };
-  if (!CONTEXTS.includes(context as Context)) {
-    return { error: "Pick where you want to get better." };
-  }
+
+  // Checked against the topics that actually exist rather than a list kept in
+  // the code, so adding a topic is one migration and nothing else.
+  const topic = (await getTopics()).find((t) => t.slug === topicSlug);
+  if (!topic) return { error: "Pick where you want to start." };
 
   const patch: Record<string, string> = {
     display_name: displayName,
-    onboarding_context: context,
+    starting_topic_id: topic.id,
+    onboarded_at: new Date().toISOString(),
   };
 
   // Same loose IANA check as the log action.
@@ -44,5 +47,9 @@ export async function completeOnboarding(
   if (error) return { error: `That did not save: ${error.message}` };
 
   revalidatePath("/today");
-  redirect(`/skills/${FIRST_TRACK[context as Context]}/1`);
+
+  // Straight into the first lesson when there is one. Landing on a list after
+  // choosing from a list is a click that teaches nothing.
+  const first = topic.skills[0];
+  redirect(first ? `/skills/${first.slug}/1` : `/topics/${topic.slug}`);
 }

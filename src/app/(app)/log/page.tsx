@@ -1,5 +1,5 @@
 import { requireUser } from "@/lib/auth/dal";
-import { getSkills } from "@/lib/curriculum/queries";
+import { getTopics } from "@/lib/curriculum/queries";
 import { createClient } from "@/lib/supabase/server";
 import { LogForm } from "./log-form";
 
@@ -12,7 +12,7 @@ export default async function LogPage({
 }) {
   await requireUser();
   const { lesson: lessonId } = await searchParams;
-  const skills = await getSkills();
+  const topics = await getTopics();
 
   let missionText: string | undefined;
   let defaultSkillId: string | undefined;
@@ -43,7 +43,12 @@ export default async function LogPage({
       </header>
 
       <LogForm
-        skills={skills.map((s) => ({ id: s.id, name: s.name }))}
+        groups={topics
+          .filter((t) => t.skills.length > 0)
+          .map((t) => ({
+            topic: t.name,
+            skills: t.skills.map((s) => ({ id: s.id, name: s.name })),
+          }))}
         defaultSkillId={defaultSkillId}
         lessonId={lessonId}
         missionText={missionText}

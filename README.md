@@ -100,17 +100,47 @@ suite skips rather than passing silently, so check the output says `pass`, not
 
 ## Curriculum
 
+Three levels: **topics** hold **skills** hold **lessons**. A topic is a
+situation — Small talk, Interviews, Work, Dating, Making friends, Hard
+conversations, Storytelling — and the skills inside it are written for that
+situation only, because an opener at a bar and an opener in an interview are
+different crafts.
+
 Lessons live in `supabase/migrations/*_seed_lessons_*.sql`, one migration per
-track. Each lesson carries a theory card, exactly three worked examples, a
-comprehension beat, a rubric for the feedback engine, and a roleplay scenario
+skill. Each lesson carries a theory card, exactly three worked examples, two
+comprehension beats, a rubric for the feedback engine, and a roleplay scenario
 whose partner has an `openness` of 1 to 5.
+
+## Entitlements
+
+The first two lessons of the first skill in every topic are free, along with one
+rehearsal, the field log, streaks and the weekly review. Everything else needs a
+subscription.
+
+That rule lives in row level security, not in the pages — see
+`supabase/migrations/*_entitlements.sql`. A gate written only in the UI is a gate
+on a hyperlink, and the lesson body is the product. Because a gated row is
+invisible to a free account, listings read from the `lesson_index` view, which
+exposes titles and nothing that teaches anything.
+
+There is no checkout yet. Access is granted by hand from the admin screen, which
+writes a `subscriptions` row with the secret key; the table has no insert policy,
+so nothing reachable with a user's own session can grant entitlement. Stripe
+later writes the same rows and nothing else has to change.
+
+[`tests/entitlements.test.ts`](tests/entitlements.test.ts) proves all of this
+against real policies with real sessions. It needs the same three environment
+variables as the RLS suite.
 
 [`tests/curriculum.test.ts`](tests/curriculum.test.ts) validates all of that
 without a database: it parses every `$j$` block, rejects malformed JSON, and
 enforces the rules the content has to follow — three examples per card, exactly
-one correct answer per check, openness within range, and a scenario that tells
-the roleplay partner never to coach mid-scene. Run `npm test` after writing a
-track.
+one correct answer per check, openness within range, every skill filed under a
+topic that exists, and a scenario that tells the roleplay partner never to coach
+mid-scene. Run `npm test` after writing a track.
+
+Avoid currency symbols in seed content. A stray dollar sign inside a
+dollar-quoted block breaks the migration and the test's parser at once.
 
 ## Design
 

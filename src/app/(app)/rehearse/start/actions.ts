@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/dal";
+import { rehearsalsLeft } from "@/lib/billing/entitlement";
 import { createClient } from "@/lib/supabase/server";
 import { checkSceneStartLimit } from "@/lib/roleplay/engine";
 import { isRehearsalUnlocked } from "@/lib/roleplay/limits";
@@ -18,7 +19,7 @@ export async function startRehearsal(formData: FormData): Promise<void> {
   const supabase = await createClient();
 
   const lessonId = String(formData.get("lesson_id") ?? "");
-  if (!lessonId) redirect("/skills");
+  if (!lessonId) redirect("/topics");
 
   const { data: lesson } = await supabase
     .from("lessons")
@@ -26,7 +27,7 @@ export async function startRehearsal(formData: FormData): Promise<void> {
     .eq("id", lessonId)
     .maybeSingle();
 
-  if (!lesson) redirect("/skills");
+  if (!lesson) redirect("/topics");
 
   const { data: state } = await supabase
     .from("user_skill_state")
@@ -58,12 +59,17 @@ export async function startRehearsal(formData: FormData): Promise<void> {
   const scenes = await checkSceneStartLimit(supabase);
   if (!scenes.allowed) redirect("/rehearse?limit=1");
 
+  // The insert policy refuses this too. Checking here as well is what turns a
+  // failed write into an explanation of what a subscription is.
+  const left = await rehearsalsLeft();
+  if (left !== null && left <= 0) redirect("/pro?rehearsals=spent");
+
   const { data: created, error } = await supabase
     .from("roleplays")
     .insert({ user_id: user.id, lesson_id: lessonId })
     .select("id")
     .single();
 
-  if (error || !created) redirect("/skills");
+  if (error || !created) redirect("/topics");
   redirect(`/rehearse/${created.id}`);
 }

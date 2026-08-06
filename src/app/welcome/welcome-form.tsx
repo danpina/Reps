@@ -5,35 +5,24 @@ import { useFormStatus } from "react-dom";
 
 import { completeOnboarding, type WelcomeState } from "./actions";
 
-const CONTEXTS = [
-  {
-    value: "work",
-    label: "At work",
-    hint: "Colleagues, clients, the people you see every day and still cannot talk to.",
-  },
-  {
-    value: "casual",
-    label: "Out and about",
-    hint: "Strangers, queues, parties, the gym. Conversations from nothing.",
-  },
-  {
-    value: "flirting",
-    label: "Dating",
-    hint: "Reading interest accurately, and backing off warmly when it is not there.",
-  },
-  {
-    value: "all",
-    label: "All of it",
-    hint: "No particular weak spot. Start at the beginning and work through.",
-  },
-];
+export type TopicChoice = {
+  slug: string;
+  name: string;
+  description: string;
+};
 
-export function WelcomeForm({ suggestedName }: { suggestedName?: string }) {
+export function WelcomeForm({
+  suggestedName,
+  topics,
+}: {
+  suggestedName?: string;
+  topics: TopicChoice[];
+}) {
   const [state, formAction] = useActionState<WelcomeState, FormData>(
     completeOnboarding,
     {},
   );
-  const [context, setContext] = useState<string | null>(null);
+  const [choice, setChoice] = useState<string | null>(null);
 
   return (
     <form action={formAction} className="mt-8 flex flex-col gap-8">
@@ -65,15 +54,16 @@ export function WelcomeForm({ suggestedName }: { suggestedName?: string }) {
           Where do you most want to get better?
         </legend>
         <p className="text-[13px] leading-relaxed text-ink-muted">
-          This only picks where you start. Every track stays available.
+          This only picks where you start. Every topic stays available, and more
+          are being written.
         </p>
 
         <div className="mt-2 flex flex-col gap-2">
-          {CONTEXTS.map((option) => {
-            const selected = context === option.value;
+          {topics.map((option) => {
+            const selected = choice === option.slug;
             return (
               <label
-                key={option.value}
+                key={option.slug}
                 className={[
                   "cursor-pointer rounded border px-4 py-3 transition-colors",
                   // The input is sr-only, so the label carries the focus ring.
@@ -85,18 +75,18 @@ export function WelcomeForm({ suggestedName }: { suggestedName?: string }) {
               >
                 <input
                   type="radio"
-                  name="onboarding_context"
-                  value={option.value}
+                  name="topic"
+                  value={option.slug}
                   checked={selected}
-                  onChange={() => setContext(option.value)}
+                  onChange={() => setChoice(option.slug)}
                   required
                   className="sr-only"
                 />
                 <span className="block text-sm font-medium text-ink">
-                  {option.label}
+                  {option.name}
                 </span>
                 <span className="mt-1 block text-[13px] leading-relaxed text-ink-muted">
-                  {option.hint}
+                  {option.description}
                 </span>
               </label>
             );

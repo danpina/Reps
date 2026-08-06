@@ -42,7 +42,8 @@ export type Profile = {
   id: string;
   display_name: string | null;
   timezone: string;
-  onboarding_context: "work" | "casual" | "flirting" | "all" | null;
+  onboarded_at: string | null;
+  starting_topic_id: string | null;
   theme: Theme;
   blocked_at: string | null;
   blocked_reason: string | null;
@@ -57,7 +58,7 @@ export const getProfile = cache(async (): Promise<Profile | null> => {
   const { data } = await supabase
     .from("profiles")
     .select(
-      "id, display_name, timezone, onboarding_context, theme, blocked_at, blocked_reason, created_at",
+      "id, display_name, timezone, onboarded_at, starting_topic_id, theme, blocked_at, blocked_reason, created_at",
     )
     .eq("id", user.id)
     .maybeSingle();

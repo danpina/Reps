@@ -213,6 +213,75 @@ export async function deleteUser(
   return { done: "User deleted." };
 }
 
+/**
+ * Opens the paid product for an account, by hand.
+ *
+ * This is the only writer of `subscriptions` until Stripe exists, and it works
+ * because the secret key bypasses row level security — the table has no insert
+ * policy at all, so nothing reachable with a user's own session can grant
+ * entitlement, including a user granting it to themselves.
+ *
+ * A grant made here has no end date. That is right for the people this is for:
+ * friends, testers, and anyone owed a comp. Stripe's rows will carry a period
+ * end and expire on their own.
+ */
+export async function grantPro(
+  _prev: AdminState,
+  formData: FormData,
+): Promise<AdminState> {
+  const session = await begin();
+  if (!session.ok) return { error: session.error };
+
+  const userId = String(formData.get("user_id") ?? "");
+  const note = String(formData.get("note") ?? "").trim();
+  if (!userId) return { error: "No user was given." };
+
+  const { error } = await session.admin.from("subscriptions").upsert(
+    {
+      user_id: userId,
+      status: "active",
+      source: "manual",
+      current_period_end: null,
+      granted_by: session.actorId,
+      note: note || null,
+    },
+    { onConflict: "user_id" },
+  );
+
+  if (error) return { error: `That did not save: ${error.message}` };
+
+  revalidatePath("/admin");
+  return { done: "Subscription granted." };
+}
+
+/**
+ * Closes it again.
+ *
+ * The row is marked cancelled rather than deleted, so that why-and-by-whom
+ * survives the decision. `is_pro` reads the status, so a cancelled row is the
+ * same as no row for every purpose except the record.
+ */
+export async function revokePro(
+  _prev: AdminState,
+  formData: FormData,
+): Promise<AdminState> {
+  const session = await begin();
+  if (!session.ok) return { error: session.error };
+
+  const userId = String(formData.get("user_id") ?? "");
+  if (!userId) return { error: "No user was given." };
+
+  const { error } = await session.admin
+    .from("subscriptions")
+    .update({ status: "canceled" })
+    .eq("user_id", userId);
+
+  if (error) return { error: `That did not save: ${error.message}` };
+
+  revalidatePath("/admin");
+  return { done: "Subscription revoked." };
+}
+
 /** Lets an admin fix someone's settings for them. */
 export async function updateUserSettings(
   _prev: AdminState,

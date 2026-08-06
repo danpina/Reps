@@ -70,7 +70,7 @@ export default async function RehearsalsPage({
             available straight away.
           </p>
           <Link
-            href="/skills"
+            href="/topics"
             className="mt-4 inline-block rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
           >
             Browse skills

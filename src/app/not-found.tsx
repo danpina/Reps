@@ -10,7 +10,7 @@ export default function NotFound() {
         That lesson or skill doesn&rsquo;t exist.
       </p>
       <Link
-        href="/skills"
+        href="/topics"
         className="text-sm font-medium text-ink underline underline-offset-4"
       >
         Back to the skills

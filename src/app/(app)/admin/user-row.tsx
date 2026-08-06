@@ -8,6 +8,8 @@ import { Feedback } from "./add-user";
 import {
   blockUser,
   deleteUser,
+  grantPro,
+  revokePro,
   unblockUser,
   updateUserSettings,
   type AdminState,
@@ -39,6 +41,7 @@ export function UserRow({
           <span className="text-sm text-ink">{user.email ?? "no email"}</span>
 
           {user.isAdmin ? <Tag tone="accent">Admin</Tag> : null}
+          {user.isPro && !user.isAdmin ? <Tag tone="accent">Pro</Tag> : null}
           {isSelf ? <Tag tone="muted">You</Tag> : null}
           {blocked ? <Tag tone="flag">Blocked</Tag> : null}
 
@@ -59,6 +62,15 @@ export function UserRow({
           ) : null}
 
           <SettingsForm user={user} />
+
+          {user.isAdmin ? (
+            <p className="text-[13px] leading-relaxed text-ink-muted">
+              Admins have the whole product already, so there is nothing to
+              grant here.
+            </p>
+          ) : (
+            <SubscriptionForm user={user} />
+          )}
 
           {managed ? (
             <>
@@ -118,6 +130,56 @@ function SettingsForm({ user }: { user: ManagedUser }) {
       <Feedback state={state} />
       <Button idle="Save" busy="Saving…" />
     </form>
+  );
+}
+
+/**
+ * Grant or revoke the paid product.
+ *
+ * Two separate forms rather than one toggle, because a toggle whose current
+ * state came from a list rendered seconds ago will eventually flip the wrong
+ * way. Each button states what it does.
+ */
+function SubscriptionForm({ user }: { user: ManagedUser }) {
+  const [grantState, grantAction] = useActionState<AdminState, FormData>(
+    grantPro,
+    {},
+  );
+  const [revokeState, revokeAction] = useActionState<AdminState, FormData>(
+    revokePro,
+    {},
+  );
+
+  return (
+    <div>
+      <h3 className="text-xs uppercase tracking-[0.14em] text-ink-faint">
+        Subscription
+      </h3>
+      <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
+        {user.isPro
+          ? "Every lesson and unlimited rehearsals are open to this account."
+          : "This account can read two lessons per topic and has one free rehearsal."}
+      </p>
+
+      {user.isPro ? (
+        <form action={revokeAction}>
+          <input type="hidden" name="user_id" value={user.id} />
+          <Feedback state={revokeState} />
+          <Button idle="Revoke access" busy="Revoking…" />
+        </form>
+      ) : (
+        <form action={grantAction}>
+          <input type="hidden" name="user_id" value={user.id} />
+          <input
+            name="note"
+            placeholder="Why, for your own records (optional)"
+            className="mt-3 w-full rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+          />
+          <Feedback state={grantState} />
+          <Button idle="Grant full access" busy="Granting…" />
+        </form>
+      )}
+    </div>
   );
 }
 

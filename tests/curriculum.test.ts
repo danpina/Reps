@@ -34,6 +34,67 @@ function lessonSeedFiles() {
   return readdirSync(MIGRATIONS).filter((f) => f.includes("seed_lessons_"));
 }
 
+function skillSeedFiles() {
+  return readdirSync(MIGRATIONS).filter((f) => f.includes("seed_skills"));
+}
+
+function readMigration(file: string) {
+  return readFileSync(join(MIGRATIONS, file), "utf8");
+}
+
+/** Every topic slug the migrations create. */
+function topicSlugs(): Set<string> {
+  const sql = readdirSync(MIGRATIONS)
+    .filter((f) => f.includes("topics"))
+    .map(readMigration)
+    .join("\n");
+
+  const block = /insert into public\.topics[\s\S]*?\n\s*\);/.exec(sql)?.[0] ?? "";
+  return new Set(
+    [...block.matchAll(/^\s{4}'([a-z0-9-]+)',$/gm)].map(([, s]) => s),
+  );
+}
+
+/**
+ * Every skill the migrations create, and the topic it was filed under.
+ *
+ * A skill seeded after topics existed names its topic inline. The original
+ * nine predate the table and were assigned by the topics migration, so both
+ * shapes are read here.
+ */
+function seededSkills(): Map<string, string | null> {
+  const skills = new Map<string, string | null>();
+
+  for (const file of skillSeedFiles()) {
+    const sql = readMigration(file);
+
+    for (const [, topic, skill] of sql.matchAll(
+      /select id from public\.topics where slug = '([a-z0-9-]+)'\s*\),\s*'([a-z0-9-]+)'/g,
+    )) {
+      skills.set(skill, topic);
+    }
+
+    // The pre-topics shape: slug first, no topic on the row.
+    for (const [, skill] of sql.matchAll(/^\s{4}'([a-z0-9-]+)',$/gm)) {
+      if (!skills.has(skill)) skills.set(skill, null);
+    }
+  }
+
+  return skills;
+}
+
+/** Which skill each lesson seed file writes lessons for. */
+function skillsTargetedBy(file: string): string[] {
+  const sql = readMigration(file);
+  return [
+    ...new Set(
+      [
+        ...sql.matchAll(/from public\.skills where slug = '([a-z0-9-]+)'/g),
+      ].map(([, slug]) => slug),
+    ),
+  ];
+}
+
 function jsonBlocks(sql: string): unknown[] {
   return [...sql.matchAll(/\$j\$([\s\S]*?)\$j\$/g)].map(([, raw], i) => {
     try {
@@ -50,6 +111,59 @@ function jsonBlocks(sql: string): unknown[] {
 
 const files = lessonSeedFiles();
 
+describe("curriculum shape", () => {
+  const topics = topicSlugs();
+  const skills = seededSkills();
+
+  // A parser reading SQL with a regular expression fails silently when the
+  // SQL is written a little differently, and a silent parser makes every
+  // assertion below vacuously true. So it has to find real slugs first.
+  test("the topics migration seeds topics", () => {
+    assert.ok(topics.size >= 4, `only found ${topics.size} topics: ${[...topics]}`);
+    assert.ok(topics.has("small-talk"), "small-talk is missing from the topics");
+  });
+
+  test("every skill seeded belongs to something", () => {
+    assert.ok(skills.size >= 9, `only found ${skills.size} skills`);
+  });
+
+  test("every skill is filed under a topic that exists", () => {
+    for (const [skill, topic] of skills) {
+      if (topic === null) continue; // assigned by the topics migration itself
+      assert.ok(
+        topics.has(topic),
+        `${skill} is filed under "${topic}", which no migration creates`,
+      );
+    }
+  });
+
+  // The paywall samples the first two lessons of the first skill in a topic.
+  // A topic whose opening skill is thin has no sample worth reading, and the
+  // failure is silent: the page renders, it is just a worse advertisement.
+  test("every lesson seed writes a track deep enough to be a track", () => {
+    for (const file of files) {
+      const targets = skillsTargetedBy(file);
+      assert.equal(
+        targets.length,
+        1,
+        `${file} writes lessons for ${targets.length} skills; keep one skill per migration`,
+      );
+      assert.ok(
+        skills.has(targets[0]),
+        `${file} writes lessons for "${targets[0]}", which no skill seed creates`,
+      );
+
+      const count = [
+        ...readMigration(file).matchAll(/from public\.skills where slug =/g),
+      ].length;
+      assert.ok(
+        count >= 4 && count <= 6,
+        `${file} has ${count} lessons; a track is five, give or take one`,
+      );
+    }
+  });
+});
+
 describe("curriculum seed content", () => {
   test("there is at least one lesson seed migration", () => {
     assert.ok(files.length > 0, "no seed_lessons_* migration found");
@@ -62,9 +176,16 @@ describe("curriculum seed content", () => {
       const examples = blocks.filter(
         (b): b is Example[] => Array.isArray(b) && "situation" in (b[0] ?? {}),
       );
-      const checks = blocks.filter(
-        (b): b is Check => typeof b === "object" && b !== null && "prompt" in b,
+      // Two shapes, both valid. The original nine tracks wrote one check per
+      // lesson into check_json and a later migration lifted them into an
+      // array; everything written since seeds checks_json directly, with both
+      // beats in it. Either way a lesson contributes exactly one block.
+      const checkBlocks = blocks.filter(
+        (b): b is Check | Check[] =>
+          (Array.isArray(b) && "prompt" in (b[0] ?? {})) ||
+          (typeof b === "object" && b !== null && "prompt" in b),
       );
+      const checks = checkBlocks.flat();
       const rubrics = blocks.filter(
         (b): b is Rubric =>
           typeof b === "object" && b !== null && "criteria" in b,
@@ -76,7 +197,7 @@ describe("curriculum seed content", () => {
 
       test("every lesson has all four structured fields", () => {
         assert.ok(examples.length > 0, "no lessons found");
-        assert.equal(checks.length, examples.length, "missing a check");
+        assert.equal(checkBlocks.length, examples.length, "missing a check");
         assert.equal(rubrics.length, examples.length, "missing a rubric");
         assert.equal(scenarios.length, examples.length, "missing a scenario");
       });

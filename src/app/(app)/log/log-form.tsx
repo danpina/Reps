@@ -6,7 +6,14 @@ import { useFormStatus } from "react-dom";
 import { WENT_LABELS, XP_AWARD } from "@/lib/progress/rules";
 import { logRep, type LogRepState } from "./actions";
 
-type SkillOption = { id: string; name: string };
+/**
+ * Grouped by topic rather than listed flat.
+ *
+ * At nine skills a flat list was fine. Across every topic it is fifty entries
+ * with three different things called "Openers" in it, and the topic is the
+ * only thing that tells them apart.
+ */
+type SkillGroup = { topic: string; skills: { id: string; name: string }[] };
 
 const WENT_HINTS: Record<number, string> = {
   1: "Fell flat, or you bailed",
@@ -15,12 +22,12 @@ const WENT_HINTS: Record<number, string> = {
 };
 
 export function LogForm({
-  skills,
+  groups,
   defaultSkillId,
   lessonId,
   missionText,
 }: {
-  skills: SkillOption[];
+  groups: SkillGroup[];
   defaultSkillId?: string;
   lessonId?: string;
   missionText?: string;
@@ -71,10 +78,14 @@ export function LogForm({
           <option value="" disabled>
             Pick one
           </option>
-          {skills.map((skill) => (
-            <option key={skill.id} value={skill.id}>
-              {skill.name}
-            </option>
+          {groups.map((group) => (
+            <optgroup key={group.topic} label={group.topic}>
+              {group.skills.map((skill) => (
+                <option key={skill.id} value={skill.id}>
+                  {skill.name}
+                </option>
+              ))}
+            </optgroup>
           ))}
         </select>
       </div>

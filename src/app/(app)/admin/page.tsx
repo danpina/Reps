@@ -14,6 +14,8 @@ export type ManagedUser = {
   blockedAt: string | null;
   blockedReason: string | null;
   isAdmin: boolean;
+  /** A live subscription row, however it got there. */
+  isPro: boolean;
   createdAt: string;
 };
 
@@ -32,19 +34,36 @@ export default async function AdminPage() {
   // Email lives on the auth user and everything else lives on the profile, so
   // the list is a merge. Paged high rather than paginated: this is a personal
   // app, and a page of controls nobody can find is worse than a long list.
-  const [{ data: authUsers }, { data: profiles }, { data: roster }] =
+  const [{ data: authUsers }, { data: profiles }, { data: roster }, { data: subs }] =
     await Promise.all([
       admin.auth.admin.listUsers({ page: 1, perPage: 200 }),
       admin
         .from("profiles")
         .select("id, display_name, theme, blocked_at, blocked_reason"),
       admin.from("admins").select("user_id"),
+      admin
+        .from("subscriptions")
+        .select("user_id, status, current_period_end"),
     ]);
 
   const byId = new Map(
     (profiles ?? []).map((p) => [p.id as string, p] as const),
   );
   const adminIds = new Set((roster ?? []).map((r) => r.user_id as string));
+
+  // The same three conditions the is_pro() function applies, because this list
+  // should show what the database would answer rather than merely that a row
+  // exists — a cancelled or lapsed subscription is a row too.
+  const proIds = new Set(
+    (subs ?? [])
+      .filter(
+        (s) =>
+          ["active", "trialing"].includes(s.status as string) &&
+          (!s.current_period_end ||
+            new Date(s.current_period_end as string) > new Date()),
+      )
+      .map((s) => s.user_id as string),
+  );
 
   const users: ManagedUser[] = (authUsers?.users ?? []).map((u) => {
     const profile = byId.get(u.id);
@@ -56,6 +75,7 @@ export default async function AdminPage() {
       blockedAt: (profile?.blocked_at as string | null) ?? null,
       blockedReason: (profile?.blocked_reason as string | null) ?? null,
       isAdmin: adminIds.has(u.id),
+      isPro: proIds.has(u.id),
       createdAt: u.created_at,
     };
   });

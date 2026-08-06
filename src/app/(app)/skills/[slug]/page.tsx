@@ -4,8 +4,9 @@ import { notFound } from "next/navigation";
 import { BackLink } from "@/components/back-link";
 import { DoneMark, stateLabel, type LessonState } from "@/components/done-mark";
 import { requireUser } from "@/lib/auth/dal";
+import { isPro } from "@/lib/billing/entitlement";
 import { getCurriculumProgress } from "@/lib/curriculum/progress";
-import { getSkillBySlug } from "@/lib/curriculum/queries";
+import { getSkillBySlug, getTopicForSkill } from "@/lib/curriculum/queries";
 
 export default async function SkillPage({
   params,
@@ -14,9 +15,11 @@ export default async function SkillPage({
 }) {
   await requireUser();
   const { slug } = await params;
-  const [skill, progress] = await Promise.all([
+  const [skill, topic, progress, pro] = await Promise.all([
     getSkillBySlug(slug),
+    getTopicForSkill(slug),
     getCurriculumProgress(),
+    isPro(),
   ]);
 
   if (!skill) notFound();
@@ -24,14 +27,17 @@ export default async function SkillPage({
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="border-b border-rule pb-5">
-        <BackLink href="/skills" label="All skills" />
+        <BackLink
+          href={topic ? `/topics/${topic.slug}` : "/topics"}
+          label={topic?.name ?? "All topics"}
+        />
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
           {skill.name}
         </h1>
         <p className="mt-3 border-l-2 border-[var(--accent)] pl-4 text-sm leading-relaxed text-ink">
           {skill.core_idea}
         </p>
-        {skill.lessons.length > 0 ? (
+        {skill.lessons.length > 0 && pro ? (
           <Link
             href={`/skills/${skill.slug}/recap`}
             className="mt-4 inline-block text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline"
@@ -48,6 +54,7 @@ export default async function SkillPage({
       ) : (
         <ol className="mt-2">
           {skill.lessons.map((lesson) => {
+            const locked = !pro && !lesson.is_preview;
             const state: LessonState = progress.usedLessonIds.has(lesson.id)
               ? "used"
               : progress.readLessonIds.has(lesson.id)
@@ -67,7 +74,7 @@ export default async function SkillPage({
                   <span
                     className={[
                       "text-base",
-                      state === "unread" ? "text-ink-muted" : "text-ink",
+                      locked || state === "unread" ? "text-ink-muted" : "text-ink",
                     ].join(" ")}
                   >
                     {lesson.title}
@@ -78,7 +85,7 @@ export default async function SkillPage({
                       state === "used" ? "text-[var(--accent)]" : "text-ink-faint",
                     ].join(" ")}
                   >
-                    {stateLabel(state)}
+                    {locked ? "Locked" : stateLabel(state)}
                   </span>
                 </Link>
               </li>

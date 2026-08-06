@@ -40,9 +40,12 @@ const ITEMS: Item[] = [
     ),
   },
   {
-    href: "/skills",
-    label: "Skills",
-    match: (p) => p.startsWith("/skills"),
+    href: "/topics",
+    label: "Learn",
+    // A skill is reached through its topic, and /pro is reached from the locks
+    // inside one, so all three light the same tab.
+    match: (p) =>
+      p.startsWith("/topics") || p.startsWith("/skills") || p.startsWith("/pro"),
     icon: (
       <svg viewBox="0 0 20 20" aria-hidden className="h-5 w-5">
         <path d="M4 5h12M4 10h12M4 15h8" {...stroke} />

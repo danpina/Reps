@@ -15,7 +15,7 @@ export default async function AppLayout({
   // Onboarding lives outside this group precisely so this redirect cannot loop
   // through its own layout.
   const profile = await getProfile();
-  if (!profile?.onboarding_context) redirect("/welcome");
+  if (!profile?.onboarded_at) redirect("/welcome");
 
   return (
     <div className="min-h-dvh">
