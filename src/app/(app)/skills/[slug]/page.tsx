@@ -70,38 +70,67 @@ export default async function SkillPage({
                 ? "read"
                 : "unread";
 
+            const row = (
+              <>
+                <DoneMark state={state} />
+                <span className="tabular mt-px text-xs text-ink-faint">
+                  {String(lesson.sort_order).padStart(2, "0")}
+                </span>
+                <span
+                  className={[
+                    "text-base",
+                    locked || state === "unread" ? "text-ink-muted" : "text-ink",
+                  ].join(" ")}
+                >
+                  {lesson.title}
+                </span>
+                <span
+                  className={[
+                    "tabular ml-auto shrink-0 pl-3 text-[11px]",
+                    state === "used" ? "text-[var(--accent)]" : "text-ink-faint",
+                  ].join(" ")}
+                >
+                  {!inOrder ? "Next up" : locked ? "Locked" : stateLabel(state)}
+                </span>
+              </>
+            );
+
             return (
               <li key={lesson.id} className="border-b border-rule">
-                <Link
-                  href={`/skills/${skill.slug}/${lesson.sort_order}`}
-                  className="flex items-start gap-3 py-5 transition-colors hover:bg-[var(--paper-raised)]"
-                >
-                  <DoneMark state={state} />
-                  <span className="tabular mt-px text-xs text-ink-faint">
-                    {String(lesson.sort_order).padStart(2, "0")}
-                  </span>
-                  <span
-                    className={[
-                      "text-base",
-                      locked || state === "unread" ? "text-ink-muted" : "text-ink",
-                    ].join(" ")}
+                {/* A locked row is not a link. It used to be one, and clicking
+                    it produced a screen explaining why you should not have
+                    clicked it — which is a slower way of saying no and reads
+                    as the app changing its mind. */}
+                {locked ? (
+                  <div className="flex cursor-default items-start gap-3 py-5 opacity-60">
+                    {row}
+                  </div>
+                ) : (
+                  <Link
+                    href={`/skills/${skill.slug}/${lesson.sort_order}`}
+                    className="flex items-start gap-3 py-5 transition-colors hover:bg-[var(--paper-raised)]"
                   >
-                    {lesson.title}
-                  </span>
-                  <span
-                    className={[
-                      "tabular ml-auto shrink-0 pl-3 text-[11px]",
-                      state === "used" ? "text-[var(--accent)]" : "text-ink-faint",
-                    ].join(" ")}
-                  >
-                    {!inOrder ? "Next up" : locked ? "Locked" : stateLabel(state)}
-                  </span>
-                </Link>
+                    {row}
+                  </Link>
+                )}
               </li>
             );
           })}
         </ol>
       )}
+
+      {/* The one route out, once the rows themselves have stopped offering
+          one. Without this a free account can see the locks and has nowhere
+          to go from them. */}
+      {!pro && skill.lessons.some((l) => !l.is_preview) ? (
+        <p className="mt-6 text-[13px] leading-relaxed text-ink-muted">
+          The rest of this track is part of the subscription.{" "}
+          <Link href="/pro" className="text-ink underline underline-offset-4">
+            See what it unlocks
+          </Link>
+          .
+        </p>
+      ) : null}
     </main>
   );
 }

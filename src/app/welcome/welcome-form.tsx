@@ -55,9 +55,10 @@ export function WelcomeForm({
       <div className="flex flex-col gap-2">
         <AboutYouFields sex={null} ageGroup={null} datingInterest={null} />
         <p className="text-[13px] leading-relaxed text-ink-muted">
-          Optional, and only used to make the coaching fit. Advice about
-          flirting or about talking to your boss is different at twenty-two and
-          at fifty-five, and an app that does not know cannot tell.
+          All optional. They change which version of a lesson you are shown and
+          how your practice gets reviewed — advice about flirting, or about
+          talking to your boss, is different at twenty-two and at fifty-five,
+          and an app that does not know cannot tell.
         </p>
       </div>
 

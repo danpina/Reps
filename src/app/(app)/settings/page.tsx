@@ -25,7 +25,7 @@ export default async function SettingsPage() {
       <div className="flex flex-col">
         <Section
           title="About you"
-          description="Used to make the coaching fit, and nothing else. Both can be left blank or taken back at any time."
+          description="Three optional answers. They decide which version of a lesson you are shown, how a rehearsal is reviewed, and what a read of your log is able to notice. Leave any of them blank and you get the general version, which is written to be right for everybody."
         >
           <AboutYouForm
             sex={profile?.sex ?? null}

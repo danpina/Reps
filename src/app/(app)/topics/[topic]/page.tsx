@@ -57,12 +57,12 @@ export default async function TopicPage({
               (l) => pro || l.is_preview,
             ).length;
 
-            return (
-              <li key={skill.id} className="border-b border-rule">
-                <Link
-                  href={`/skills/${skill.slug}`}
-                  className="block py-5 transition-colors hover:bg-[var(--paper-raised)]"
-                >
+            // Nothing inside it can be opened, so neither can it. A locked
+            // row that still takes a click is a slower way of saying no.
+            const shut = !inOrder || open === 0;
+
+            const row = (
+              <>
                   <div className="flex items-baseline gap-3">
                     <span className="tabular text-xs text-ink-faint">
                       {String(skill.sort_order).padStart(2, "0")}
@@ -74,7 +74,7 @@ export default async function TopicPage({
                       <span className="tabular ml-auto rounded border border-[var(--accent)] px-1.5 py-0.5 text-[11px] text-[var(--accent)]">
                         All read
                       </span>
-                    ) : !inOrder || open === 0 ? (
+                    ) : shut ? (
                       <span className="ml-auto shrink-0 text-ink-faint">
                         <LockIcon />
                       </span>
@@ -134,7 +134,23 @@ export default async function TopicPage({
                       Not written yet
                     </p>
                   )}
-                </Link>
+              </>
+            );
+
+            return (
+              <li key={skill.id} className="border-b border-rule">
+                {shut ? (
+                  <div className="block cursor-default py-5 opacity-60">
+                    {row}
+                  </div>
+                ) : (
+                  <Link
+                    href={`/skills/${skill.slug}`}
+                    className="block py-5 transition-colors hover:bg-[var(--paper-raised)]"
+                  >
+                    {row}
+                  </Link>
+                )}
               </li>
             );
           })}
