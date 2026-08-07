@@ -2,7 +2,13 @@ import Link from "next/link";
 
 import { getProfile, requireUser } from "@/lib/auth/dal";
 import { MIN_REPS_FOR_REVIEW } from "@/lib/coach/eligibility";
-import { getBadges, getFieldLog, getTotals } from "@/lib/progress/queries";
+import { describeOther } from "@/lib/profile/demographics";
+import {
+  getBadges,
+  getFieldLog,
+  getTotals,
+  type FieldLogEntry,
+} from "@/lib/progress/queries";
 import { WENT_LABELS, XP_AWARD } from "@/lib/progress/rules";
 
 export const metadata = { title: "Field log — Reps" };
@@ -301,9 +307,11 @@ export default async function FieldLogPage({
                       </span>
                     </div>
 
-                    {entry.context_note ? (
+                    {entry.context_note || who(entry) ? (
                       <p className="mt-1.5 text-[13px] text-ink-muted">
-                        {entry.context_note}
+                        {[entry.context_note, who(entry)]
+                          .filter(Boolean)
+                          .join(" · ")}
                       </p>
                     ) : null}
 
@@ -337,6 +345,11 @@ export default async function FieldLogPage({
       )}
     </main>
   );
+}
+
+/** Who the rep was with, when it was recorded. Sits beside the context note. */
+function who(entry: FieldLogEntry): string | null {
+  return describeOther(entry.other_sex, entry.other_age_group);
 }
 
 function FilterChip({

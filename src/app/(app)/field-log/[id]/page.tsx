@@ -24,7 +24,9 @@ export default async function EditRepPage({
   const [{ data: entry }, topics] = await Promise.all([
     supabase
       .from("field_logs")
-      .select("id, skill_id, went, context_note, reflection, logged_date, mission_text")
+      .select(
+        "id, skill_id, went, context_note, reflection, logged_date, mission_text, other_sex, other_age_group",
+      )
       .eq("id", id)
       .maybeSingle(),
     getTopics(),
@@ -73,6 +75,8 @@ export default async function EditRepPage({
           went: entry.went,
           contextNote: entry.context_note ?? undefined,
           reflection: entry.reflection ?? undefined,
+          otherSex: entry.other_sex,
+          otherAgeGroup: entry.other_age_group,
         }}
       />
     </main>

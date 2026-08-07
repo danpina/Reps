@@ -2,7 +2,12 @@ import "server-only";
 
 import Anthropic from "@anthropic-ai/sdk";
 
-import { buildCoachSystemPrompt, buildCoachUserPrompt, type ReviewableRep } from "./prompt";
+import {
+  buildCoachSystemPrompt,
+  buildCoachUserPrompt,
+  type Coachee,
+  type ReviewableRep,
+} from "./prompt";
 import { parseReview, reviewSchema, type ParsedReview, type RepReview } from "./review";
 
 const MODEL = process.env.ANTHROPIC_MODEL?.trim() || "claude-opus-5";
@@ -71,6 +76,7 @@ export async function readTheLog(input: {
   previous: RepReview | null;
   repsTotal: number;
   capped: boolean;
+  coachee: Coachee;
 }): Promise<ReviewResult> {
   if (input.reps.length === 0) {
     return { ok: false, reason: "There is nothing new to read." };

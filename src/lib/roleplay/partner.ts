@@ -52,6 +52,11 @@ export interface PartnerEngine {
     scenario: Scenario,
     rubric: Rubric,
     history: Turn[],
+    /**
+     * A line describing the learner, when they have said who they are. Sets
+     * the register of the advice; the scripted engine ignores it entirely.
+     */
+    learner?: string | null,
   ): Promise<{ ok: true; feedback: Feedback } | { ok: false; reason: string }>;
 }
 

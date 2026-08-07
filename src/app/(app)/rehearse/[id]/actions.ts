@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireUser } from "@/lib/auth/dal";
+import { getProfile, requireUser } from "@/lib/auth/dal";
+import { describeSelf } from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
 import type { Rubric, Scenario } from "@/lib/curriculum/types";
 import {
@@ -172,12 +173,14 @@ export async function endScene(
   // here: the scene ends, and the user is told why. Letting a network failure
   // escape would lose the transcript to an error page.
   const engine = getPartnerEngine();
+  const profile = await getProfile();
   let result: Awaited<ReturnType<typeof engine.feedback>>;
   try {
     result = await engine.feedback(
       roleplay.lessons.scenario_json,
       roleplay.lessons.rubric_json,
       roleplay.transcript_json,
+      describeSelf(profile?.sex ?? null, profile?.age_group ?? null),
     );
   } catch (error) {
     result = {

@@ -3,6 +3,8 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
+import type { DatingInterest } from "@/lib/curriculum/variants";
+import type { AgeGroup, Sex } from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
 
 export type SessionUser = {
@@ -44,6 +46,11 @@ export type Profile = {
   timezone: string;
   onboarded_at: string | null;
   starting_topic_id: string | null;
+  /** Both optional, always. Nobody has to answer to use a training diary. */
+  sex: Sex | null;
+  age_group: AgeGroup | null;
+  /** Who they are practising dating with. Only ever used by the Dating topic. */
+  dating_interest: DatingInterest | null;
   theme: Theme;
   blocked_at: string | null;
   blocked_reason: string | null;
@@ -58,7 +65,7 @@ export const getProfile = cache(async (): Promise<Profile | null> => {
   const { data } = await supabase
     .from("profiles")
     .select(
-      "id, display_name, timezone, onboarded_at, starting_topic_id, theme, blocked_at, blocked_reason, created_at",
+      "id, display_name, timezone, onboarded_at, starting_topic_id, sex, age_group, dating_interest, theme, blocked_at, blocked_reason, created_at",
     )
     .eq("id", user.id)
     .maybeSingle();

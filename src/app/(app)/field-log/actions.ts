@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/dal";
+import { parseAgeGroup, parseSex } from "@/lib/profile/demographics";
 import { adjustSkillXp, recomputeStreak } from "@/lib/progress/adjust";
 import { createClient } from "@/lib/supabase/server";
 
@@ -56,6 +57,8 @@ export async function updateRep(
       went,
       context_note: contextNote,
       reflection,
+      other_sex: parseSex(formData.get("other_sex")),
+      other_age_group: parseAgeGroup(formData.get("other_age_group")),
     })
     .eq("id", id);
 

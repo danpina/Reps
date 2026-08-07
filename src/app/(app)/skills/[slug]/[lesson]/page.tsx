@@ -3,8 +3,9 @@ import { notFound } from "next/navigation";
 
 import { BackLink } from "@/components/back-link";
 import { Prose } from "@/components/prose";
-import { requireUser } from "@/lib/auth/dal";
+import { getProfile, requireUser } from "@/lib/auth/dal";
 import { isPro } from "@/lib/billing/entitlement";
+import { pickVariant } from "@/lib/curriculum/variants";
 import {
   getLesson,
   getSkillBySlug,
@@ -61,6 +62,18 @@ export default async function LessonPage({
   const { skill, lesson } = result;
   const hasNext = sortOrder < total;
 
+  // Almost always null: an opener at a bus stop is an opener, and only the
+  // lessons where the advice genuinely differs by reader carry variants at
+  // all. Where one matches, it adds a passage and may replace the examples.
+  const profile = await getProfile();
+  const variant = pickVariant(lesson.variants_json, {
+    sex: profile?.sex ?? null,
+    ageGroup: profile?.age_group ?? null,
+    datingInterest: profile?.dating_interest ?? null,
+  });
+
+  const examples = variant?.examples_json ?? lesson.examples_json;
+
   // Shuffled here rather than in the client component, so the browser hydrates
   // with the same order the server rendered. Falls back to the single legacy
   // check for any lesson the two-check migrations have not reached.
@@ -92,6 +105,26 @@ export default async function LessonPage({
       <article className="mt-7 flex flex-col gap-9">
         <Prose markdown={lesson.theory_md} />
 
+        {/* Marked as being for this reader specifically, rather than slipped in
+            as though the lesson always said it. Someone should be able to tell
+            which part of what they read was written for them. */}
+        {variant?.note_md ? (
+          <section
+            aria-labelledby="for-you"
+            className="rounded border border-[var(--flag)] bg-[var(--flag-soft)] p-5"
+          >
+            <h2
+              id="for-you"
+              className="tabular text-xs uppercase tracking-[0.18em] text-[var(--flag)]"
+            >
+              {variant.label}
+            </h2>
+            <div className="mt-3">
+              <Prose markdown={variant.note_md} />
+            </div>
+          </section>
+        ) : null}
+
         <section aria-labelledby="examples">
           <h2
             id="examples"
@@ -100,7 +133,7 @@ export default async function LessonPage({
             In practice
           </h2>
           <ol className="mt-4 flex flex-col gap-5">
-            {lesson.examples_json.map((example, i) => (
+            {examples.map((example, i) => (
               <li key={i} className="border-l-2 border-rule-strong pl-4">
                 <p className="text-[13px] leading-relaxed text-ink-muted">
                   {example.situation}

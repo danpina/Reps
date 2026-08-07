@@ -1,3 +1,5 @@
+import type { LessonVariant } from "./variants";
+
 export type Topic = {
   id: string;
   slug: string;
@@ -76,6 +78,12 @@ export type Lesson = {
   rubric_json: Rubric;
   scenario_json: Scenario;
   mission_text: string;
+  /**
+   * Optional per-audience versions. Empty for almost every lesson: an opener
+   * at a bus stop is an opener. Populated where the advice genuinely differs
+   * by who is reading, which in practice means Dating.
+   */
+  variants_json: LessonVariant[];
 };
 
 /**

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { signOut } from "@/app/(auth)/actions";
 import { BackLink } from "@/components/back-link";
 import { getProfile, isAdmin, requireUser } from "@/lib/auth/dal";
+import { AboutYouForm } from "./about-you-form";
 import { PasswordForm } from "./password-form";
 import { ThemeForm } from "./theme-form";
 
@@ -22,6 +23,17 @@ export default async function SettingsPage() {
       </header>
 
       <div className="flex flex-col">
+        <Section
+          title="About you"
+          description="Used to make the coaching fit, and nothing else. Both can be left blank or taken back at any time."
+        >
+          <AboutYouForm
+            sex={profile?.sex ?? null}
+            ageGroup={profile?.age_group ?? null}
+            datingInterest={profile?.dating_interest ?? null}
+          />
+        </Section>
+
         <Section
           title="Appearance"
           description="Stored on your account, so it follows you to any device you sign in on."

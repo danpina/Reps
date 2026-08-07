@@ -1,3 +1,9 @@
+import {
+  describeSelf,
+  type AgeGroup,
+  type AgeRelation,
+  type Sex,
+} from "@/lib/profile/demographics";
 import type { RepReview } from "./review";
 
 /** One logged conversation, flattened to what a reviewer actually needs. */
@@ -10,6 +16,16 @@ export type ReviewableRep = {
   context: string | null;
   reflection: string | null;
   mission: string | null;
+  /** Who it was with, if the user said. A guess, and treated as one. */
+  other: string | null;
+  /** Where they sat relative to the user, when both ages are known. */
+  otherAge: AgeRelation | null;
+};
+
+/** Who is being coached. Every field optional — most logs will know neither. */
+export type Coachee = {
+  sex: Sex | null;
+  ageGroup: AgeGroup | null;
 };
 
 const WENT_WORD: Record<number, string> = {
@@ -38,6 +54,16 @@ export function buildCoachSystemPrompt(): string {
     "- Comments on the rating alone. Someone rating conversations badly may be honest rather than bad at this, and a run of ones next to thoughtful reflections usually means high standards.",
     "- Congratulates them for logging. They know.",
     "",
+    "# Who they are, and who they spoke to",
+    "",
+    "Some entries record the other person's sex and rough age. It is a guess made afterwards, so treat it as one — never quote it back as fact about a stranger, and never build a whole read on it.",
+    "",
+    "What it is genuinely good for is the gap. If the conversations that went flat were all with people a generation older, or all with men, or all with women, that is a real finding and it is one they cannot see themselves. Say it plainly and without embarrassment when the log shows it, and say nothing at all when it does not — three entries pointing the same way is a coincidence.",
+    "",
+    "Where you know their own age and sex, let it set the register rather than the content. The same advice is phrased differently for someone of twenty-two and someone of fifty-five, and a note about flirting written for the wrong one of those is worse than no note.",
+    "",
+    "Never generalise about a sex or an age group as a category of person. 'Women respond well to' is astrology. 'Four of your six flat conversations were with women' is a fact about a log.",
+    "",
     "# Tone",
     "",
     "Plain, specific and unsentimental, like a coach who has watched a lot of people do this and is not impressed or disappointed by any of it. Short sentences. British spelling. Never use the word journey.",
@@ -58,13 +84,20 @@ export function buildCoachUserPrompt({
   previous,
   repsTotal,
   capped,
+  coachee,
 }: {
   reps: ReviewableRep[];
   previous: RepReview | null;
   repsTotal: number;
   capped: boolean;
+  coachee: Coachee;
 }): string {
   const parts: string[] = [];
+
+  const self = describeSelf(coachee.sex, coachee.ageGroup);
+  if (self) {
+    parts.push("# Who you are writing for", "", self, "");
+  }
 
   if (previous) {
     parts.push(
@@ -109,6 +142,15 @@ export function buildCoachUserPrompt({
     ];
     if (rep.mission) line.push(`Mission: ${rep.mission}`);
     if (rep.context) line.push(`Where: ${rep.context}`);
+    if (rep.other) {
+      line.push(
+        `With: ${rep.other}${
+          rep.otherAge && rep.otherAge !== "same"
+            ? ` (${rep.otherAge} than them)`
+            : ""
+        }`,
+      );
+    }
     line.push(rep.reflection ? `Note: ${rep.reflection}` : "Note: none written.");
     parts.push(line.join("\n"), "");
   }

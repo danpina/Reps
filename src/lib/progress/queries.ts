@@ -1,5 +1,6 @@
 import "server-only";
 
+import type { AgeGroup, Sex } from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
 import type { Badge } from "./badges";
 import { levelProgress, toIsoDate, weekStart, type LevelProgress } from "./rules";
@@ -16,6 +17,9 @@ export type FieldLogEntry = {
   logged_at: string;
   /** The user's own calendar day, independent of the server's timezone. */
   logged_date: string;
+  /** Who the conversation was with, when the user chose to say. */
+  other_sex: Sex | null;
+  other_age_group: AgeGroup | null;
   skills: {
     slug: string;
     name: string;
@@ -37,7 +41,7 @@ export async function getFieldLog(
   let query = supabase
     .from("field_logs")
     .select(
-      "id, skill_id, lesson_id, mission_text, context_note, went, reflection, xp_awarded, logged_at, logged_date, skills(slug, name, topics(slug, name))",
+      "id, skill_id, lesson_id, mission_text, context_note, went, reflection, xp_awarded, logged_at, logged_date, other_sex, other_age_group, skills(slug, name, topics(slug, name))",
     )
     .order("logged_at", { ascending: false });
 
@@ -324,7 +328,7 @@ export async function getWeeklyReview(): Promise<WeeklyReview> {
   const { data } = await supabase
     .from("field_logs")
     .select(
-      "id, skill_id, lesson_id, mission_text, context_note, went, reflection, rewrite, xp_awarded, logged_at, logged_date, skills(slug, name)",
+      "id, skill_id, lesson_id, mission_text, context_note, went, reflection, rewrite, xp_awarded, logged_at, logged_date, other_sex, other_age_group, skills(slug, name)",
     )
     // Compared against the user's own calendar day, so a rep logged late on a
     // Sunday evening cannot fall into next week on a UTC host.

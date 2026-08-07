@@ -2,6 +2,12 @@ import "server-only";
 
 import { cache } from "react";
 
+import {
+  compareAges,
+  describeOther,
+  type AgeGroup,
+  type Sex,
+} from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
 import { eligibility, MAX_REPS_PER_REVIEW, type Eligibility } from "./eligibility";
 import type { ReviewableRep } from "./prompt";
@@ -81,13 +87,15 @@ export async function getCoachState(): Promise<CoachState> {
  */
 export async function getUnreadReps(
   coversThrough: string | null,
+  /** Used only to work out whether each person was older or younger. */
+  mine: AgeGroup | null = null,
 ): Promise<{ reps: ReviewableRep[]; capped: boolean; newest: string | null }> {
   const supabase = await createClient();
 
   let query = supabase
     .from("field_logs")
     .select(
-      "logged_at, logged_date, went, context_note, reflection, mission_text, skills(name, topics(name))",
+      "logged_at, logged_date, went, context_note, reflection, mission_text, other_sex, other_age_group, skills(name, topics(name))",
     )
     .order("logged_at", { ascending: false })
     .limit(MAX_REPS_PER_REVIEW + 1);
@@ -104,6 +112,8 @@ export async function getUnreadReps(
     context_note: string | null;
     reflection: string | null;
     mission_text: string | null;
+    other_sex: Sex | null;
+    other_age_group: AgeGroup | null;
     skills: { name: string; topics: { name: string } | null } | null;
   }[];
 
@@ -129,6 +139,8 @@ export async function getUnreadReps(
         context: row.context_note,
         reflection: row.reflection,
         mission: row.mission_text,
+        other: describeOther(row.other_sex, row.other_age_group),
+        otherAge: compareAges(mine, row.other_age_group),
       })),
   };
 }

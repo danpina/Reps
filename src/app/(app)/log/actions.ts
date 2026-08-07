@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { requireUser } from "@/lib/auth/dal";
+import { parseAgeGroup, parseSex } from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
 import {
   XP_AWARD,
@@ -65,6 +66,8 @@ export async function logRep(
     context_note: contextNote,
     went,
     reflection,
+    other_sex: parseSex(formData.get("other_sex")),
+    other_age_group: parseAgeGroup(formData.get("other_age_group")),
     xp_awarded: xp,
     logged_at: new Date().toISOString(),
     // The user's own calendar day, so grouping never depends on the server's

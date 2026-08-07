@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { AboutYouFields } from "@/components/about-you-fields";
 import { completeOnboarding, type WelcomeState } from "./actions";
 
 export type TopicChoice = {
@@ -47,6 +48,17 @@ export function WelcomeForm({
           placeholder="Your first name is plenty"
           className="rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         />
+      </div>
+
+      {/* Asked here rather than buried in settings, because they change the
+          advice from the first lesson onwards — and both may be skipped. */}
+      <div className="flex flex-col gap-2">
+        <AboutYouFields sex={null} ageGroup={null} datingInterest={null} />
+        <p className="text-[13px] leading-relaxed text-ink-muted">
+          Optional, and only used to make the coaching fit. Advice about
+          flirting or about talking to your boss is different at twenty-two and
+          at fifty-five, and an app that does not know cannot tell.
+        </p>
       </div>
 
       <fieldset className="flex flex-col gap-2">

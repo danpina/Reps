@@ -2,6 +2,8 @@
 
 import { useState } from "react";
 
+import { AboutThemFields } from "@/components/about-you-fields";
+import type { AgeGroup, Sex } from "@/lib/profile/demographics";
 import { WENT_LABELS } from "@/lib/progress/rules";
 
 /**
@@ -23,6 +25,8 @@ export type RepValues = {
   went?: number;
   contextNote?: string;
   reflection?: string;
+  otherSex?: Sex | null;
+  otherAgeGroup?: AgeGroup | null;
 };
 
 const WENT_HINTS: Record<number, string> = {
@@ -127,6 +131,28 @@ export function RepFields({
         />
         <p className="text-[12px] text-ink-faint">Your words. No names needed.</p>
       </div>
+
+      {/* Folded away, because it is a guess about a stranger and must never
+          feel like paperwork owed before a rep can be recorded. Worth
+          offering because it is what lets a read of the log say something no
+          generic coach could — that the flat ones were all with people a
+          generation older, say. */}
+      <details className="rounded border border-rule bg-[var(--paper-raised)] px-4 py-3">
+        <summary className="cursor-pointer text-sm text-ink-muted">
+          Who you spoke to{" "}
+          <span className="text-ink-faint">— optional, and a guess is fine</span>
+        </summary>
+        <div className="mt-4">
+          <AboutThemFields
+            sex={values.otherSex ?? null}
+            ageGroup={values.otherAgeGroup ?? null}
+          />
+          <p className="mt-3 text-[12px] leading-relaxed text-ink-faint">
+            Only ever used to find patterns across your own log. Leave it blank
+            and nothing is lost except that.
+          </p>
+        </div>
+      </details>
 
       <div className="flex flex-col gap-2">
         <label htmlFor="reflection" className="text-sm font-medium text-ink">

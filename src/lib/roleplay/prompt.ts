@@ -67,6 +67,13 @@ export function buildSystemPrompt(scenario: Scenario): string {
  */
 export function buildFeedbackPrompt(
   rubric: { scale: { min: number; max: number }; criteria: { key: string; label: string; description: string }[] },
+  /**
+   * Who is being reviewed, when they have said. It sets the register of the
+   * advice rather than its content — the same note about flirting is phrased
+   * differently at twenty-two and at fifty-five, and one written for the wrong
+   * one of those is worse than none.
+   */
+  learner?: string | null,
 ): string {
   const criteria = rubric.criteria
     .map((c) => `- ${c.key}: ${c.label}. ${c.description}`)
@@ -75,6 +82,12 @@ export function buildFeedbackPrompt(
   return [
     `You are reviewing a practice conversation between two people. The learner is a person deliberately working on their small talk; the partner is a character who was played for them. Score what the learner actually did.`,
     ``,
+    ...(learner
+      ? [
+          `The learner is ${learner}. Let that set the register of your advice, never its substance, and never mention it back to them.`,
+          ``,
+        ]
+      : []),
     `Every line of the transcript is labelled. LEARNER is the person you are reviewing. PARTNER is the character they were talking to. Score only the LEARNER lines — how the partner behaved is the situation the learner was handed, not part of their performance.`,
     ``,
     `# Criteria, scored ${rubric.scale.min} to ${rubric.scale.max}`,

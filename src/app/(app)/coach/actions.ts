@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { requireUser } from "@/lib/auth/dal";
+import { getProfile, requireUser } from "@/lib/auth/dal";
 import { isPro } from "@/lib/billing/entitlement";
 import { readTheLog } from "@/lib/coach/engine";
 import { getCoachState, getUnreadReps } from "@/lib/coach/queries";
@@ -66,8 +66,11 @@ export async function runReview(
     };
   }
 
+  const profile = await getProfile();
+
   const { reps, capped, newest } = await getUnreadReps(
     state.latest?.coversThrough ?? null,
+    profile?.age_group ?? null,
   );
 
   if (reps.length === 0 || !newest) {
@@ -86,6 +89,10 @@ export async function runReview(
     previous: state.latest?.review ?? null,
     repsTotal: state.repsTotal,
     capped,
+    coachee: {
+      sex: profile?.sex ?? null,
+      ageGroup: profile?.age_group ?? null,
+    },
   });
 
   if (!result.ok) return { error: result.reason };

@@ -176,7 +176,12 @@ export class AnthropicPartner implements PartnerEngine {
     return reply;
   }
 
-  async feedback(scenario: Scenario, rubric: Rubric, history: Turn[]) {
+  async feedback(
+    scenario: Scenario,
+    rubric: Rubric,
+    history: Turn[],
+    learner?: string | null,
+  ) {
     const userTurns = history
       .filter((turn) => turn.role === "user")
       .map((turn) => turn.content);
@@ -190,7 +195,7 @@ export class AnthropicPartner implements PartnerEngine {
       message = await getClient().messages.create({
         model: MODEL,
         max_tokens: FEEDBACK_MAX_TOKENS,
-        system: buildFeedbackPrompt(rubric),
+        system: buildFeedbackPrompt(rubric, learner),
         output_config: {
           // The review is the part users judge the app by, and a shallow one
           // reads as filler. Worth the tokens.

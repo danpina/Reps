@@ -3,6 +3,11 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser, type Theme } from "@/lib/auth/dal";
+import {
+  parseAgeGroup,
+  parseDatingInterest,
+  parseSex,
+} from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
 
 export type SettingsState = { error?: string; done?: string };
@@ -33,6 +38,35 @@ export async function updateTheme(
   // The theme is rendered by the root layout, so the whole tree is stale.
   revalidatePath("/", "layout");
   return { done: "Theme saved." };
+}
+
+/**
+ * The two facts that change the advice.
+ *
+ * Clearing them is a legitimate outcome, not a validation failure — someone
+ * who filled these in at signup and would rather not have is entitled to take
+ * them back, so a blank answer writes null rather than being rejected.
+ */
+export async function updateAboutYou(
+  _prev: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  const user = await requireUser();
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update({
+      sex: parseSex(formData.get("sex")),
+      age_group: parseAgeGroup(formData.get("age_group")),
+      dating_interest: parseDatingInterest(formData.get("dating_interest")),
+    })
+    .eq("id", user.id);
+
+  if (error) return { error: "That did not save. Try again." };
+
+  revalidatePath("/settings");
+  return { done: "Saved." };
 }
 
 export async function changePassword(

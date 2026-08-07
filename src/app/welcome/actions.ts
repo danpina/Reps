@@ -5,6 +5,11 @@ import { revalidatePath } from "next/cache";
 
 import { requireUser } from "@/lib/auth/dal";
 import { getTopics } from "@/lib/curriculum/queries";
+import {
+  parseAgeGroup,
+  parseDatingInterest,
+  parseSex,
+} from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
 
 export type WelcomeState = { error?: string };
@@ -28,10 +33,16 @@ export async function completeOnboarding(
   const topic = (await getTopics()).find((t) => t.slug === topicSlug);
   if (!topic) return { error: "Pick where you want to start." };
 
-  const patch: Record<string, string> = {
+  const patch: Record<string, string | null> = {
     display_name: displayName,
     starting_topic_id: topic.id,
     onboarded_at: new Date().toISOString(),
+    // Both are allowed to be skipped, and a skipped answer is stored as
+    // nothing rather than as a default. Anything that reads these has to cope
+    // with not knowing anyway.
+    sex: parseSex(formData.get("sex")),
+    age_group: parseAgeGroup(formData.get("age_group")),
+    dating_interest: parseDatingInterest(formData.get("dating_interest")),
   };
 
   // Same loose IANA check as the log action.
