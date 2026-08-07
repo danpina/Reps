@@ -6,6 +6,7 @@ import { DoneMark, stateLabel, type LessonState } from "@/components/done-mark";
 import { requireUser } from "@/lib/auth/dal";
 import { isPro } from "@/lib/billing/entitlement";
 import { getCurriculumProgress } from "@/lib/curriculum/progress";
+import { isLessonUnlocked } from "@/lib/curriculum/progression";
 import { getSkillBySlug, getTopicForSkill } from "@/lib/curriculum/queries";
 
 export default async function SkillPage({
@@ -53,8 +54,16 @@ export default async function SkillPage({
         </p>
       ) : (
         <ol className="mt-2">
-          {skill.lessons.map((lesson) => {
-            const locked = !pro && !lesson.is_preview;
+          {skill.lessons.map((lesson, index) => {
+            // Two different locks, and the order matters. Being told to
+            // finish the previous lesson is actionable; being told to
+            // subscribe when you could not have opened it anyway is not.
+            const inOrder = isLessonUnlocked(
+              skill.lessons,
+              index,
+              progress.readLessonIds,
+            );
+            const locked = !inOrder || (!pro && !lesson.is_preview);
             const state: LessonState = progress.usedLessonIds.has(lesson.id)
               ? "used"
               : progress.readLessonIds.has(lesson.id)
@@ -85,7 +94,7 @@ export default async function SkillPage({
                       state === "used" ? "text-[var(--accent)]" : "text-ink-faint",
                     ].join(" ")}
                   >
-                    {locked ? "Locked" : stateLabel(state)}
+                    {!inOrder ? "Next up" : locked ? "Locked" : stateLabel(state)}
                   </span>
                 </Link>
               </li>

@@ -5,6 +5,7 @@ import { BackLink } from "@/components/back-link";
 import { requireUser } from "@/lib/auth/dal";
 import { FREE_PREVIEW_LESSONS, isPro } from "@/lib/billing/entitlement";
 import { getCurriculumProgress } from "@/lib/curriculum/progress";
+import { isSkillUnlocked } from "@/lib/curriculum/progression";
 import { getTopicBySlug } from "@/lib/curriculum/queries";
 
 export default async function TopicPage({
@@ -41,7 +42,12 @@ export default async function TopicPage({
         </p>
       ) : (
         <ol className="mt-2">
-          {topic.skills.map((skill) => {
+          {topic.skills.map((skill, index) => {
+            const inOrder = isSkillUnlocked(
+              topic.skills,
+              index,
+              progress.readLessonIds,
+            );
             const total = skill.lessons.length;
             const read = skill.lessons.filter((l) =>
               progress.readLessonIds.has(l.id),
@@ -68,7 +74,7 @@ export default async function TopicPage({
                       <span className="tabular ml-auto rounded border border-[var(--accent)] px-1.5 py-0.5 text-[11px] text-[var(--accent)]">
                         All read
                       </span>
-                    ) : open === 0 ? (
+                    ) : !inOrder || open === 0 ? (
                       <span className="ml-auto shrink-0 text-ink-faint">
                         <LockIcon />
                       </span>
@@ -116,9 +122,11 @@ export default async function TopicPage({
                         {reps > 0
                           ? ` · ${reps} ${reps === 1 ? "rep" : "reps"} logged`
                           : ""}
-                        {!pro && open > 0 && open < total
-                          ? ` · ${open} free`
-                          : ""}
+                        {!inOrder
+                          ? ` · after ${topic.skills[index - 1].name.toLowerCase()}`
+                          : !pro && open > 0 && open < total
+                            ? ` · ${open} free`
+                            : ""}
                       </p>
                     </div>
                   ) : (

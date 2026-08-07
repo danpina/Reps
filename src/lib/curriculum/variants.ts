@@ -28,7 +28,15 @@ export type VariantConditions = {
 
 export type LessonVariant = {
   when: VariantConditions;
-  /** Shown as the heading of the passage, so the reader knows why it is here. */
+  /**
+   * For whoever is editing the seed, not for the reader.
+   *
+   * Four variants sit in one JSON array in a migration and the conditions
+   * alone are hard to scan, so each says plainly who it is for. It is
+   * deliberately not rendered: the reader answered the questions, and a
+   * heading reading "if you are a woman" back to a woman spends a line
+   * telling her something she told the app.
+   */
   label: string;
   /** An extra passage, added to the lesson rather than replacing it. */
   note_md?: string;

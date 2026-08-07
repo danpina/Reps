@@ -28,10 +28,17 @@ export type Rank = {
 };
 
 /**
- * Eight ranks. The gaps widen deliberately: the first arrives after two logged
- * conversations, so there is a visible reward for starting, and the last is
- * roughly seventy of them, which is a real amount of practice and should feel
- * like one.
+ * Ten ranks, and a long road.
+ *
+ * Two things are being balanced. The first promotion has to arrive while
+ * someone is still deciding whether this app is worth their time, so it costs
+ * three conversations. Everything after that gets steadily further apart,
+ * because the failure mode of a generous ladder is someone reaching the top in
+ * a month and concluding they are done — at a skill that takes years, and that
+ * they took up precisely because it does not come quickly.
+ *
+ * The last rank is a few hundred logged conversations. It should be rare, and
+ * anyone who gets there will have changed rather more than their small talk.
  */
 export const RANKS: readonly Rank[] = [
   {
@@ -40,37 +47,47 @@ export const RANKS: readonly Rank[] = [
     note: "the first one is the only one that is genuinely hard",
   },
   {
-    at: 100,
+    at: 150,
     name: "Showing up",
     note: "further than most people ever get",
   },
   {
-    at: 300,
+    at: 500,
     name: "In the habit",
     note: "where this stops being an experiment",
   },
   {
-    at: 650,
+    at: 1100,
     name: "Warm in a room",
     note: "where starting one stops being the hard part",
   },
   {
-    at: 1100,
+    at: 2000,
     name: "Rarely stuck",
     note: "where silences stop being emergencies",
   },
   {
-    at: 1700,
+    at: 3200,
     name: "Hard to faze",
     note: "where a bad reaction is information, not a verdict",
   },
   {
-    at: 2500,
+    at: 4800,
+    name: "Good in a crowd",
+    note: "where a group stops being harder than one person",
+  },
+  {
+    at: 7000,
     name: "At ease anywhere",
     note: "where a room full of strangers stops being a category of problem",
   },
   {
-    at: 3500,
+    at: 9800,
+    name: "The one who starts it",
+    note: "where other people are relieved you are there",
+  },
+  {
+    at: 13000,
     name: "Second nature",
     note: "not practising any more, just talking to people",
   },

@@ -7,43 +7,61 @@ import {
   describeNextLevel,
   repsToNextLevel,
 } from "../src/lib/progress/explain.ts";
-import { XP_AWARD, levelProgress } from "../src/lib/progress/rules.ts";
+import {
+  LEVEL_THRESHOLDS,
+  MAX_LEVEL,
+  XP_AWARD,
+  levelProgress,
+} from "../src/lib/progress/rules.ts";
+
+// Derived from the ladder rather than written against it. The thresholds are a
+// product decision that will be retuned more than once, and a test that
+// hardcodes them fails on every retune without ever having found a bug.
+const LEVEL_2 = LEVEL_THRESHOLDS[1];
+const CAPSTONE = LEVEL_THRESHOLDS[MAX_LEVEL - 1];
+const REPS_TO_LEVEL_2 = Math.ceil(LEVEL_2 / XP_AWARD.mission);
 
 describe("progress in reps rather than points", () => {
-  test("a fresh user is two reps from level 2", () => {
-    // Level 2 sits at 100 XP, and a logged rep is 50.
-    assert.equal(repsToNextLevel(levelProgress(0)), 2);
-    assert.equal(describeNextLevel(levelProgress(0)), "2 more reps to level 2");
+  test("a fresh user is a small number of reps from level 2", () => {
+    assert.equal(repsToNextLevel(levelProgress(0)), REPS_TO_LEVEL_2);
+    assert.equal(
+      describeNextLevel(levelProgress(0)),
+      `${REPS_TO_LEVEL_2} more reps to level 2`,
+    );
   });
 
-  test("one rep in, one to go", () => {
-    assert.equal(describeNextLevel(levelProgress(50)), "1 more rep to level 2");
+  test("each logged rep takes one off the count", () => {
+    assert.equal(
+      repsToNextLevel(levelProgress(XP_AWARD.mission)),
+      REPS_TO_LEVEL_2 - 1,
+    );
   });
 
   // Rounding down would say "0 more reps" while the bar is not full, which
   // reads as broken.
   test("a part-finished rep still counts as one more", () => {
-    const almost = levelProgress(99);
+    const almost = levelProgress(LEVEL_2 - 1);
     assert.equal(repsToNextLevel(almost), 1);
     assert.match(describeNextLevel(almost), /1 more rep\b/);
   });
 
   test("singular and plural are both handled", () => {
-    assert.match(describeNextLevel(levelProgress(50)), /^1 more rep to/);
-    assert.match(describeNextLevel(levelProgress(0)), /^2 more reps to/);
+    const oneAway = levelProgress(LEVEL_2 - XP_AWARD.mission);
+    assert.match(describeNextLevel(oneAway), /^1 more rep to/);
+    assert.match(describeNextLevel(levelProgress(0)), /^\d+ more reps to/);
   });
 
   test("the top of a skill says so rather than showing a gap", () => {
-    const maxed = levelProgress(3000);
+    const maxed = levelProgress(CAPSTONE);
     assert.equal(repsToNextLevel(maxed), 0);
     assert.match(describeNextLevel(maxed), /top of this skill/);
   });
 
   test("never promises a level above the cap", () => {
-    for (let xp = 0; xp <= 3000; xp += 25) {
+    for (let xp = 0; xp <= CAPSTONE + 500; xp += 25) {
       const progress = levelProgress(xp);
       const phrase = describeNextLevel(progress);
-      assert.ok(!phrase.includes("level 11"), `at ${xp} XP: ${phrase}`);
+      assert.ok(!phrase.includes(`level ${MAX_LEVEL + 1}`), `at ${xp} XP: ${phrase}`);
     }
   });
 });

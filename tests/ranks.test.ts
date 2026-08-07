@@ -105,14 +105,33 @@ describe("ranks", () => {
     );
   });
 
-  // Two logged conversations is the first promotion. That is the whole reason
-  // the early gaps are small: the reward for starting has to arrive while
-  // someone is still deciding whether this app is worth their time.
-  test("the first promotion arrives quickly", () => {
-    const afterTwoReps = rankProgress(XP_AWARD.mission * 2);
+  // The first promotion has to land while someone is still deciding whether
+  // this app is worth their time, which is why the opening gap stays small
+  // even though every gap after it widens.
+  test("the first promotion arrives within a handful of reps", () => {
+    const reps = Math.ceil(RANKS[1].at / XP_AWARD.mission);
+    assert.ok(reps <= 4, `the first promotion takes ${reps} conversations`);
+    assert.ok(rankProgress(RANKS[1].at).position >= 2);
+  });
+
+  // And the last one must not. A ladder somebody tops out in a month tells
+  // them they are finished with a skill that takes years.
+  test("the last rank is a long way off", () => {
+    const top = RANKS[RANKS.length - 1];
     assert.ok(
-      afterTwoReps.position >= 2,
-      "two real conversations should be worth a promotion",
+      top.at / XP_AWARD.mission >= 150,
+      `the top rank is ${top.at / XP_AWARD.mission} conversations away`,
     );
+  });
+
+  test("every gap is at least as large as the one before it", () => {
+    for (let i = 2; i < RANKS.length; i++) {
+      const thisGap = RANKS[i].at - RANKS[i - 1].at;
+      const lastGap = RANKS[i - 1].at - RANKS[i - 2].at;
+      assert.ok(
+        thisGap >= lastGap,
+        `${RANKS[i].name} is cheaper to reach than ${RANKS[i - 1].name}`,
+      );
+    }
   });
 });

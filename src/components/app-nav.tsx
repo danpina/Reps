@@ -143,23 +143,23 @@ export function AppNav() {
             Log a rep
           </Link>
 
-          {/* Off to the side rather than in the run of tabs. Settings is
-              somewhere you go twice a year, and sitting it beside the places
-              you go daily gave it a weight it has not earned. Icon only, with
-              its name carried by the label for anyone who cannot see it. */}
+          {/* Off to the side rather than in the run of tabs, because it is
+              somewhere you go twice a year. Icon only was a step too far — a
+              faint glyph in a corner is not findable, it is merely small. It
+              keeps its word, in a bordered pill that reads as a control rather
+              than as another tab. */}
           <Link
             href="/settings"
-            aria-label="Settings"
             aria-current={settings.match(pathname) ? "page" : undefined}
-            title="Settings"
             className={[
-              "ml-1 rounded p-1.5 transition-colors",
+              "ml-2 flex items-center gap-1.5 rounded border px-2.5 py-1.5 text-sm transition-colors",
               settings.match(pathname)
-                ? "bg-[var(--accent-soft)] text-ink"
-                : "text-ink-faint hover:bg-[var(--paper-raised)] hover:text-ink",
+                ? "border-[var(--accent)] bg-[var(--accent-soft)] text-ink"
+                : "border-[var(--rule-strong)] text-ink-muted hover:bg-[var(--paper-raised)] hover:text-ink",
             ].join(" ")}
           >
             {settings.icon}
+            <span>Settings</span>
           </Link>
         </nav>
       </header>

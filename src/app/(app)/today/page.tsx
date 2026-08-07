@@ -56,56 +56,6 @@ export default async function TodayPage() {
         </form>
       </header>
 
-      {/* Named rather than numbered, and placed above everything else. Skills
-          have levels; you have a rank. Two numbers on one screen invited an
-          arithmetic that does not exist, and a name does not. */}
-      <section aria-labelledby="rank" className="mt-7">
-        <div className="flex items-baseline justify-between gap-3">
-          <h2 id="rank" className="text-lg font-semibold tracking-tight text-ink">
-            {rank.rank.name}
-          </h2>
-          <span className="tabular shrink-0 text-xs text-ink-faint">
-            {rank.xp} XP · rank {rank.position} of {rank.total}
-          </span>
-        </div>
-
-        <div
-          className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-[var(--rule)]"
-          role="progressbar"
-          aria-valuenow={Math.round(rank.fraction * 100)}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-label={
-            rank.next
-              ? `Progress to ${rank.next.name}`
-              : "Every rank earned"
-          }
-        >
-          <div
-            className="h-full bg-[var(--accent)]"
-            style={{ width: `${Math.round(rank.fraction * 100)}%` }}
-          />
-        </div>
-
-        {rank.next ? (
-          <p className="mt-2.5 text-[13px] leading-relaxed text-ink-muted">
-            {/* Said in conversations, not points. Nobody has a feel for 450 XP,
-                and reps are the only currency the app wants spent. */}
-            <span className="text-ink">
-              {repsToNextRank(rank.toNext, XP_AWARD.mission)} more{" "}
-              {repsToNextRank(rank.toNext, XP_AWARD.mission) === 1
-                ? "conversation"
-                : "conversations"}
-            </span>{" "}
-            to {rank.next.name} — {rank.next.note}.
-          </p>
-        ) : (
-          <p className="mt-2.5 text-[13px] leading-relaxed text-ink-muted">
-            Every rank earned — {rank.rank.note}.
-          </p>
-        )}
-      </section>
-
       <div className="mt-7">
         <FactBanner fact={fact} />
       </div>
@@ -150,6 +100,61 @@ export default async function TodayPage() {
             }
           />
         </dl>
+
+        {/* Sits with the reps rather than above them, because it is what the
+            reps add up to. Named rather than numbered: skills have levels, you
+            have a rank, and two numbers on one screen invited an arithmetic
+            that does not exist. */}
+        <section
+          aria-labelledby="rank"
+          className="mt-6 border-t border-rule pt-5"
+        >
+          <div className="flex items-baseline justify-between gap-3">
+            <h3
+              id="rank"
+              className="text-base font-medium tracking-tight text-ink"
+            >
+              {rank.rank.name}
+            </h3>
+            <span className="tabular shrink-0 text-xs text-ink-faint">
+              {rank.xp} XP · rank {rank.position} of {rank.total}
+            </span>
+          </div>
+
+          <div
+            className="mt-2.5 h-1.5 w-full overflow-hidden rounded-full bg-[var(--rule)]"
+            role="progressbar"
+            aria-valuenow={Math.round(rank.fraction * 100)}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-label={
+              rank.next ? `Progress to ${rank.next.name}` : "Every rank earned"
+            }
+          >
+            <div
+              className="h-full bg-[var(--accent)]"
+              style={{ width: `${Math.round(rank.fraction * 100)}%` }}
+            />
+          </div>
+
+          {rank.next ? (
+            <p className="mt-2.5 text-[13px] leading-relaxed text-ink-muted">
+              {/* Said in conversations, not points. Nobody has a feel for 450
+                  XP, and reps are the only currency the app wants spent. */}
+              <span className="text-ink">
+                {repsToNextRank(rank.toNext, XP_AWARD.mission)} more{" "}
+                {repsToNextRank(rank.toNext, XP_AWARD.mission) === 1
+                  ? "conversation"
+                  : "conversations"}
+              </span>{" "}
+              to {rank.next.name} — {rank.next.note}.
+            </p>
+          ) : (
+            <p className="mt-2.5 text-[13px] leading-relaxed text-ink-muted">
+              Every rank earned — {rank.rank.note}.
+            </p>
+          )}
+        </section>
 
         <details className="mt-5 border-t border-rule pt-4">
           <summary className="cursor-pointer text-xs text-ink-faint underline-offset-4 hover:underline">

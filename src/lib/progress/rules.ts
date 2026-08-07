@@ -25,12 +25,21 @@ export const XP_AWARD = {
 export type XpAction = keyof typeof XP_AWARD;
 
 /**
- * Cumulative XP needed to reach each level, indexed by level - 1. Gentle at
- * the start so the first sign of progress arrives after about two logged
- * missions, widening later.
+ * Cumulative XP needed to reach each level, indexed by level - 1.
+ *
+ * Deliberately slow, and slower the further up it goes. The first levels stay
+ * cheap because they gate something — a rehearsal opens at level 2 and the
+ * last one at level 3 — and a gate nobody reaches is a feature nobody uses.
+ * Everything above level 3 gates nothing at all, so it is free to be a long
+ * road: this is a practice log, and a skill that maxes out in a fortnight tells
+ * someone they are finished with something they have barely started.
+ *
+ * Level 3 is about eight logged conversations in one skill. Level 10 is a
+ * couple of hundred, which is the point — nobody should reach it quickly, and
+ * the people who do will have earned it in the only currency that counts.
  */
 export const LEVEL_THRESHOLDS = [
-  0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700,
+  0, 150, 400, 800, 1400, 2200, 3200, 4500, 6000, 8000,
 ] as const;
 
 export function levelForXp(xp: number): number {

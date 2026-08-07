@@ -5,6 +5,11 @@ import { BackLink } from "@/components/back-link";
 import { Prose } from "@/components/prose";
 import { getProfile, requireUser } from "@/lib/auth/dal";
 import { isPro } from "@/lib/billing/entitlement";
+import { getCurriculumProgress } from "@/lib/curriculum/progress";
+import {
+  isLessonUnlocked,
+  nextOpenLesson,
+} from "@/lib/curriculum/progression";
 import { pickVariant } from "@/lib/curriculum/variants";
 import {
   getLesson,
@@ -15,6 +20,7 @@ import { shuffle } from "@/lib/curriculum/shuffle";
 import { XP_AWARD } from "@/lib/progress/rules";
 import { ComprehensionBeat } from "./comprehension-beat";
 import { LockedLesson } from "./locked";
+import { OutOfOrder } from "./out-of-order";
 import { MarkRead } from "./mark-read";
 import { Rehearsal } from "./rehearsal";
 
@@ -32,16 +38,35 @@ export default async function LessonPage({
   // The index first, because it is the only thing that can tell a lesson that
   // does not exist from one this account may not read. `lessons` answers both
   // with nothing, by design.
-  const [track, topic, pro] = await Promise.all([
+  const [track, topic, pro, progress] = await Promise.all([
     getSkillBySlug(slug),
     getTopicForSkill(slug),
     isPro(),
+    getCurriculumProgress(),
   ]);
 
   const entry = track?.lessons.find((l) => l.sort_order === sortOrder);
   if (!track || !entry) notFound();
 
   const total = track.lessons.length;
+  const index = track.lessons.indexOf(entry);
+
+  // Checked here as well as in the list, because a link is not a permission
+  // and this URL is a small integer anybody could type.
+  if (!isLessonUnlocked(track.lessons, index, progress.readLessonIds)) {
+    const next = track.lessons[nextOpenLesson(track.lessons, progress.readLessonIds)];
+    return (
+      <OutOfOrder
+        skillName={track.name}
+        skillSlug={track.slug}
+        lessonTitle={entry.title}
+        sortOrder={sortOrder}
+        total={total}
+        nextTitle={next.title}
+        nextSortOrder={next.sort_order}
+      />
+    );
+  }
 
   if (!pro && !entry.is_preview) {
     return (
@@ -71,6 +96,14 @@ export default async function LessonPage({
     ageGroup: profile?.age_group ?? null,
     datingInterest: profile?.dating_interest ?? null,
   });
+
+  // The tailored passage joins the body rather than sitting in a box beside
+  // it. A reader who has answered the questions does not need to be told which
+  // paragraphs were chosen for them, and a heading saying so would spend a
+  // line telling them something they told the app. It is simply their lesson.
+  const theory = variant?.note_md
+    ? `${lesson.theory_md}\n\n${variant.note_md}`
+    : lesson.theory_md;
 
   const examples = variant?.examples_json ?? lesson.examples_json;
 
@@ -103,27 +136,7 @@ export default async function LessonPage({
       </header>
 
       <article className="mt-7 flex flex-col gap-9">
-        <Prose markdown={lesson.theory_md} />
-
-        {/* Marked as being for this reader specifically, rather than slipped in
-            as though the lesson always said it. Someone should be able to tell
-            which part of what they read was written for them. */}
-        {variant?.note_md ? (
-          <section
-            aria-labelledby="for-you"
-            className="rounded border border-[var(--flag)] bg-[var(--flag-soft)] p-5"
-          >
-            <h2
-              id="for-you"
-              className="tabular text-xs uppercase tracking-[0.18em] text-[var(--flag)]"
-            >
-              {variant.label}
-            </h2>
-            <div className="mt-3">
-              <Prose markdown={variant.note_md} />
-            </div>
-          </section>
-        ) : null}
+        <Prose markdown={theory} />
 
         <section aria-labelledby="examples">
           <h2

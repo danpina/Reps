@@ -66,30 +66,55 @@ describe("levels", () => {
     });
   });
 
-  test("two logged missions reach level 2", () => {
-    assert.equal(levelForXp(XP_AWARD.mission * 2), 2);
+  // The early levels gate rehearsals, so they have to stay reachable — but
+  // "reachable" is a handful of real conversations, not one afternoon.
+  test("level 2 costs a few logged missions, not one", () => {
+    const reps = Math.ceil(LEVEL_THRESHOLDS[1] / XP_AWARD.mission);
+    assert.ok(reps >= 2 && reps <= 5, `level 2 takes ${reps} reps`);
+    assert.equal(levelForXp(LEVEL_THRESHOLDS[1]), 2);
   });
 
   test("caps at level 10 and does not overflow", () => {
-    assert.equal(levelForXp(2700), MAX_LEVEL);
+    assert.equal(levelForXp(LEVEL_THRESHOLDS[MAX_LEVEL - 1]), MAX_LEVEL);
     assert.equal(levelForXp(999_999), MAX_LEVEL);
   });
 
   test("progress within a level is proportional", () => {
-    const p = levelProgress(175); // level 2 spans 100..250
+    // Halfway through level 2, wherever level 2 happens to sit.
+    const floor = LEVEL_THRESHOLDS[1];
+    const ceiling = LEVEL_THRESHOLDS[2];
+    const span = ceiling - floor;
+    const p = levelProgress(floor + span / 2);
+
     assert.equal(p.level, 2);
-    assert.equal(p.earnedThisLevel, 75);
-    assert.equal(p.levelSpan, 150);
-    assert.equal(p.toNextLevel, 75);
+    assert.equal(p.earnedThisLevel, span / 2);
+    assert.equal(p.levelSpan, span);
+    assert.equal(p.toNextLevel, span / 2);
     assert.equal(p.fraction, 0.5);
     assert.equal(p.isMax, false);
   });
 
   test("max level reads as complete rather than stuck", () => {
-    const p = levelProgress(5000);
+    const p = levelProgress(LEVEL_THRESHOLDS[MAX_LEVEL - 1] + 1000);
     assert.equal(p.isMax, true);
     assert.equal(p.fraction, 1);
     assert.equal(p.toNextLevel, 0);
+  });
+
+  // The whole point of the retune. A skill that maxes out quickly tells
+  // somebody they are finished with something they have barely started.
+  test("the ladder is a long road, and widens as it goes", () => {
+    const top = LEVEL_THRESHOLDS[MAX_LEVEL - 1];
+    assert.ok(
+      top / XP_AWARD.mission >= 100,
+      "maxing a skill should take a hundred real conversations or more",
+    );
+
+    for (let i = 2; i < LEVEL_THRESHOLDS.length; i++) {
+      const thisGap = LEVEL_THRESHOLDS[i] - LEVEL_THRESHOLDS[i - 1];
+      const lastGap = LEVEL_THRESHOLDS[i - 1] - LEVEL_THRESHOLDS[i - 2];
+      assert.ok(thisGap >= lastGap, `level ${i + 1} is cheaper than level ${i}`);
+    }
   });
 
   test("fraction always stays within 0 and 1", () => {
