@@ -1,22 +1,12 @@
 import Link from "next/link";
 
 import { BackLink } from "@/components/back-link";
+import { RehearsalLessons, rehearsalCount } from "@/components/rehearsal-list";
 import { requireUser } from "@/lib/auth/dal";
-import { createClient } from "@/lib/supabase/server";
-import { averageScore, type Feedback } from "@/lib/roleplay/feedback";
 import { MAX_SCENES_PER_DAY } from "@/lib/roleplay/limits";
+import { getRehearsalTree } from "@/lib/roleplay/queries";
 
 export const metadata = { title: "Rehearsals — Reps" };
-
-type Row = {
-  id: string;
-  status: string;
-  started_at: string;
-  transcript_json: { role: string }[];
-  feedback_json: Feedback | null;
-  scores_json: Record<string, number> | null;
-  lessons: { title: string; sort_order: number; skills: { slug: string; name: string } };
-};
 
 export default async function RehearsalsPage({
   searchParams,
@@ -24,17 +14,10 @@ export default async function RehearsalsPage({
   searchParams: Promise<{ limit?: string }>;
 }) {
   await requireUser();
-  const supabase = await createClient();
   const atLimit = (await searchParams).limit === "1";
+  const topics = await getRehearsalTree();
 
-  const { data } = await supabase
-    .from("roleplays")
-    .select(
-      "id, status, started_at, transcript_json, feedback_json, scores_json, lessons(title, sort_order, skills(slug, name))",
-    )
-    .order("started_at", { ascending: false });
-
-  const rows = (data ?? []) as unknown as Row[];
+  const total = topics.reduce((n, topic) => n + topic.total, 0);
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
@@ -47,6 +30,11 @@ export default async function RehearsalsPage({
           Practice scenes and what they were scored on. Useful, and worth less
           than one real conversation.
         </p>
+        {total > 0 ? (
+          <p className="tabular mt-3 text-xs text-ink-faint">
+            {rehearsalCount(total)}, in the order the curriculum runs
+          </p>
+        ) : null}
       </header>
 
       {/* Reached by redirect from the start action, so the message has to
@@ -57,12 +45,12 @@ export default async function RehearsalsPage({
           className="mt-6 rounded border border-[var(--flag)] bg-[var(--flag-soft)] px-4 py-3 text-sm leading-relaxed text-ink"
         >
           That is {MAX_SCENES_PER_DAY} scenes today, which is the daily cap.
-          Unfinished ones above are still open. The real reps do not have a
+          Unfinished ones below are still open. The real reps do not have a
           limit — go and have one.
         </p>
       ) : null}
 
-      {rows.length === 0 ? (
+      {topics.length === 0 ? (
         <div className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6">
           <h2 className="text-sm font-semibold text-ink">Nothing rehearsed yet</h2>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
@@ -77,56 +65,52 @@ export default async function RehearsalsPage({
           </Link>
         </div>
       ) : (
-        <ol className="mt-2">
-          {rows.map((row) => {
-            const turns = row.transcript_json.filter((t) => t.role === "user").length;
-            const average = row.scores_json ? averageScore(row.scores_json) : null;
+        <div className="mt-8 flex flex-col gap-10">
+          {topics.map((topic) => (
+            <section key={topic.slug}>
+              <div className="flex items-baseline justify-between gap-3 border-b border-rule pb-1.5">
+                <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
+                  <Link
+                    href={`/topics/${topic.slug}`}
+                    className="underline-offset-4 hover:text-ink hover:underline"
+                  >
+                    {topic.name}
+                  </Link>
+                </h2>
+                <span className="tabular shrink-0 text-xs text-ink-faint">
+                  {topic.total}
+                </span>
+              </div>
 
-            return (
-              <li key={row.id} className="border-b border-rule">
-                <Link
-                  href={`/rehearse/${row.id}`}
-                  className="block py-5 transition-colors hover:bg-[var(--paper-raised)]"
-                >
-                  <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-                    <span className="text-sm font-medium text-ink">
-                      {row.lessons.skills.name}
-                    </span>
-                    {row.status === "open" ? (
-                      <span className="tabular rounded border border-[var(--flag)] px-1.5 py-0.5 text-[11px] text-[var(--flag)]">
-                        Unfinished
+              <div className="mt-5 flex flex-col gap-7">
+                {topic.skills.map((skill) => (
+                  <section key={skill.slug}>
+                    <div className="flex items-baseline justify-between gap-3">
+                      <h3 className="text-sm font-medium text-ink">
+                        <Link
+                          href={`/skills/${skill.slug}`}
+                          className="underline-offset-4 hover:underline"
+                        >
+                          {skill.name}
+                        </Link>
+                      </h3>
+                      <span className="tabular shrink-0 text-xs text-ink-faint">
+                        {rehearsalCount(skill.total)}
                       </span>
-                    ) : average !== null ? (
-                      <span className="tabular rounded border border-[var(--accent)] px-1.5 py-0.5 text-[11px] text-[var(--accent)]">
-                        {average.toFixed(1)} avg
-                      </span>
-                    ) : null}
-                    <span className="tabular ml-auto text-xs text-ink-faint">
-                      {new Date(row.started_at).toLocaleDateString(undefined, {
-                        day: "numeric",
-                        month: "short",
-                      })}
-                    </span>
-                  </div>
+                    </div>
 
-                  <p className="mt-1 text-[13px] text-ink-muted">
-                    {row.lessons.title}
-                  </p>
-
-                  {row.feedback_json ? (
-                    <p className="mt-2 text-[13px] leading-relaxed text-ink">
-                      {row.feedback_json.fix}
-                    </p>
-                  ) : (
-                    <p className="tabular mt-2 text-xs text-ink-faint">
-                      {turns} {turns === 1 ? "line" : "lines"} said
-                    </p>
-                  )}
-                </Link>
-              </li>
-            );
-          })}
-        </ol>
+                    <div className="mt-3 border-l-2 border-rule-strong pl-4">
+                      <RehearsalLessons
+                        lessons={skill.lessons}
+                        skillSlug={skill.slug}
+                      />
+                    </div>
+                  </section>
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
       )}
     </main>
   );

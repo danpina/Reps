@@ -1,11 +1,13 @@
 import Link from "next/link";
 
+import { RehearsalRow, rehearsalCount } from "@/components/rehearsal-list";
 import { rehearsalsLeft } from "@/lib/billing/entitlement";
 import { createClient } from "@/lib/supabase/server";
 import {
   isRehearsalUnlocked,
   requiredLevelForLesson,
 } from "@/lib/roleplay/limits";
+import { getRehearsalsForLesson } from "@/lib/roleplay/queries";
 import { startRehearsal } from "@/app/(app)/rehearse/start/actions";
 import { XP_AWARD } from "@/lib/progress/rules";
 
@@ -32,25 +34,19 @@ export async function Rehearsal({
   const supabase = await createClient();
 
   const left = await rehearsalsLeft();
-  const [{ data: state }, { data: past }] = await Promise.all([
+  const [{ data: state }, past] = await Promise.all([
     supabase
       .from("user_skill_state")
       .select("level")
       .eq("skill_id", skillId)
       .maybeSingle(),
-    supabase
-      .from("roleplays")
-      .select("id, status")
-      .eq("lesson_id", lessonId)
-      .order("started_at", { ascending: false })
-      .limit(5),
+    getRehearsalsForLesson(lessonId),
   ]);
 
   const level = state?.level ?? 1;
   const unlocked = isRehearsalUnlocked(sortOrder, level);
   const required = requiredLevelForLesson(sortOrder);
-  const open = (past ?? []).find((r) => r.status === "open");
-  const completed = (past ?? []).filter((r) => r.status === "complete").length;
+  const open = past.find((r) => r.status === "open");
 
   // A free account gets a fixed number of scenes rather than a daily
   // allowance, because this is the one feature that costs real money every
@@ -108,12 +104,6 @@ export async function Rehearsal({
               +{XP_AWARD.roleplay} XP
             </span>
           </form>
-          {completed > 0 ? (
-            <p className="tabular mt-3 text-xs text-ink-faint">
-              {completed} rehearsed {completed === 1 ? "scene" : "scenes"} on this
-              lesson
-            </p>
-          ) : null}
         </>
       ) : (
         <>
@@ -127,6 +117,23 @@ export async function Rehearsal({
           </p>
         </>
       )}
+
+      {/* Outside the branches above, because what you already rehearsed here
+          stays worth reading whether or not you may start another one — a
+          lapsed subscription should not take your own transcripts away. Folded,
+          so the scene you came to start is still the first thing in reach. */}
+      {past.length > 0 ? (
+        <details className="mt-5 border-t border-rule pt-4">
+          <summary className="cursor-pointer text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline">
+            {rehearsalCount(past.length)} on this lesson
+          </summary>
+          <ol className="mt-2">
+            {past.map((rehearsal) => (
+              <RehearsalRow key={rehearsal.id} rehearsal={rehearsal} />
+            ))}
+          </ol>
+        </details>
+      ) : null}
     </section>
   );
 }

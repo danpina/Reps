@@ -3,11 +3,13 @@ import { notFound } from "next/navigation";
 
 import { BackLink } from "@/components/back-link";
 import { DoneMark, stateLabel, type LessonState } from "@/components/done-mark";
+import { RehearsalLessons, rehearsalCount } from "@/components/rehearsal-list";
 import { requireUser } from "@/lib/auth/dal";
 import { isPro } from "@/lib/billing/entitlement";
 import { getCurriculumProgress } from "@/lib/curriculum/progress";
 import { isLessonUnlocked } from "@/lib/curriculum/progression";
 import { getSkillBySlug, getTopicForSkill } from "@/lib/curriculum/queries";
+import { getRehearsalsForSkill } from "@/lib/roleplay/queries";
 
 export default async function SkillPage({
   params,
@@ -16,11 +18,12 @@ export default async function SkillPage({
 }) {
   await requireUser();
   const { slug } = await params;
-  const [skill, topic, progress, pro] = await Promise.all([
+  const [skill, topic, progress, pro, rehearsed] = await Promise.all([
     getSkillBySlug(slug),
     getTopicForSkill(slug),
     getCurriculumProgress(),
     isPro(),
+    getRehearsalsForSkill(slug),
   ]);
 
   if (!skill) notFound();
@@ -118,6 +121,21 @@ export default async function SkillPage({
           })}
         </ol>
       )}
+
+      {/* Folded, and only present once there is something inside it. What you
+          rehearsed on this track is worth being able to find from the track,
+          but it is a record of practice rather than part of the road, so it
+          does not get to sit open above the lessons. */}
+      {rehearsed.total > 0 ? (
+        <details className="mt-8 rounded border border-rule bg-[var(--paper-raised)] px-5 py-4">
+          <summary className="cursor-pointer text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline">
+            {rehearsalCount(rehearsed.total)} on this track
+          </summary>
+          <div className="mt-4">
+            <RehearsalLessons lessons={rehearsed.lessons} skillSlug={slug} />
+          </div>
+        </details>
+      ) : null}
 
       {/* The one route out, once the rows themselves have stopped offering
           one. Without this a free account can see the locks and has nowhere

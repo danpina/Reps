@@ -14,7 +14,17 @@ import { usePathname } from "next/navigation";
 type Item = {
   href: string;
   label: string;
-  icon: React.ReactNode;
+  /** Only ever drawn in the bottom bar, so a desktop-only item has none. */
+  icon?: React.ReactNode;
+  /**
+   * Kept off the phone.
+   *
+   * The bottom bar is five tabs wide and every one of them is a place you go
+   * daily. A sixth would shrink the other five to make room for the one you
+   * open least, so this stays a top-bar link and reaches the phone through
+   * Today instead.
+   */
+  wideOnly?: boolean;
   /** Also treat these prefixes as this section. */
   match: (pathname: string) => boolean;
 };
@@ -72,6 +82,14 @@ const ITEMS: Item[] = [
         <path d="M5 3.5h9a1.5 1.5 0 0 1 1.5 1.5v11L10 13.5 4.5 16V5A1.5 1.5 0 0 1 6 3.5Z" {...stroke} />
       </svg>
     ),
+  },
+  {
+    href: "/rehearse",
+    label: "Rehearsals",
+    wideOnly: true,
+    // A scene is reached from the lesson it belongs to, so /rehearse/:id lights
+    // this rather than Learn.
+    match: (p) => p.startsWith("/rehearse"),
   },
   {
     href: "/settings",
@@ -171,7 +189,7 @@ export function AppNav() {
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >
         <ul className="mx-auto flex max-w-lg">
-          {ITEMS.map((item) => {
+          {ITEMS.filter((item) => !item.wideOnly).map((item) => {
             const active = item.match(pathname);
             return (
               <li key={item.href} className="flex-1">

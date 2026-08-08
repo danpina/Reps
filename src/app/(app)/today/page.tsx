@@ -22,18 +22,22 @@ import {
 } from "@/lib/progress/explain";
 import { rankProgress, repsToNextRank } from "@/lib/progress/ranks";
 import { XP_AWARD } from "@/lib/progress/rules";
+import { rehearsalCount } from "@/components/rehearsal-list";
+import { countRehearsals } from "@/lib/roleplay/queries";
 
 export default async function TodayPage() {
   const user = await requireUser();
-  const [profile, totals, standings, heatmap, badges, review, resume] = await Promise.all([
-    getProfile(),
-    getTotals(),
-    getSkillStandings(),
-    getHeatmap(),
-    getBadges(),
-    getWeeklyReview(),
-    getResumePoint(),
-  ]);
+  const [profile, totals, standings, heatmap, badges, review, resume, rehearsals] =
+    await Promise.all([
+      getProfile(),
+      getTotals(),
+      getSkillStandings(),
+      getHeatmap(),
+      getBadges(),
+      getWeeklyReview(),
+      getResumePoint(),
+      countRehearsals(),
+    ]);
 
   const fact = randomFact();
   const name = profile?.display_name?.trim();
@@ -84,6 +88,18 @@ export default async function TodayPage() {
             {totals.repsLogged === 0 ? "Browse topics" : "See your reps"}
           </Link>
         </div>
+
+        {/* Quiet, and below the two things that matter, because a rehearsal is
+            the warm up. It is here at all because the transcripts were
+            otherwise only reachable from the lesson they were started on. */}
+        {rehearsals > 0 ? (
+          <Link
+            href="/rehearse"
+            className="mt-3 inline-block text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline"
+          >
+            {rehearsalCount(rehearsals)} →
+          </Link>
+        ) : null}
 
         {/* No global level. Levels are per-skill, further down, where they say
             something specific rather than averaging nine skills into one

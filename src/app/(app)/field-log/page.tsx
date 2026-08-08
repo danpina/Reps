@@ -327,12 +327,16 @@ export default async function FieldLogPage({
                       </p>
                     ) : null}
 
-                    {/* Quiet on purpose. A diary of real conversations should
-                        read as a record first, and offer to be corrected
-                        second. */}
+                    {/* Quiet, but a control rather than a caption. It used to
+                        be a bare word in exactly the size and colour of the
+                        mission line directly above it, which made it read as
+                        the last line of the entry instead of the way to
+                        correct one. A border and a tap target are the whole
+                        difference between an affordance and a footnote. */}
                     <Link
                       href={`/field-log/${entry.id}`}
-                      className="mt-2 inline-block text-[12px] text-ink-faint underline-offset-4 hover:text-ink hover:underline"
+                      aria-label={`Edit this ${entry.skills?.name ?? "rep"}`}
+                      className="mt-3 inline-flex items-center rounded border border-[var(--rule-strong)] px-2.5 py-1 text-[12px] text-ink-muted transition-colors hover:bg-[var(--paper-raised)] hover:text-ink"
                     >
                       Edit
                     </Link>
