@@ -15,7 +15,9 @@ import {
   MAX_LINE_CHARS,
   describeWait,
   sceneIsFull,
+  turnCap,
 } from "@/lib/roleplay/limits";
+import { asBeatSpec, isRehearsalMode } from "@/lib/roleplay/modes";
 import { PartnerError, type Turn } from "@/lib/roleplay/partner";
 import { XP_AWARD, levelForXp } from "@/lib/progress/rules";
 import { awardBadges } from "@/lib/progress/snapshot";
@@ -26,7 +28,9 @@ async function loadRoleplay(id: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("roleplays")
-    .select("id, lesson_id, transcript_json, status, lessons(scenario_json, rubric_json, skill_id)")
+    .select(
+      "id, lesson_id, transcript_json, status, mode, lessons(scenario_json, rubric_json, rehearsal_spec, skill_id)",
+    )
     .eq("id", id)
     .maybeSingle();
 
@@ -36,8 +40,26 @@ async function loadRoleplay(id: string) {
     lesson_id: string;
     transcript_json: Turn[];
     status: string;
-    lessons: { scenario_json: Scenario; rubric_json: Rubric; skill_id: string };
+    mode: string;
+    lessons: {
+      scenario_json: Scenario;
+      rubric_json: Rubric;
+      rehearsal_spec: unknown;
+      skill_id: string;
+    };
   };
+}
+
+/**
+ * How many lines this rehearsal accepts, from what the lesson authored.
+ *
+ * Read on the server for the same reason the count itself is: the cap shown in
+ * the UI is a courtesy, and this is the only place it cannot be got around.
+ */
+function capFor(roleplay: { mode: string; lessons: { rehearsal_spec: unknown } }) {
+  const mode = isRehearsalMode(roleplay.mode) ? roleplay.mode : "scene";
+  const beats = asBeatSpec(roleplay.lessons.rehearsal_spec);
+  return turnCap(mode, beats?.turns.length);
 }
 
 /** Adds the user's line, then the partner's reply. */
@@ -65,9 +87,12 @@ export async function say(
   // Checked here and not only in the UI: a disabled textarea is a courtesy,
   // not a limit. This is the only place the count cannot be got around.
   const said = roleplay.transcript_json.filter((t) => t.role === "user").length;
-  if (sceneIsFull(said)) {
+  if (sceneIsFull(said, capFor(roleplay))) {
     return {
-      error: "This scene has run its course. End it and read the review.",
+      error:
+        roleplay.mode === "beat"
+          ? "That is the whole sequence. End it and read the review."
+          : "This scene has run its course. End it and read the review.",
     };
   }
 

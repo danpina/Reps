@@ -174,6 +174,7 @@ export default async function LessonPage({
           lessonId={lesson.id}
           sortOrder={sortOrder}
           skillId={skill.id}
+          mode={lesson.rehearsal_mode}
           partnerName={lesson.scenario_json.partner.name}
           openness={lesson.scenario_json.partner.openness}
         />

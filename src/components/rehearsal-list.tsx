@@ -19,22 +19,10 @@ export function RehearsalRow({ rehearsal }: { rehearsal: Rehearsal }) {
         className="block py-3 transition-colors hover:bg-[var(--paper)]"
       >
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          {rehearsal.status === "open" ? (
-            <span className="tabular rounded border border-[var(--flag)] px-1.5 py-0.5 text-[11px] text-[var(--flag)]">
-              Unfinished
-            </span>
-          ) : rehearsal.average !== null ? (
-            <span className="tabular rounded border border-[var(--accent)] px-1.5 py-0.5 text-[11px] text-[var(--accent)]">
-              {rehearsal.average.toFixed(1)} avg
-            </span>
-          ) : (
-            <span className="tabular rounded border border-[var(--rule-strong)] px-1.5 py-0.5 text-[11px] text-ink-muted">
-              Unscored
-            </span>
-          )}
+          <Verdict rehearsal={rehearsal} />
 
           <span className="tabular text-xs text-ink-faint">
-            {rehearsal.lines} {rehearsal.lines === 1 ? "line" : "lines"} said
+            {countLabel(rehearsal)}
           </span>
 
           <span className="tabular ml-auto text-xs text-ink-faint">
@@ -54,6 +42,62 @@ export function RehearsalRow({ rehearsal }: { rehearsal: Rehearsal }) {
       </Link>
     </li>
   );
+}
+
+/**
+ * How a finished rehearsal reports itself, which depends on what kind it was.
+ *
+ * A drill either met its requirements or it did not — there is no average to
+ * take, and inventing one out of four boolean checks would be a number that
+ * looked like the AI scores without meaning anything like them.
+ */
+function Verdict({ rehearsal }: { rehearsal: Rehearsal }) {
+  if (rehearsal.status === "open") {
+    return (
+      <span className="tabular rounded border border-[var(--flag)] px-1.5 py-0.5 text-[11px] text-[var(--flag)]">
+        Unfinished
+      </span>
+    );
+  }
+
+  if (rehearsal.landed !== null) {
+    return rehearsal.landed ? (
+      <span className="tabular rounded border border-[var(--accent)] px-1.5 py-0.5 text-[11px] text-[var(--accent)]">
+        Landed
+      </span>
+    ) : (
+      <span className="tabular rounded border border-[var(--rule-strong)] px-1.5 py-0.5 text-[11px] text-ink-muted">
+        Not quite
+      </span>
+    );
+  }
+
+  if (rehearsal.average !== null) {
+    return (
+      <span className="tabular rounded border border-[var(--accent)] px-1.5 py-0.5 text-[11px] text-[var(--accent)]">
+        {rehearsal.average.toFixed(1)} avg
+      </span>
+    );
+  }
+
+  return (
+    <span className="tabular rounded border border-[var(--rule-strong)] px-1.5 py-0.5 text-[11px] text-ink-muted">
+      Unscored
+    </span>
+  );
+}
+
+/** Lines said in a conversation; attempts or situations read in a drill. */
+function countLabel(rehearsal: Rehearsal): string {
+  const n = rehearsal.lines;
+
+  if (rehearsal.mode === "line") {
+    return `${n} ${n === 1 ? "attempt" : "attempts"}`;
+  }
+  if (rehearsal.mode === "choice") {
+    return `${n} read`;
+  }
+  return `${n} ${n === 1 ? "line" : "lines"} said`;
 }
 
 /**

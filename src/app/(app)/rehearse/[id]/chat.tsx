@@ -12,11 +12,21 @@ export function Chat({
   partnerName,
   transcript,
   turnsLeft,
+  instruction,
 }: {
   roleplayId: string;
   partnerName: string;
   transcript: Turn[];
   turnsLeft: number;
+  /**
+   * What this particular turn is for, in a sequence drill.
+   *
+   * Named as it arrives rather than listed up front. "Two questions, then
+   * something of your own" is three turns, and asking somebody to hold the
+   * shape in their head while also thinking of something to say is how the
+   * shape gets dropped — which is the exact failure the lesson is about.
+   */
+  instruction?: string;
 }) {
   const [state, formAction] = useActionState<SayState, FormData>(say, {});
   const endRef = useRef<HTMLDivElement>(null);
@@ -58,6 +68,12 @@ export function Chat({
         ))}
         <div ref={endRef} />
       </ol>
+
+      {instruction && !full ? (
+        <p className="mt-6 rounded border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3 text-sm leading-relaxed text-ink">
+          {instruction}
+        </p>
+      ) : null}
 
       <form action={formAction} className="mt-6">
         <input type="hidden" name="roleplay_id" value={roleplayId} />

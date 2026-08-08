@@ -79,6 +79,15 @@ export type Lesson = {
   scenario_json: Scenario;
   mission_text: string;
   /**
+   * Which kind of rehearsal this lesson gets. See lib/roleplay/modes — the
+   * short version is that one utterance, a fixed sequence, a read-and-decide
+   * and an open conversation are four different exercises, and handing all of
+   * them the same chat window taught the wrong thing in about half of them.
+   */
+  rehearsal_mode: string;
+  /** Shape depends on the mode. Parsed by the readers in lib/roleplay/modes. */
+  rehearsal_spec: unknown;
+  /**
    * Optional per-audience versions. Empty for almost every lesson: an opener
    * at a bus stop is an opener. Populated where the advice genuinely differs
    * by who is reading, which in practice means Dating.

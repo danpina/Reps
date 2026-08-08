@@ -120,9 +120,13 @@ export async function checkSceneStartLimit(
 ): Promise<LimitVerdict> {
   const since = new Date(Date.now() - 24 * 60 * 60_000).toISOString();
 
+  // Drills are not counted. The daily cap bounds spend, and a drill spends
+  // nothing — capping them would ration the one part of the app a beginner is
+  // meant to repeat until it stops being frightening.
   const { data, error } = await client
     .from("roleplays")
     .select("started_at")
+    .in("mode", ["beat", "scene"])
     .gte("started_at", since);
 
   if (error) return { allowed: false, retryAfterMinutes: 1 };

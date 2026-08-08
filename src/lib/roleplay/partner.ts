@@ -1,7 +1,18 @@
 import type { Rubric, Scenario } from "@/lib/curriculum/types";
 import type { Feedback, Rewrite } from "./feedback";
 
-export type Turn = { role: "user" | "partner"; content: string; at: string };
+export type Turn = {
+  role: "user" | "partner";
+  content: string;
+  at: string;
+  /**
+   * Whether this turn was right, in the modes where that is a decidable
+   * question. Set by the read-and-decide drill, where the options and the
+   * answer were both authored; absent everywhere else, because "was that line
+   * correct" is not a question a conversation has an answer to.
+   */
+  correct?: boolean;
+};
 
 /**
  * A failure the user is allowed to read.

@@ -31,6 +31,11 @@ export const LIMITS: Record<AiKind, { max: number; windowMinutes: number }> = {
   rep_review: { max: 3, windowMinutes: 24 * 60 },
 };
 
+// Explicit extension, as in lib/progress/explain: this file is imported
+// directly by the test runner, which resolves real paths rather than going
+// through the bundler.
+import { costsMoney, type RehearsalMode } from "./modes.ts";
+
 /**
  * How many lines one person may say in a single scene.
  *
@@ -69,15 +74,28 @@ export type LimitVerdict =
   | { allowed: false; retryAfterMinutes: number };
 
 /**
+ * How many lines this particular rehearsal will accept.
+ *
+ * A beat drill carries its own count, and it is short on purpose: "two
+ * questions, then something of your own" is three turns, and a fourth turn is
+ * not more practice, it is the shape dissolving. Where a lesson has not said,
+ * the scene cap applies.
+ */
+export function turnCap(mode: RehearsalMode, authoredTurns?: number): number {
+  if (mode === "beat" && authoredTurns && authoredTurns > 0) return authoredTurns;
+  return MAX_TURNS_PER_SCENE;
+}
+
+/**
  * How many more lines this scene will accept. Zero means it is finished
  * whether or not the user has ended it.
  */
-export function turnsLeftInScene(userTurnsSoFar: number): number {
-  return Math.max(0, MAX_TURNS_PER_SCENE - userTurnsSoFar);
+export function turnsLeftInScene(userTurnsSoFar: number, cap = MAX_TURNS_PER_SCENE): number {
+  return Math.max(0, cap - userTurnsSoFar);
 }
 
-export function sceneIsFull(userTurnsSoFar: number): boolean {
-  return turnsLeftInScene(userTurnsSoFar) === 0;
+export function sceneIsFull(userTurnsSoFar: number, cap = MAX_TURNS_PER_SCENE): boolean {
+  return turnsLeftInScene(userTurnsSoFar, cap) === 0;
 }
 
 /**
@@ -161,9 +179,22 @@ export function requiredLevelForLesson(sortOrder: number): number {
   return Math.max(1, Math.ceil(sortOrder / 2));
 }
 
+/**
+ * Whether this rehearsal is open yet.
+ *
+ * The level gate exists for two reasons, and only one of them survives a free
+ * drill. The cost reason is gone — a drill makes no calls. The pedagogical
+ * reason, that rehearsal is the warm up and reps are the work, does not apply
+ * to somebody who cannot yet manage a first sentence: gating the drill behind
+ * logged conversations asks them to do the thing the drill exists to teach
+ * them to do. So drills are always open, and the paid scenes still have to be
+ * earned in the only currency this app respects.
+ */
 export function isRehearsalUnlocked(
   sortOrder: number,
   skillLevel: number,
+  mode: RehearsalMode = "scene",
 ): boolean {
+  if (!costsMoney(mode)) return true;
   return skillLevel >= requiredLevelForLesson(sortOrder);
 }

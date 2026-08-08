@@ -5,6 +5,12 @@ import { cache } from "react";
 import { getTopics } from "@/lib/curriculum/queries";
 import { createClient } from "@/lib/supabase/server";
 import { averageScore, type Feedback } from "./feedback";
+import {
+  isDrillResult,
+  isRehearsalMode,
+  type DrillResult,
+  type RehearsalMode,
+} from "./modes";
 
 /**
  * Rehearsals, read once and placed in the curriculum.
@@ -24,12 +30,15 @@ import { averageScore, type Feedback } from "./feedback";
 export type Rehearsal = {
   id: string;
   status: "open" | "complete";
+  mode: RehearsalMode;
   startedAt: string;
   /** How many lines the user said. The only measure an unfinished scene has. */
   lines: number;
-  /** Mean of the rubric scores, once the scene has been ended and scored. */
+  /** Mean of the rubric scores, once an AI scene has been ended and scored. */
   average: number | null;
-  /** The single thing to fix, from the feedback pass. */
+  /** Whether a drill met every requirement. Null for the AI modes. */
+  landed: boolean | null;
+  /** The single thing to fix, or the first requirement a drill missed. */
   fix: string | null;
 };
 
@@ -59,9 +68,10 @@ type Row = {
   id: string;
   lesson_id: string;
   status: "open" | "complete";
+  mode: string;
   started_at: string;
   transcript_json: { role: string }[];
-  feedback_json: Feedback | null;
+  feedback_json: Feedback | DrillResult | null;
   scores_json: Record<string, number> | null;
 };
 
@@ -71,7 +81,7 @@ const getRows = cache(async (): Promise<Row[]> => {
   const { data, error } = await supabase
     .from("roleplays")
     .select(
-      "id, lesson_id, status, started_at, transcript_json, feedback_json, scores_json",
+      "id, lesson_id, status, mode, started_at, transcript_json, feedback_json, scores_json",
     )
     .order("started_at", { ascending: false });
 
@@ -81,13 +91,19 @@ const getRows = cache(async (): Promise<Row[]> => {
 });
 
 function toRehearsal(row: Row): Rehearsal {
+  const drill = isDrillResult(row.feedback_json) ? row.feedback_json : null;
+
   return {
     id: row.id,
     status: row.status,
+    mode: isRehearsalMode(row.mode) ? row.mode : "scene",
     startedAt: row.started_at,
     lines: row.transcript_json.filter((turn) => turn.role === "user").length,
     average: row.scores_json ? averageScore(row.scores_json) : null,
-    fix: row.feedback_json?.fix ?? null,
+    landed: drill ? drill.landed : null,
+    // A drill has no single fix to offer, so the first requirement it missed
+    // stands in for one — which is the same job that sentence does for a scene.
+    fix: drill ? (drill.missed[0] ?? null) : ((row.feedback_json as Feedback | null)?.fix ?? null),
   };
 }
 

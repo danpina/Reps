@@ -57,7 +57,12 @@ export const getSubscription = cache(async (): Promise<Subscription | null> => {
 });
 
 /**
- * How many rehearsals a free account has left.
+ * How many paid rehearsals a free account has left.
+ *
+ * Only the AI modes are counted. The drills — one-line and read-and-decide —
+ * are decided entirely from what the lesson author wrote down, so they cost
+ * nothing to run and are not rationed. That is not generosity: a drill works
+ * by being repeated, and one attempt at a drill teaches nobody anything.
  *
  * Pro accounts get null rather than a number: they are bounded by the rate
  * limits in `lib/roleplay/limits`, which is a different question with a
@@ -70,7 +75,8 @@ export const rehearsalsLeft = cache(async (): Promise<number | null> => {
   const supabase = await createClient();
   const { count } = await supabase
     .from("roleplays")
-    .select("id", { count: "exact", head: true });
+    .select("id", { count: "exact", head: true })
+    .in("mode", ["beat", "scene"]);
 
   return Math.max(0, FREE_REHEARSALS - (count ?? 0));
 });
