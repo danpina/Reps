@@ -140,6 +140,22 @@ body {
   font-feature-settings: "tnum" 1;
 }
 
+/*
+ * The disclosure arrow on a folded section.
+ *
+ * A summary laid out with flex loses the browser's own marker, which leaves a
+ * row that toggles and gives no sign that it does. So the arrow is drawn, and
+ * turned from here: the open state only exists once the browser has toggled it,
+ * so nothing rendered on the server can express it.
+ */
+.chevron {
+  transition: transform 150ms ease;
+}
+
+details[open] > summary .chevron {
+  transform: rotate(90deg);
+}
+
 :focus-visible {
   outline: 2px solid var(--focus);
   outline-offset: 2px;

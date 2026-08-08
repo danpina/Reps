@@ -44,6 +44,12 @@ export default async function TodayPage() {
   // Only skills with something in them, then grouped, so a topic heading only
   // appears once there is something under it.
   const started = groupByTopic(standings.filter((s) => s.progress.xp > 0));
+
+  // Which fold is left open below. The topic they were last reading, or the
+  // first one when that is not among the topics they have XP in — which also
+  // covers having only one, and stops every fold being shut at once.
+  const openTopic =
+    started.find((t) => t.slug === resume?.topicSlug)?.slug ?? started[0]?.slug;
   const hasReview = review.reps > 0;
   const rank = rankProgress(totals.totalXp);
 
@@ -262,22 +268,43 @@ export default async function TodayPage() {
           <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
             Where you are
           </h2>
-          <div className="mt-4 flex flex-col gap-7">
+          {/* One fold per topic. With a single topic on the go this was a
+              short list; someone working through four is looking at twenty
+              progress bars on the screen they open every day, and the one they
+              are actually mid-way through is somewhere in the middle of it.
+
+              The topic they were last reading is the one left open, and nothing
+              on screen says so — a label explaining why a thing is open is
+              worse than the thing just being open. */}
+          <div className="mt-4 flex flex-col gap-4">
             {started.map((topic) => (
-              <section key={topic.slug}>
-                <div className="flex items-baseline justify-between gap-3 border-b border-rule pb-1.5">
-                  <Link
-                    href={`/topics/${topic.slug}`}
-                    className="text-sm font-medium text-ink underline-offset-4 hover:underline"
+              <details key={topic.slug} open={topic.slug === openTopic}>
+                {/* The marker is drawn rather than inherited — see .chevron in
+                    globals.css for why a flex summary has none of its own. */}
+                <summary className="flex cursor-pointer list-none items-baseline gap-2 border-b border-rule pb-1.5 [&::-webkit-details-marker]:hidden">
+                  <svg
+                    viewBox="0 0 12 12"
+                    aria-hidden
+                    className="chevron mt-px h-3 w-3 shrink-0 text-ink-faint"
                   >
+                    <path
+                      d="M4.5 2.5 8 6l-3.5 3.5"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
+                  <span className="text-sm font-medium text-ink">
                     {topic.name}
-                  </Link>
-                  <span className="tabular text-xs text-ink-faint">
+                  </span>
+                  <span className="tabular ml-auto text-xs text-ink-faint">
                     {topic.reps} {topic.reps === 1 ? "rep" : "reps"} ·{" "}
                     {topic.skills.length}{" "}
                     {topic.skills.length === 1 ? "skill" : "skills"}
                   </span>
-                </div>
+                </summary>
 
                 <ol className="mt-3 flex flex-col gap-4">
                   {topic.skills.map((skill) => (
@@ -303,7 +330,16 @@ export default async function TodayPage() {
                     </li>
                   ))}
                 </ol>
-              </section>
+
+                {/* The topic name used to be this link. It cannot be, now that
+                    it is the thing you click to open the fold. */}
+                <Link
+                  href={`/topics/${topic.slug}`}
+                  className="mt-3 inline-block text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline"
+                >
+                  All of {topic.name} →
+                </Link>
+              </details>
             ))}
           </div>
         </section>
