@@ -1,7 +1,33 @@
 import "server-only";
 
+import { cache } from "react";
+
 import { createClient } from "@/lib/supabase/server";
 import { extractTheMove } from "./the-move";
+
+/**
+ * The one hand-written page of a track: what to take away from it.
+ *
+ * Fetched on its own rather than through `getTopics`, which every list in the
+ * app calls. Adding a paragraph per skill to that query would carry fifty of
+ * them into pages that show a name and a level.
+ *
+ * Null for a track written before this column existed, or one still being
+ * written. The caller shows nothing rather than an empty box.
+ */
+export const getSkillTakeaway = cache(
+  async (slug: string): Promise<string | null> => {
+    const supabase = await createClient();
+
+    const { data } = await supabase
+      .from("skills")
+      .select("takeaway_md")
+      .eq("slug", slug)
+      .maybeSingle();
+
+    return data?.takeaway_md?.trim() || null;
+  },
+);
 
 export type RecapLesson = {
   sortOrder: number;
