@@ -3,6 +3,7 @@ import "server-only";
 import { cache } from "react";
 
 import { createClient } from "@/lib/supabase/server";
+import { asCheatSheet, type CheatSheet } from "./cheat-sheet";
 import type { Lesson, LessonSummary, Skill, Topic } from "./types";
 
 export type SkillWithLessons = Skill & { lessons: LessonSummary[] };
@@ -70,6 +71,27 @@ export const getTopicBySlug = cache(
   async (slug: string): Promise<TopicWithSkills | null> => {
     const topics = await getTopics();
     return topics.find((topic) => topic.slug === slug) ?? null;
+  },
+);
+
+/**
+ * A topic's printable page, or null where none has been written.
+ *
+ * Read on its own rather than through `getTopics`, which backs every list in
+ * the app. A sheet is a couple of thousand characters per topic and only two
+ * pages ever want one.
+ */
+export const getCheatSheet = cache(
+  async (topicSlug: string): Promise<CheatSheet | null> => {
+    const supabase = await createClient();
+
+    const { data } = await supabase
+      .from("topics")
+      .select("cheatsheet_json")
+      .eq("slug", topicSlug)
+      .maybeSingle();
+
+    return asCheatSheet(data?.cheatsheet_json);
   },
 );
 

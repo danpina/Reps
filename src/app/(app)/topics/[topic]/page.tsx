@@ -4,9 +4,10 @@ import { notFound } from "next/navigation";
 import { BackLink } from "@/components/back-link";
 import { requireUser } from "@/lib/auth/dal";
 import { FREE_PREVIEW_LESSONS, isPro } from "@/lib/billing/entitlement";
+
 import { getCurriculumProgress } from "@/lib/curriculum/progress";
 import { isSkillUnlocked } from "@/lib/curriculum/progression";
-import { getTopicBySlug } from "@/lib/curriculum/queries";
+import { getCheatSheet, getTopicBySlug } from "@/lib/curriculum/queries";
 
 export default async function TopicPage({
   params,
@@ -16,10 +17,11 @@ export default async function TopicPage({
   await requireUser();
   const { topic: slug } = await params;
 
-  const [topic, progress, pro] = await Promise.all([
+  const [topic, progress, pro, sheet] = await Promise.all([
     getTopicBySlug(slug),
     getCurriculumProgress(),
     isPro(),
+    getCheatSheet(slug),
   ]);
 
   if (!topic) notFound();
@@ -34,6 +36,18 @@ export default async function TopicPage({
         <p className="mt-3 border-l-2 border-[var(--accent)] pl-4 text-sm leading-relaxed text-ink">
           {topic.promise}
         </p>
+
+        {/* Only once there is a sheet to read, and only for an account that has
+            paid for the topic it distils — it is most of what a subscription
+            buys, on one page. */}
+        {sheet && pro ? (
+          <Link
+            href={`/topics/${topic.slug}/cheat-sheet`}
+            className="mt-4 inline-block text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline"
+          >
+            The whole topic on one page, to print →
+          </Link>
+        ) : null}
       </header>
 
       {topic.skills.length === 0 ? (

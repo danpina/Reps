@@ -120,7 +120,10 @@ export function AppNav() {
   return (
     <>
       {/* Wide screens: a quiet bar across the top. */}
-      <header className="sticky top-0 z-20 hidden border-b border-rule bg-[var(--paper)]/90 backdrop-blur sm:block">
+      <header
+        data-print="hide"
+        className="sticky top-0 z-20 hidden border-b border-rule bg-[var(--paper)]/90 backdrop-blur sm:block"
+      >
         <nav
           aria-label="Main"
           className="mx-auto flex w-full max-w-2xl items-center gap-1 px-5 py-3"
@@ -185,6 +188,7 @@ export function AppNav() {
       {/* Phones: tabs under the thumb. */}
       <nav
         aria-label="Main"
+        data-print="hide"
         className="fixed inset-x-0 bottom-0 z-20 border-t border-rule bg-[var(--paper)]/95 backdrop-blur sm:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
       >

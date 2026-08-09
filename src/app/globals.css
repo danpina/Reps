@@ -141,6 +141,62 @@ body {
 }
 
 /*
+ * Print.
+ *
+ * The palette is redefined rather than the components being restyled, because
+ * every colour in the app already comes from these six variables. One block
+ * here turns the whole thing into black on white, including a dark-mode reader
+ * who hits print without thinking about it — and a cheat sheet printed in
+ * paper-saving sage on charcoal would be unreadable and expensive.
+ */
+@media print {
+  :root {
+    --paper: #ffffff;
+    --paper-raised: #ffffff;
+    --ink: #000000;
+    --ink-muted: #333333;
+    --ink-faint: #555555;
+    --rule: #cccccc;
+    --rule-strong: #888888;
+    --accent: #000000;
+    --accent-soft: #ffffff;
+    --accent-ink: #ffffff;
+    --flag: #000000;
+    --flag-soft: #ffffff;
+  }
+
+  html {
+    color-scheme: light;
+  }
+
+  /* The app's chrome is not part of the page you are taking with you. */
+  [data-print="hide"] {
+    display: none !important;
+  }
+
+  main {
+    max-width: none;
+    padding: 0;
+  }
+
+  /* A concept split across a page break is a concept you have to reassemble. */
+  [data-print="keep"] {
+    break-inside: avoid;
+  }
+
+  /*
+   * Two columns on paper. Written here rather than as print:columns-2, which
+   * Tailwind quietly emits no rule for — the class lands on the element, no CSS
+   * is generated, and the sheet prints as one long column with nothing to say
+   * it went wrong.
+   */
+  [data-print="columns"] {
+    columns: 2;
+    column-gap: 18pt;
+  }
+}
+
+/*
  * The disclosure arrow on a folded section.
  *
  * A summary laid out with flex loses the browser's own marker, which leaves a
