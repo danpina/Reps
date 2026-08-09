@@ -240,3 +240,170 @@ describe("the partner a reader gets instead", () => {
     }
   });
 });
+
+/**
+ * Topics where the person across the table is somebody the reader might be
+ * drawn to, which is what makes their sex follow from what the reader said
+ * rather than from whoever the author happened to be picturing.
+ */
+const ROMANTIC_TOPICS = new Set(["meeting-someone", "dating-apps"]);
+
+/**
+ * Tracks inside those topics whose partner is not a prospect.
+ *
+ * The allow-list exists because "every scene in a dating topic" is the wrong
+ * rule, and was wrong from the first day it could have been written. Reasons
+ * are required rather than decorative: an entry with no argument for it is how
+ * an allow-list turns into a place to put failures.
+ */
+const NOT_A_PROSPECT = new Map([
+  [
+    "your-profile",
+    "Robin is a friend reading your profile over your shoulder. Tying their " +
+      "sex to who the reader dates would imply the friend is a prospect, and " +
+      "would make a scene about photo slots depend on something irrelevant.",
+  ],
+]);
+
+/** Which topic each skill is filed under, in both shapes the migrations use. */
+function topicOfSkill(): Map<string, string> {
+  const out = new Map<string, string>();
+
+  for (const file of readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql"))) {
+    const sql = readFileSync(join(MIGRATIONS, file), "utf8");
+
+    // Seeded with its topic named inline.
+    for (const [, topic, skill] of sql.matchAll(
+      /select id from public\.topics where slug = '([a-z0-9-]+)'\s*\),\s*'([a-z0-9-]+)'/g,
+    )) {
+      out.set(skill, topic);
+    }
+
+    // Assigned afterwards, which is how the nine that predate the topics table
+    // ended up anywhere. Reading only the shape above would leave Flirting and
+    // Reading disinterest looking like they belong to nothing, and a scene in
+    // a topic this cannot see is a scene this cannot guard.
+    for (const [, topic, skill] of sql.matchAll(
+      /t\.slug = '([a-z0-9-]+)' and s\.slug = '([a-z0-9-]+)'/g,
+    )) {
+      out.set(skill, topic);
+    }
+  }
+
+  return out;
+}
+
+/** Every authored scene, with the lesson it belongs to. */
+function authoredScenes(): {
+  skill: string;
+  order: string;
+  partner: Scenario["partner"];
+}[] {
+  const out: { skill: string; order: string; partner: Scenario["partner"] }[] = [];
+
+  for (const file of readdirSync(MIGRATIONS).filter((f) => f.includes("seed_lessons_"))) {
+    const sql = readFileSync(join(MIGRATIONS, file), "utf8");
+
+    const heads = [
+      ...sql.matchAll(
+        /\(select id from public\.skills where slug = '([a-z0-9-]+)'\),\s*(\d+),/g,
+      ),
+    ];
+
+    for (const [i, head] of heads.entries()) {
+      const chunk = sql.slice(
+        head.index + head[0].length,
+        heads[i + 1]?.index ?? sql.length,
+      );
+
+      for (const [, raw] of chunk.matchAll(/\$j\$([\s\S]*?)\$j\$/g)) {
+        let parsed;
+        try {
+          parsed = JSON.parse(raw);
+        } catch {
+          continue;
+        }
+        if (parsed?.partner) {
+          out.push({ skill: head[1], order: head[2], partner: parsed.partner });
+        }
+      }
+    }
+  }
+
+  return out;
+}
+
+/** Scenes given an alternate afterwards rather than in the seed. */
+function retrofitted(): Set<string> {
+  const out = new Set<string>();
+
+  for (const file of readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql"))) {
+    for (const [, skill, order] of readFileSync(join(MIGRATIONS, file), "utf8").matchAll(
+      /set_partner\('([a-z0-9-]+)',\s*(\d+),/g,
+    )) {
+      out.add(`${skill}/${order}`);
+    }
+  }
+
+  return out;
+}
+
+/**
+ * The guard the audit had to do by hand.
+ *
+ * What the suite already checked was that an alternate, if one existed, was a
+ * whole character of the other sex. Nothing checked that a scene which needs
+ * one has one — so a whole track could ship with every partner fixed to
+ * whichever sex the author was picturing, stay green, and be noticed only by
+ * a reader who does not date that sex.
+ */
+describe("scenes that need a partner of the other sex have one", () => {
+  const topics = topicOfSkill();
+  const already = retrofitted();
+
+  const scenes = authoredScenes().filter((s) =>
+    ROMANTIC_TOPICS.has(topics.get(s.skill) ?? ""),
+  );
+
+  // A parser reading SQL with a regular expression fails silently when the SQL
+  // is written a little differently, and a silent parser makes the assertions
+  // below vacuously true.
+  test("the scenes were actually found", () => {
+    assert.ok(scenes.length >= 30, `only found ${scenes.length} scenes to check`);
+    for (const skill of NOT_A_PROSPECT.keys()) {
+      assert.ok(
+        scenes.some((s) => s.skill === skill),
+        `${skill} is on the allow-list but has no scenes in a romantic topic`,
+      );
+    }
+  });
+
+  test("every prospect has an alternate", () => {
+    for (const { skill, order, partner } of scenes) {
+      if (NOT_A_PROSPECT.has(skill)) continue;
+
+      // A retrofitted scene is covered by its set_partner call, which writes
+      // the sex onto the authored partner as well as adding the alternate.
+      // Reading only the seed would report every one of those as missing a
+      // sex it does in fact have.
+      if (already.has(`${skill}/${order}`)) continue;
+
+      assert.ok(
+        partner.sex,
+        `${skill}/${order} (${partner.name}) does not say which sex it is, so ` +
+          `nothing can work out who to put in the scene instead`,
+      );
+      assert.ok(
+        partner.alt,
+        `${skill}/${order} (${partner.name}) has no alternate, so a reader who ` +
+          `does not date ${partner.sex}s rehearses against the wrong person`,
+      );
+    }
+  });
+
+  test("nothing is exempt without an argument for it", () => {
+    for (const [skill, why] of NOT_A_PROSPECT) {
+      assert.ok(why.length > 40, `${skill} is exempt with no argument for it`);
+    }
+  });
+});
