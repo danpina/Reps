@@ -147,3 +147,75 @@ describe("feedback prompt", () => {
     assert.ok(prompt.includes("never invent a line"));
   });
 });
+
+/**
+ * The alternate partners, which never pass through the scenarios above.
+ *
+ * A Dating scene carries a second character for a reader who dates the other
+ * sex, authored in its own migration rather than inside the seed. Nothing else
+ * in the suite would notice a half-written one — a partner missing a mood
+ * produces a prompt with a blank in it, and the only symptom is a model
+ * improvising a personality nobody wrote.
+ */
+function allAlternates(): { where: string; base: string; partner: Scenario["partner"] }[] {
+  const out: { where: string; base: string; partner: Scenario["partner"] }[] = [];
+
+  for (const file of readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql"))) {
+    const sql = readFileSync(join(MIGRATIONS, file), "utf8");
+    for (const [, skill, order, base, raw] of sql.matchAll(
+      /set_partner\('([a-z-]+)',\s*(\d+),\s*'(male|female)',\s*\$j\$([\s\S]*?)\$j\$/g,
+    )) {
+      out.push({
+        where: `${skill}/${order}`,
+        base,
+        partner: JSON.parse(raw) as Scenario["partner"],
+      });
+    }
+  }
+
+  return out;
+}
+
+describe("the partner a reader gets instead", () => {
+  const alternates = allAlternates();
+  const scene = scenarios[0];
+
+  test("there are alternates to check", () => {
+    assert.ok(alternates.length >= 10, `only found ${alternates.length}`);
+  });
+
+  test("each is a whole character rather than a renamed one", () => {
+    for (const { where, partner } of alternates) {
+      for (const key of ["name", "role", "personality", "mood"] as const) {
+        assert.ok(partner[key]?.trim(), `${where} alternate has no ${key}`);
+      }
+      assert.ok(
+        Number.isInteger(partner.openness) &&
+          partner.openness >= 1 &&
+          partner.openness <= 5,
+        `${where} alternate has openness ${partner.openness}`,
+      );
+    }
+  });
+
+  test("each is the other sex to the one it replaces", () => {
+    for (const { where, base, partner } of alternates) {
+      assert.ok(partner.sex, `${where} alternate does not say which sex it is`);
+      assert.notEqual(
+        partner.sex,
+        base,
+        `${where} alternate is the same sex as the partner it stands in for`,
+      );
+    }
+  });
+
+  test("each builds a prompt that carries who they are", () => {
+    for (const { where, partner } of alternates) {
+      const prompt = buildSystemPrompt({ ...scene, partner });
+      assert.ok(prompt.includes(partner.name), `${where}: missing name`);
+      assert.ok(prompt.includes(partner.role), `${where}: missing role`);
+      assert.ok(prompt.includes(partner.personality), `${where}: missing personality`);
+      assert.ok(prompt.includes(partner.mood), `${where}: missing mood`);
+    }
+  });
+});

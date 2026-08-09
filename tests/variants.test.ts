@@ -11,6 +11,7 @@ import assert from "node:assert/strict";
 import {
   partnerSexFor,
   pickVariant,
+  scenarioFor,
   scoreVariant,
   type Audience,
   type LessonVariant,
@@ -135,5 +136,76 @@ describe("who the rehearsal partner should be", () => {
   test("someone who dates both keeps the authored partner", () => {
     const both: Audience = { sex: "female", ageGroup: null, datingInterest: "both" };
     assert.equal(partnerSexFor(both, "male"), "male");
+  });
+});
+
+describe("putting the right person in the scene", () => {
+  const scene = {
+    setting: "A party.",
+    opening_beat: "She looks up.",
+    success_looks_like: "It goes somewhere.",
+    constraints: [],
+    partner: {
+      name: "Wren",
+      role: "a friend of the birthday person",
+      personality: "Warm and engaged. Mirrors the register she is given.",
+      mood: "Enjoying herself.",
+      openness: 4,
+      sex: "female" as const,
+      alt: {
+        name: "Wren",
+        role: "a friend of the birthday person",
+        personality: "Warm and engaged. Mirrors the register he is given.",
+        mood: "Enjoying himself.",
+        openness: 4,
+        sex: "male" as const,
+      },
+    },
+  };
+
+  test("a reader who dates men gets the man", () => {
+    const out = scenarioFor(scene, womanIntoMen);
+    assert.equal(out.partner.sex, "male");
+    assert.match(out.partner.mood, /himself/);
+  });
+
+  test("a reader who dates women keeps the scene as written", () => {
+    const out = scenarioFor(scene, manIntoWomen);
+    assert.equal(out.partner.sex, "female");
+    assert.match(out.partner.mood, /herself/);
+  });
+
+  // Inferring it from somebody's own sex would be assuming they are straight.
+  test("a reader who has said nothing gets the scene as written", () => {
+    assert.equal(scenarioFor(scene, nobody).partner.sex, "female");
+  });
+
+  test("a reader who dates both keeps the scene as written", () => {
+    const both: Audience = { sex: "male", ageGroup: null, datingInterest: "both" };
+    assert.equal(scenarioFor(scene, both).partner.sex, "female");
+  });
+
+  // Nothing downstream should be able to see a second character, least of all
+  // the prompt — a partner who knows about their own alternate is one who can
+  // mention it.
+  test("the alternate never survives selection", () => {
+    for (const audience of [nobody, manIntoWomen, womanIntoMen]) {
+      assert.equal("alt" in scenarioFor(scene, audience).partner, false);
+    }
+  });
+
+  test("a scene with no alternate is returned untouched", () => {
+    const plain = { ...scene, partner: { ...scene.partner, alt: undefined } };
+    assert.equal(scenarioFor(plain, womanIntoMen).partner.name, "Wren");
+    assert.equal(scenarioFor(plain, womanIntoMen).partner.sex, "female");
+  });
+
+  test("a variant's partner_sex outranks the authored one", () => {
+    const variant: LessonVariant = {
+      when: { sex: "female", dating_interest: "men" },
+      label: "Women approaching men",
+      partner_sex: "male",
+    };
+    assert.equal(scenarioFor(scene, nobody, variant).partner.sex, "male");
   });
 });

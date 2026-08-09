@@ -3,10 +3,12 @@ import { notFound } from "next/navigation";
 
 import { BackLink } from "@/components/back-link";
 import { extractTheMove } from "@/lib/curriculum/the-move";
-import { requireUser } from "@/lib/auth/dal";
+import { getProfile, requireUser } from "@/lib/auth/dal";
 import { createClient } from "@/lib/supabase/server";
 import type { Rubric, Scenario, WorkedExample } from "@/lib/curriculum/types";
+import type { LessonVariant } from "@/lib/curriculum/variants";
 import { shuffle } from "@/lib/curriculum/shuffle";
+import { pickVariant, scenarioFor } from "@/lib/curriculum/variants";
 import { checkLine } from "@/lib/roleplay/checks";
 import type { Feedback } from "@/lib/roleplay/feedback";
 import type { Turn } from "@/lib/roleplay/partner";
@@ -42,6 +44,7 @@ type Roleplay = {
     rehearsal_note: string | null;
     rehearsal_spec: unknown;
     examples_json: WorkedExample[];
+    variants_json: LessonVariant[];
     scenario_json: Scenario;
     rubric_json: Rubric;
     mission_text: string;
@@ -57,11 +60,12 @@ export default async function RehearsePage({
   await requireUser();
   const { id } = await params;
 
+  const profile = await getProfile();
   const supabase = await createClient();
   const { data } = await supabase
     .from("roleplays")
     .select(
-      "id, status, mode, transcript_json, feedback_json, lesson_id, lessons(title, sort_order, theory_md, rehearsal_note, rehearsal_spec, examples_json, scenario_json, rubric_json, mission_text, skills(slug, name))",
+      "id, status, mode, transcript_json, feedback_json, lesson_id, lessons(title, sort_order, theory_md, rehearsal_note, rehearsal_spec, examples_json, variants_json, scenario_json, rubric_json, mission_text, skills(slug, name))",
     )
     .eq("id", id)
     .maybeSingle();
@@ -70,7 +74,19 @@ export default async function RehearsePage({
 
   const roleplay = data as unknown as Roleplay;
   const { lessons: lesson } = roleplay;
-  const scenario = lesson.scenario_json;
+
+  // Who the reader is practising with, where the lesson cares. Everywhere else
+  // this returns the scene exactly as written.
+  const audience = {
+    sex: profile?.sex ?? null,
+    ageGroup: profile?.age_group ?? null,
+    datingInterest: profile?.dating_interest ?? null,
+  };
+  const scenario = scenarioFor(
+    lesson.scenario_json,
+    audience,
+    pickVariant(lesson.variants_json, audience),
+  );
   const theMove = extractTheMove(lesson.theory_md, lesson.title);
   const complete = roleplay.status === "complete";
 

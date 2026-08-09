@@ -1,5 +1,5 @@
 import type { AgeGroup, Sex } from "@/lib/profile/demographics";
-import type { WorkedExample } from "./types";
+import type { Partner, WorkedExample } from "./types";
 
 /**
  * Choosing which version of a lesson someone should read.
@@ -127,4 +127,35 @@ export function partnerSexFor(
   if (audience.datingInterest === "men") return "male";
   if (audience.datingInterest === "women") return "female";
   return authored;
+}
+
+/**
+ * The scene as this reader should get it.
+ *
+ * The partner a lesson was written with is the right one for almost everybody,
+ * because almost no scene depends on who the other person is. Dating is the
+ * exception, and it is a total one: a man practising flirting against a woman
+ * called Wren is not doing a slightly imperfect version of the exercise, he is
+ * doing a different one.
+ *
+ * The alternate is dropped from whatever comes back, so nothing downstream —
+ * the prompt above all — can see a second character it might mention.
+ *
+ * Deliberately does nothing when the reader has not said who they date. The
+ * app will not infer that from their own sex, since being wrong about it here
+ * is worse than the scene staying as written.
+ */
+export function scenarioFor<S extends { partner: Partner }>(
+  scenario: S,
+  audience: Audience,
+  variant?: LessonVariant | null,
+): S {
+  const { alt, ...authored } = scenario.partner;
+  const wanted = partnerSexFor(audience, variant?.partner_sex ?? authored.sex);
+
+  if (!alt || !wanted || wanted === authored.sex || alt.sex !== wanted) {
+    return { ...scenario, partner: authored };
+  }
+
+  return { ...scenario, partner: alt };
 }

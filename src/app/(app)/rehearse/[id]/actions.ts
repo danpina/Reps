@@ -6,6 +6,7 @@ import { getProfile, requireUser } from "@/lib/auth/dal";
 import { describeSelf } from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
 import type { Rubric, Scenario } from "@/lib/curriculum/types";
+import { pickVariant, scenarioFor, type LessonVariant } from "@/lib/curriculum/variants";
 import {
   checkRateLimit,
   getPartnerEngine,
@@ -29,7 +30,7 @@ async function loadRoleplay(id: string) {
   const { data, error } = await supabase
     .from("roleplays")
     .select(
-      "id, lesson_id, transcript_json, status, mode, lessons(scenario_json, rubric_json, rehearsal_spec, skill_id)",
+      "id, lesson_id, transcript_json, status, mode, lessons(scenario_json, rubric_json, rehearsal_spec, variants_json, skill_id)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -45,9 +46,35 @@ async function loadRoleplay(id: string) {
       scenario_json: Scenario;
       rubric_json: Rubric;
       rehearsal_spec: unknown;
+      variants_json: LessonVariant[];
       skill_id: string;
     };
   };
+}
+
+/**
+ * The scene as this reader should get it.
+ *
+ * Resolved here as well as on the page, and for the more important reason: the
+ * page decides what somebody reads, this decides who the model is told to be.
+ * A partner swapped in the card and not in the prompt would be worse than not
+ * swapping at all.
+ */
+async function sceneFor(roleplay: {
+  lessons: { scenario_json: Scenario; variants_json: LessonVariant[] };
+}): Promise<Scenario> {
+  const profile = await getProfile();
+  const audience = {
+    sex: profile?.sex ?? null,
+    ageGroup: profile?.age_group ?? null,
+    datingInterest: profile?.dating_interest ?? null,
+  };
+
+  return scenarioFor(
+    roleplay.lessons.scenario_json,
+    audience,
+    pickVariant(roleplay.lessons.variants_json, audience),
+  );
 }
 
 /**
@@ -130,7 +157,7 @@ export async function say(
   let reply: string;
   try {
     const engine = getPartnerEngine();
-    reply = await engine.nextTurn(roleplay.lessons.scenario_json, history);
+    reply = await engine.nextTurn(await sceneFor(roleplay), history);
   } catch (error) {
     // A refusal is recorded as well as reported. Without the row the limit
     // above can never trip, since nothing else remembers that it happened.
@@ -202,7 +229,7 @@ export async function endScene(
   let result: Awaited<ReturnType<typeof engine.feedback>>;
   try {
     result = await engine.feedback(
-      roleplay.lessons.scenario_json,
+      await sceneFor(roleplay),
       roleplay.lessons.rubric_json,
       roleplay.transcript_json,
       describeSelf(profile?.sex ?? null, profile?.age_group ?? null),

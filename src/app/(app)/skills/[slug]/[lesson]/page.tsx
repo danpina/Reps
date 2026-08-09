@@ -10,7 +10,7 @@ import {
   isLessonUnlocked,
   nextOpenLesson,
 } from "@/lib/curriculum/progression";
-import { pickVariant } from "@/lib/curriculum/variants";
+import { pickVariant, scenarioFor } from "@/lib/curriculum/variants";
 import {
   getLesson,
   getSkillBySlug,
@@ -91,11 +91,16 @@ export default async function LessonPage({
   // lessons where the advice genuinely differs by reader carry variants at
   // all. Where one matches, it adds a passage and may replace the examples.
   const profile = await getProfile();
-  const variant = pickVariant(lesson.variants_json, {
+  const audience = {
     sex: profile?.sex ?? null,
     ageGroup: profile?.age_group ?? null,
     datingInterest: profile?.dating_interest ?? null,
-  });
+  };
+  const variant = pickVariant(lesson.variants_json, audience);
+
+  // The box below names the partner before you start, so it has to name the
+  // one the scene will actually produce.
+  const scenario = scenarioFor(lesson.scenario_json, audience, variant);
 
   // The tailored passage joins the body rather than sitting in a box beside
   // it. A reader who has answered the questions does not need to be told which
@@ -175,8 +180,8 @@ export default async function LessonPage({
           sortOrder={sortOrder}
           skillId={skill.id}
           mode={lesson.rehearsal_mode}
-          partnerName={lesson.scenario_json.partner.name}
-          openness={lesson.scenario_json.partner.openness}
+          partnerName={scenario.partner.name}
+          openness={scenario.partner.openness}
         />
 
         <section

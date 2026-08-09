@@ -1,3 +1,4 @@
+import type { Sex } from "@/lib/profile/demographics";
 import type { LessonVariant } from "./variants";
 
 export type Topic = {
@@ -50,19 +51,38 @@ export type Rubric = {
   criteria: RubricCriterion[];
 };
 
+export type Partner = {
+  name: string;
+  role: string;
+  personality: string;
+  mood: string;
+  /** 1 (closed, makes the user work) to 5 (warm and forthcoming). */
+  openness: number;
+  /**
+   * Which sex this partner is.
+   *
+   * Absent almost everywhere, because almost nowhere does it matter — a
+   * stranger at a coffee machine is a stranger. It is authored in Dating,
+   * where a scene naming a specific person is incoherent if that person is
+   * the wrong sex for the reader.
+   */
+  sex?: Sex;
+  /**
+   * The same scene with somebody of the other sex in it.
+   *
+   * A whole partner rather than a name swap, because the pronouns live in the
+   * personality and the mood as well, and a half-swapped character reads worse
+   * than an unswapped one.
+   */
+  alt?: Omit<Partner, "alt">;
+};
+
 export type Scenario = {
   setting: string;
   opening_beat: string;
   success_looks_like: string;
   constraints: string[];
-  partner: {
-    name: string;
-    role: string;
-    personality: string;
-    mood: string;
-    /** 1 (closed, makes the user work) to 5 (warm and forthcoming). */
-    openness: number;
-  };
+  partner: Partner;
 };
 
 export type Lesson = {
