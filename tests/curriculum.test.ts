@@ -49,10 +49,17 @@ function topicSlugs(): Set<string> {
     .map(readMigration)
     .join("\n");
 
-  const block = /insert into public\.topics[\s\S]*?\n\s*\);/.exec(sql)?.[0] ?? "";
-  const slugs = new Set(
-    [...block.matchAll(/^\s{4}'([a-z0-9-]+)',$/gm)].map(([, s]) => s),
-  );
+  // Every insert block, not the first one. Topics arrived in two waves — the
+  // original seven and the four added when Dating was split — and reading a
+  // single block meant the second wave did not exist as far as this was
+  // concerned, so a skill filed under one of them looked like a skill filed
+  // under nothing.
+  const slugs = new Set<string>();
+  for (const [block] of sql.matchAll(/insert into public\.topics[\s\S]*?\n\s*\);/g)) {
+    for (const [, slug] of block.matchAll(/^\s{4}'([a-z0-9-]+)',$/gm)) {
+      slugs.add(slug);
+    }
+  }
 
   // A topic can also arrive by being renamed, which is how Dating became
   // Meeting someone. Reading only the insert missed those, so a skill filed

@@ -32,6 +32,15 @@ export type LineCheck =
    * hiring manager remembers.
    */
   | { kind: "requires_question"; requirement: string }
+  /**
+   * At most this many questions.
+   *
+   * Its own kind rather than a variant of the two above, because a message
+   * carrying three questions is a specific failure with a specific cost: the
+   * reader answers the easiest one and the other two are gone. It is the
+   * commonest way a first message on an app gets a one-word reply.
+   */
+  | { kind: "max_questions"; requirement: string; n: number }
   | { kind: "max_words"; requirement: string; n: number }
   | { kind: "min_words"; requirement: string; n: number }
   /** Stopping is the move in several lessons, and stopping is countable. */
@@ -151,6 +160,13 @@ function evaluate(check: LineCheck, line: string): { ok: boolean; why: string | 
       return line.includes("?")
         ? { ok: true, why: null }
         : { ok: false, why: "That is a statement. Ask it." };
+
+    case "max_questions": {
+      const asked = (line.match(/\?/g) ?? []).length;
+      return asked <= check.n
+        ? { ok: true, why: null }
+        : { ok: false, why: `That is ${asked} questions. They will answer one.` };
+    }
 
     case "max_words":
       return tokens.length <= check.n
