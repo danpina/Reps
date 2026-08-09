@@ -50,9 +50,18 @@ function topicSlugs(): Set<string> {
     .join("\n");
 
   const block = /insert into public\.topics[\s\S]*?\n\s*\);/.exec(sql)?.[0] ?? "";
-  return new Set(
+  const slugs = new Set(
     [...block.matchAll(/^\s{4}'([a-z0-9-]+)',$/gm)].map(([, s]) => s),
   );
+
+  // A topic can also arrive by being renamed, which is how Dating became
+  // Meeting someone. Reading only the insert missed those, so a skill filed
+  // under a renamed topic looked like a skill filed under nothing.
+  for (const [, slug] of sql.matchAll(/set\s+slug = '([a-z0-9-]+)'/g)) {
+    slugs.add(slug);
+  }
+
+  return slugs;
 }
 
 /**

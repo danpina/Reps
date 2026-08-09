@@ -162,6 +162,8 @@ function allAlternates(): { where: string; base: string; partner: Scenario["part
 
   for (const file of readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql"))) {
     const sql = readFileSync(join(MIGRATIONS, file), "utf8");
+
+    // Retrofitted onto a scene that already shipped.
     for (const [, skill, order, base, raw] of sql.matchAll(
       /set_partner\('([a-z-]+)',\s*(\d+),\s*'(male|female)',\s*\$j\$([\s\S]*?)\$j\$/g,
     )) {
@@ -169,6 +171,25 @@ function allAlternates(): { where: string; base: string; partner: Scenario["part
         where: `${skill}/${order}`,
         base,
         partner: JSON.parse(raw) as Scenario["partner"],
+      });
+    }
+
+    // Written into the scene from the start, which is how new content should
+    // do it. Both shapes have to be checked or the newer one is the untested
+    // one, which is the wrong way round.
+    for (const [, raw] of sql.matchAll(/\$j\$([\s\S]*?)\$j\$/g)) {
+      let parsed;
+      try {
+        parsed = JSON.parse(raw);
+      } catch {
+        continue;
+      }
+      if (!parsed?.partner?.alt) continue;
+
+      out.push({
+        where: `${file} — ${parsed.partner.name}`,
+        base: parsed.partner.sex,
+        partner: parsed.partner.alt as Scenario["partner"],
       });
     }
   }
