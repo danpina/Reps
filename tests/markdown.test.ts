@@ -11,7 +11,7 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { toParagraphs } from "../src/lib/markdown.ts";
+import { toParagraphs, toTokens } from "../src/lib/markdown.ts";
 
 describe("splitting authored prose into paragraphs", () => {
   test("blank lines separate paragraphs", () => {
@@ -50,6 +50,47 @@ describe("splitting authored prose into paragraphs", () => {
   });
 });
 
+describe("splitting a paragraph into emphasis runs", () => {
+  const plain = (s: string) => toTokens(s).map((t) => `${t.emphasis}:${t.text}`);
+
+  test("bold survives", () => {
+    assert.deepEqual(plain("**The move:** do the thing."), [
+      "bold:The move:",
+      "none: do the thing.",
+    ]);
+  });
+
+  test("italics survive, which they did not used to", () => {
+    assert.deepEqual(plain("The phrase is *run out of* exactly."), [
+      "none:The phrase is ",
+      "italic:run out of",
+      "none: exactly.",
+    ]);
+  });
+
+  test("bold is matched before italics, so its stars are not mistaken", () => {
+    assert.deepEqual(plain("**both** and *one*"), [
+      "bold:both",
+      "none: and ",
+      "italic:one",
+    ]);
+  });
+
+  test("a lone star is left alone", () => {
+    assert.deepEqual(plain("2 * 3 is six"), ["none:2 * 3 is six"]);
+  });
+
+  test("plain text comes back as one run", () => {
+    assert.deepEqual(plain("nothing to see"), ["none:nothing to see"]);
+  });
+
+  test("no token is ever empty", () => {
+    for (const source of ["**a** **b**", "*a**b*", "", "**", "***"]) {
+      assert.ok(toTokens(source).every((t) => t.text.length > 0), source);
+    }
+  });
+});
+
 const MIGRATIONS = join(import.meta.dirname, "..", "supabase", "migrations");
 
 /** Every dollar-quoted markdown block the seed migrations write. */
@@ -85,6 +126,26 @@ describe("the prose the curriculum ships", () => {
         toParagraphs(body).length > 1,
         `${file}: a multi-paragraph block collapsed into one`,
       );
+    }
+  });
+
+  test("no authored emphasis survives as a literal asterisk", () => {
+    // Twenty-five lessons printed their own asterisks because only bold was
+    // ever rendered. Nothing throws when that happens, which is why it needs
+    // asserting rather than watching for.
+    for (const { file, body } of blocks) {
+      for (const paragraph of toParagraphs(body)) {
+        const rendered = toTokens(paragraph)
+          .map((t) => t.text)
+          .join("");
+
+        assert.ok(
+          !rendered.includes("*"),
+          `${file}: emphasis the renderer cannot parse — ${paragraph
+            .slice(Math.max(0, paragraph.indexOf("*") - 30), paragraph.indexOf("*") + 40)
+            .trim()}`,
+        );
+      }
     }
   });
 

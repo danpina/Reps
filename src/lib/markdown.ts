@@ -26,3 +26,33 @@ export function toParagraphs(markdown: string): string[] {
     .map((paragraph) => paragraph.replace(/\n/g, " ").trim())
     .filter(Boolean);
 }
+
+export type Emphasis = "none" | "bold" | "italic";
+export type Token = { text: string; emphasis: Emphasis };
+
+/**
+ * A paragraph split into runs of plain, bold and italic text.
+ *
+ * Both markers are used throughout the curriculum — bold for "**The move:**"
+ * and italics for quoting a line somebody might say — and only bold was ever
+ * rendered. Twenty-five lessons were printing their own asterisks, which is
+ * the same class of silent failure as the paragraph splitting: nothing throws,
+ * and it reads as sloppy writing rather than as a bug.
+ *
+ * Bold is matched first, so the two stars of "**x**" are never mistaken for an
+ * italic run containing a star.
+ */
+export function toTokens(paragraph: string): Token[] {
+  return paragraph
+    .split(/(\*\*[^*]+\*\*|\*[^*\n]+\*)/g)
+    .filter(Boolean)
+    .map((part) => {
+      const bold = /^\*\*([^*]+)\*\*$/.exec(part);
+      if (bold) return { text: bold[1], emphasis: "bold" as const };
+
+      const italic = /^\*([^*\n]+)\*$/.exec(part);
+      if (italic) return { text: italic[1], emphasis: "italic" as const };
+
+      return { text: part, emphasis: "none" as const };
+    });
+}
