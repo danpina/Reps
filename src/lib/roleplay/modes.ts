@@ -53,6 +53,17 @@ export function costsMoney(mode: RehearsalMode): boolean {
 export type LineSpec = {
   says?: string;
   /**
+   * How much room the box gives, where the default is wrong for the lesson.
+   *
+   * The default exists because a box that invites a paragraph teaches the
+   * wrong thing before a word is scored — in Small talk the skill is saying
+   * less. In Interviews it is sometimes the opposite: "tell me about
+   * yourself" is a ninety-second answer, and a drill that cannot hold one
+   * cannot drill it. The cap on what a drill may ask for is a property of the
+   * lesson, not of the app.
+   */
+  maxChars?: number;
+  /**
    * May be empty. Two lessons — saying something exposing, and mislabelling
    * something at the wrong scale — are creative acts that no rule can mark.
    * They still belong in this mode, taught by example rather than by check.
@@ -102,6 +113,10 @@ export function asLineSpec(spec: unknown): LineSpec | null {
   if (!isObject(spec) || !Array.isArray(spec.checks)) return null;
   return {
     says: typeof spec.says === "string" ? spec.says : undefined,
+    maxChars:
+      typeof spec.maxChars === "number" && spec.maxChars > 0
+        ? spec.maxChars
+        : undefined,
     checks: spec.checks as LineCheck[],
     model: isObject(spec.model)
       ? (spec.model as { line: string; why: string })

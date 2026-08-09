@@ -218,6 +218,7 @@ function LineRehearsal({ roleplay }: { roleplay: Roleplay }) {
       attempts={attempts}
       examples={roleplay.lessons.examples_json ?? []}
       model={spec.model}
+      maxChars={spec.maxChars}
     />
   );
 }

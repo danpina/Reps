@@ -176,12 +176,6 @@ describe("the rehearsal modes the curriculum authors", () => {
     return counts;
   }
 
-  // Interviews is written and has never been given rehearsal modes, so its
-  // forty lessons would each open a fourteen-turn chat window. It is also not
-  // applied to any database yet, which is why this is a named gap rather than a
-  // failure — but it is named here so it cannot be forgotten.
-  const UNAUTHORED = /^interview-/;
-
   test("no track is half-authored", () => {
     // The dangerous state is a track with some modes and not others, because
     // the ones without silently fall back to an open conversation.
@@ -203,9 +197,12 @@ describe("the rehearsal modes the curriculum authors", () => {
   });
 
   test("every track that ships has been given its modes", () => {
+    // No exemptions any more. Interviews used to be one — forty lessons written
+    // before modes existed, every one of which would have opened a fourteen-turn
+    // chat window — and now that it is authored, nothing is allowed to ship
+    // without its modes again.
     const missing = [...seededLessons().keys()].filter(
-      (skill) =>
-        !UNAUTHORED.test(skill) && !authored.some((a) => a.skill === skill),
+      (skill) => !authored.some((a) => a.skill === skill),
     );
 
     assert.deepEqual(missing, [], `tracks with no rehearsal modes: ${missing}`);

@@ -23,6 +23,15 @@
 export type LineCheck =
   /** No question mark. Several lessons are literally about this. */
   | { kind: "no_question"; requirement: string }
+  /**
+   * A question mark, required.
+   *
+   * The mirror of the one above, and both are real lessons. Small talk spends
+   * a track teaching people to stop asking; Interviews spends one teaching
+   * them to ask, because the questions you ask at the end are half of what a
+   * hiring manager remembers.
+   */
+  | { kind: "requires_question"; requirement: string }
   | { kind: "max_words"; requirement: string; n: number }
   | { kind: "min_words"; requirement: string; n: number }
   /** Stopping is the move in several lessons, and stopping is countable. */
@@ -137,6 +146,11 @@ function evaluate(check: LineCheck, line: string): { ok: boolean; why: string | 
       return line.includes("?")
         ? { ok: false, why: "There is a question mark in it." }
         : { ok: true, why: null };
+
+    case "requires_question":
+      return line.includes("?")
+        ? { ok: true, why: null }
+        : { ok: false, why: "That is a statement. Ask it." };
 
     case "max_words":
       return tokens.length <= check.n

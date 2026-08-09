@@ -31,6 +31,7 @@ export function LineDrill({
   attempts,
   examples,
   model,
+  maxChars = MAX_LINE_CHARS,
 }: {
   roleplayId: string;
   /** The partner's line, when they speak first. */
@@ -40,6 +41,8 @@ export function LineDrill({
   examples: WorkedExample[];
   /** One line that answers this exact beat. */
   model?: { line: string; why: string };
+  /** How much room this drill gives, where the lesson wants more than the default. */
+  maxChars?: number;
 }) {
   const [state, formAction] = useActionState<DrillState, FormData>(
     attemptLine,
@@ -153,7 +156,7 @@ export function LineDrill({
           <label htmlFor="line" className="sr-only">
             Your line
           </label>
-          <LineBox defaultValue={last?.line ?? ""} />
+          <LineBox defaultValue={last?.line ?? ""} maxChars={maxChars} />
 
           {state.error ? (
             <p
@@ -253,24 +256,35 @@ function Examples({
   );
 }
 
-function LineBox({ defaultValue }: { defaultValue: string }) {
+function LineBox({
+  defaultValue,
+  maxChars,
+}: {
+  defaultValue: string;
+  maxChars: number;
+}) {
   const [used, setUsed] = useState(defaultValue.length);
-  const left = MAX_LINE_CHARS - used;
+  const left = maxChars - used;
+
+  // A drill asking for a ninety-second answer needs a box that looks like it
+  // wants one. Two rows in front of a request for an interview answer reads as
+  // a mistake before anybody types.
+  const long = maxChars > MAX_LINE_CHARS;
 
   return (
     <>
       <textarea
         id="line"
         name="line"
-        rows={2}
-        maxLength={MAX_LINE_CHARS}
+        rows={long ? 8 : 2}
+        maxLength={maxChars}
         required
         defaultValue={defaultValue}
         onChange={(e) => setUsed(e.target.value.length)}
-        placeholder="What do you say?"
+        placeholder={long ? "What do you say? Take the room you need." : "What do you say?"}
         className="w-full resize-none rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-[15px] leading-relaxed text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
       />
-      {left <= 40 ? (
+      {left <= Math.max(40, Math.round(maxChars * 0.1)) ? (
         <p className="tabular mt-2 text-right text-xs text-ink-faint" aria-live="polite">
           {left} {left === 1 ? "character" : "characters"} left
         </p>

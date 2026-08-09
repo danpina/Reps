@@ -69,9 +69,6 @@ export async function attemptLine(
   const line = String(formData.get("line") ?? "").trim();
 
   if (!line) return { error: "Write the line first." };
-  if (line.length > MAX_LINE_CHARS) {
-    return { error: "That is longer than anyone speaks. Say it in fewer words." };
-  }
 
   const drill = await load(id);
   if (!drill) return { error: "That rehearsal could not be found." };
@@ -79,6 +76,13 @@ export async function attemptLine(
 
   const spec = asLineSpec(drill.lessons.rehearsal_spec);
   if (!spec) return { error: "This drill is not set up correctly." };
+
+  // Checked once the spec is loaded, because how much room a drill gives is
+  // the lesson's decision rather than the app's. Still checked here and not
+  // only by the textarea: a maxLength attribute is a courtesy, not a limit.
+  if (line.length > (spec.maxChars ?? MAX_LINE_CHARS)) {
+    return { error: "That is longer than this one asks for. Tighten it." };
+  }
 
   if (drill.transcript_json.length >= MAX_DRILL_ATTEMPTS) {
     return {
