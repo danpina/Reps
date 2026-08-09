@@ -124,7 +124,11 @@ export async function Rehearsal({
             {mode === "line"
               ? "One line, as many goes as you want. You will be told what it has to do before you write it."
               : mode === "choice"
-                ? "Two situations to read. There is a right answer, and on this one it is often to do nothing."
+                ? // Deliberately says nothing about which way the answers go.
+                  // This used to promise that the right answer was often to do
+                  // nothing, which is true of the lessons about reading
+                  // availability and false of the ones about going anyway.
+                  "Situations to read, and a decision on each. There is a right answer, and the reason it is right is the lesson."
                 : mode === "beat"
                   ? `A short sequence with ${partnerName}. Each turn tells you what it is for.`
                   : `Practise this on ${partnerName} before you try it on anyone real.${openness <= 2 ? " They are hard work on purpose." : ""}`}

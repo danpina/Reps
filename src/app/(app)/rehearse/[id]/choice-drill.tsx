@@ -3,7 +3,7 @@
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
-import type { ChoiceBeat } from "@/lib/roleplay/modes";
+import type { ChoiceBeat, ChoiceOption } from "@/lib/roleplay/modes";
 import { answerChoice, type DrillState } from "./drill-actions";
 import { FinishForm } from "./line-drill";
 
@@ -29,12 +29,20 @@ export function ChoiceDrill({
   roleplayId,
   answered,
   current,
+  options,
   total,
 }: {
   roleplayId: string;
   answered: AnsweredBeat[];
   /** The situation still to be read, or null when they are all done. */
   current: ChoiceBeat | null;
+  /**
+   * The current beat's options in the order to show them, each carrying the
+   * index it was authored at. Shuffled on the server — doing it here would
+   * reorder on hydration and hand the action a different answer than the one
+   * that was clicked.
+   */
+  options: { option: ChoiceOption; index: number }[];
   total: number;
 }) {
   const [state, formAction] = useActionState<DrillState, FormData>(
@@ -103,8 +111,8 @@ export function ChoiceDrill({
 
           <form action={formAction} className="mt-3 flex flex-col gap-2">
             <input type="hidden" name="roleplay_id" value={roleplayId} />
-            {current.options.map((option, i) => (
-              <Option key={option.text} index={i} text={option.text} />
+            {options.map(({ option, index }) => (
+              <Option key={option.text} index={index} text={option.text} />
             ))}
           </form>
 

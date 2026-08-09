@@ -6,6 +6,7 @@ import { extractTheMove } from "@/lib/curriculum/the-move";
 import { requireUser } from "@/lib/auth/dal";
 import { createClient } from "@/lib/supabase/server";
 import type { Rubric, Scenario, WorkedExample } from "@/lib/curriculum/types";
+import { shuffle } from "@/lib/curriculum/shuffle";
 import { checkLine } from "@/lib/roleplay/checks";
 import type { Feedback } from "@/lib/roleplay/feedback";
 import type { Turn } from "@/lib/roleplay/partner";
@@ -234,11 +235,23 @@ function ChoiceRehearsal({ roleplay }: { roleplay: Roleplay }) {
     correct: turn.correct === true,
   }));
 
+  const current = spec.beats[picks.length] ?? null;
+
+  // Shuffled for the same reason the comprehension beats are: a card tends to
+  // get written with the right answer in a habitual slot, and a reader picks
+  // that pattern up long before they learn anything. Each option carries the
+  // index it was authored at, so the answer the server checks is the one they
+  // actually chose rather than the position they clicked.
+  const options = current
+    ? shuffle(current.options.map((option, index) => ({ option, index })))
+    : [];
+
   return (
     <ChoiceDrill
       roleplayId={roleplay.id}
       answered={answered.filter((a) => a.beat)}
-      current={spec.beats[picks.length] ?? null}
+      current={current}
+      options={options}
       total={spec.beats.length}
     />
   );

@@ -153,12 +153,69 @@ function authoredModes(): Authored[] {
 describe("the rehearsal modes the curriculum authors", () => {
   const authored = authoredModes();
 
-  test("every lesson in the shipped topics has been given a mode", () => {
-    // Nine skills of five lessons. A lesson with no mode falls back to an open
-    // conversation, which is the wrong container for about half of them and is
-    // exactly the state this work exists to end.
-    assert.equal(authored.length, 45);
-    assert.equal(new Set(authored.map((a) => `${a.skill}/${a.order}`)).size, 45);
+  /**
+   * How many lessons each seed migration writes, by skill.
+   *
+   * Counted from the files rather than hardcoded, so a new track cannot be
+   * written without this noticing what happened to its modes.
+   */
+  function seededLessons(): Map<string, number> {
+    const counts = new Map<string, number>();
+
+    for (const file of readdirSync(MIGRATIONS).filter((f) =>
+      f.includes("seed_lessons_"),
+    )) {
+      const sql = readFileSync(join(MIGRATIONS, file), "utf8");
+      for (const [, slug] of sql.matchAll(
+        /from public\.skills where slug = '([a-z0-9-]+)'/g,
+      )) {
+        counts.set(slug, (counts.get(slug) ?? 0) + 1);
+      }
+    }
+
+    return counts;
+  }
+
+  // Interviews is written and has never been given rehearsal modes, so its
+  // forty lessons would each open a fourteen-turn chat window. It is also not
+  // applied to any database yet, which is why this is a named gap rather than a
+  // failure — but it is named here so it cannot be forgotten.
+  const UNAUTHORED = /^interview-/;
+
+  test("no track is half-authored", () => {
+    // The dangerous state is a track with some modes and not others, because
+    // the ones without silently fall back to an open conversation.
+    const byMode = new Map<string, number>();
+    for (const lesson of authored) {
+      byMode.set(lesson.skill, (byMode.get(lesson.skill) ?? 0) + 1);
+    }
+
+    for (const [skill, lessons] of seededLessons()) {
+      const modes = byMode.get(skill) ?? 0;
+      if (modes === 0) continue;
+
+      assert.equal(
+        modes,
+        lessons,
+        `${skill} seeds ${lessons} lessons and authors ${modes} modes`,
+      );
+    }
+  });
+
+  test("every track that ships has been given its modes", () => {
+    const missing = [...seededLessons().keys()].filter(
+      (skill) =>
+        !UNAUTHORED.test(skill) && !authored.some((a) => a.skill === skill),
+    );
+
+    assert.deepEqual(missing, [], `tracks with no rehearsal modes: ${missing}`);
+  });
+
+  test("a lesson is not given a mode twice", () => {
+    assert.equal(
+      new Set(authored.map((a) => `${a.skill}/${a.order}`)).size,
+      authored.length,
+    );
   });
 
   test("every mode is one the app knows how to render", () => {
