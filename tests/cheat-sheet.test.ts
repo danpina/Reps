@@ -65,11 +65,22 @@ describe("laying a cheat sheet out", () => {
   });
 });
 
-/** Every cheat sheet the migrations write, by the topic it belongs to. */
+/**
+ * Every cheat sheet the migrations end up with, by topic.
+ *
+ * Two shapes, because a topic that grows a track afterwards appends a group
+ * rather than restating the whole sheet — restating would put a second copy of
+ * twenty concepts in the repo, and the copy would go stale the first time the
+ * original was edited. Both forms are read here, in migration order, so what
+ * gets asserted below is the sheet as it finally exists rather than as it was
+ * first written.
+ */
 function authoredSheets(): { topic: string; sheet: CheatSheet }[] {
-  const found: { topic: string; sheet: CheatSheet }[] = [];
+  const byTopic = new Map<string, CheatSheet>();
 
-  for (const file of readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql"))) {
+  for (const file of readdirSync(MIGRATIONS)
+    .filter((f) => f.endsWith(".sql"))
+    .sort()) {
     const sql = readFileSync(join(MIGRATIONS, file), "utf8");
 
     for (const match of sql.matchAll(
@@ -77,11 +88,19 @@ function authoredSheets(): { topic: string; sheet: CheatSheet }[] {
     )) {
       const sheet = asCheatSheet(JSON.parse(match[1]));
       assert.ok(sheet, `${match[2]} has a cheat sheet that does not parse`);
-      found.push({ topic: match[2], sheet: sheet! });
+      byTopic.set(match[2], sheet!);
+    }
+
+    for (const match of sql.matchAll(
+      /\(cheatsheet_json -> 'groups'\) \|\| \$j\$([\s\S]*?)\$j\$::jsonb[\s\S]*?where slug = '([a-z0-9-]+)'/g,
+    )) {
+      const existing = byTopic.get(match[2]);
+      assert.ok(existing, `${match[2]} is appended to before it has a sheet`);
+      existing!.groups.push(...(JSON.parse(match[1]) as CheatSheet["groups"]));
     }
   }
 
-  return found;
+  return [...byTopic].map(([topic, sheet]) => ({ topic, sheet }));
 }
 
 describe("the cheat sheets the curriculum ships", () => {
