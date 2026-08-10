@@ -96,6 +96,22 @@ function seededSkills(): Map<string, string | null> {
     }
   }
 
+  // A skill can also arrive by being renamed, which is how "the-conversation"
+  // exists — it was seeded as "two-hours" and renamed when The first date was
+  // condensed from five tracks to four. Reading only the inserts made a lesson
+  // file look like it was writing for a skill nothing creates. The topics
+  // parser above already had to learn this; skills had not.
+  //
+  // Every file, not just the skill seeds, because a rename is a correction and
+  // corrections are not written where the original was.
+  for (const file of readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql"))) {
+    for (const [, skill, topic] of readMigration(file).matchAll(
+      /update public\.skills set\s+slug = '([a-z0-9-]+)'[\s\S]{0,200}?topics where slug = '([a-z0-9-]+)'/g,
+    )) {
+      skills.set(skill, topic);
+    }
+  }
+
   return skills;
 }
 
