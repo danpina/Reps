@@ -24,6 +24,20 @@ export type VariantConditions = {
   sex?: Sex;
   dating_interest?: DatingInterest;
   age_group?: AgeGroup;
+  /**
+   * A span of bands, matched if the reader is in any of them.
+   *
+   * Work needs this and the single band cannot express it. What changes the
+   * advice there is not age but standing in the room — a first raise with no
+   * data behind it is a different conversation from one against a band
+   * ceiling — and that runs across two or three bands at a time. Writing the
+   * same passage six times, once per band, would be six places for it to
+   * drift apart.
+   *
+   * Scores lower than an exact band, so a variant written for one specific
+   * group still wins over a range that happens to contain it.
+   */
+  age_groups?: AgeGroup[];
 };
 
 export type LessonVariant = {
@@ -73,6 +87,16 @@ export function scoreVariant(
   if (conditions.age_group !== undefined) {
     if (audience.ageGroup !== conditions.age_group) return null;
     score += 2;
+  }
+
+  if (conditions.age_groups !== undefined) {
+    // A reader who has not given a band is a miss, exactly as above. Guessing
+    // somebody's career stage in order to show them advice about it is the one
+    // failure this whole matcher exists to avoid.
+    if (!audience.ageGroup || !conditions.age_groups.includes(audience.ageGroup)) {
+      return null;
+    }
+    score += 1;
   }
 
   if (conditions.dating_interest !== undefined) {

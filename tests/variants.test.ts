@@ -7,7 +7,10 @@
 
 import { describe, test } from "node:test";
 import assert from "node:assert/strict";
+import { readFileSync, readdirSync } from "node:fs";
+import { join } from "node:path";
 
+import type { AgeGroup } from "../src/lib/profile/demographics.ts";
 import {
   partnerSexFor,
   pickVariant,
@@ -16,6 +19,8 @@ import {
   type Audience,
   type LessonVariant,
 } from "../src/lib/curriculum/variants.ts";
+
+const MIGRATIONS = join(import.meta.dirname, "..", "supabase", "migrations");
 
 const nobody: Audience = { sex: null, ageGroup: null, datingInterest: null };
 
@@ -48,6 +53,184 @@ const forAnyoneDatingWomen: LessonVariant = {
   label: "If you date women",
   note_md: "…",
 };
+
+/**
+ * Every variant the migrations author.
+ *
+ * These are parsed by nothing else in the suite, and the way they fail is
+ * silent in the worst direction: a `when` with a key the matcher does not know
+ * scores zero, never wins, and the passage simply never appears. Nobody
+ * reports a paragraph they were never shown.
+ */
+function authoredVariants(): { where: string; variant: LessonVariant }[] {
+  const out: { where: string; variant: LessonVariant }[] = [];
+
+  for (const file of readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql"))) {
+    const sql = readFileSync(join(MIGRATIONS, file), "utf8");
+
+    for (const [, raw] of sql.matchAll(
+      /variants_json = \$j\$([\s\S]*?)\$j\$::jsonb/g,
+    )) {
+      let parsed;
+      try {
+        parsed = JSON.parse(raw);
+      } catch (err) {
+        assert.fail(`${file}: variants_json is not valid JSON — ${(err as Error).message}`);
+      }
+      assert.ok(Array.isArray(parsed), `${file}: variants_json is not an array`);
+      for (const variant of parsed as LessonVariant[]) {
+        out.push({ where: `${file} — ${variant.label}`, variant });
+      }
+    }
+  }
+
+  return out;
+}
+
+const KNOWN_CONDITIONS = new Set([
+  "sex",
+  "dating_interest",
+  "age_group",
+  "age_groups",
+]);
+
+const BANDS = new Set<AgeGroup>([
+  "18-24",
+  "25-34",
+  "35-44",
+  "45-54",
+  "55-64",
+  "65+",
+]);
+
+describe("the variants the curriculum ships", () => {
+  const authored = authoredVariants();
+
+  test("there are variants to check", () => {
+    assert.ok(authored.length >= 10, `only found ${authored.length}`);
+  });
+
+  test("every condition is one the matcher knows", () => {
+    for (const { where, variant } of authored) {
+      for (const key of Object.keys(variant.when ?? {})) {
+        assert.ok(
+          KNOWN_CONDITIONS.has(key),
+          `${where}: "${key}" is not a condition scoreVariant reads, so this variant can never be shown`,
+        );
+      }
+    }
+  });
+
+  test("every age band is one the enum allows", () => {
+    for (const { where, variant } of authored) {
+      const bands = [
+        ...(variant.when.age_group ? [variant.when.age_group] : []),
+        ...(variant.when.age_groups ?? []),
+      ];
+      for (const band of bands) {
+        assert.ok(BANDS.has(band), `${where}: "${band}" is not an age_group value`);
+      }
+      assert.ok(
+        variant.when.age_groups?.length !== 0,
+        `${where}: an empty age_groups matches nobody`,
+      );
+    }
+  });
+
+  test("every variant can actually be reached by somebody", () => {
+    // The proof that the conditions are satisfiable at all. A variant nobody
+    // matches is a paragraph that was written and will never be read.
+    for (const { where, variant } of authored) {
+      const bands = variant.when.age_groups ?? [variant.when.age_group ?? null];
+      const reader: Audience = {
+        sex: variant.when.sex ?? null,
+        ageGroup: bands[0],
+        datingInterest: variant.when.dating_interest ?? null,
+      };
+      const score = scoreVariant(variant.when, reader);
+      assert.ok(
+        score !== null && score > 0,
+        `${where}: no reader can match this — pickVariant requires a score above zero`,
+      );
+    }
+  });
+
+  test("every variant says who it is for and adds something", () => {
+    for (const { where, variant } of authored) {
+      assert.ok(variant.label?.trim(), `${where}: no label for whoever edits the seed`);
+      assert.ok(
+        variant.note_md?.trim() || variant.examples_json || variant.partner_sex,
+        `${where}: matches a reader and then changes nothing`,
+      );
+    }
+  });
+});
+
+const forEarlyCareer: LessonVariant = {
+  when: { age_groups: ["18-24", "25-34"] },
+  label: "If you are early on",
+  note_md: "…",
+};
+
+const forLateCareer: LessonVariant = {
+  when: { age_groups: ["45-54", "55-64", "65+"] },
+  label: "If you are further along",
+  note_md: "…",
+};
+
+// Work does not vary by age, it varies by standing in the room, and that
+// spans two or three bands at a time. These check the span behaves like every
+// other condition: a miss when unanswered, and weaker than naming one band.
+describe("matching a reader to a span of age bands", () => {
+  const young: Audience = { sex: null, ageGroup: "25-34", datingInterest: null };
+  const older: Audience = { sex: null, ageGroup: "55-64", datingInterest: null };
+  const middle: Audience = { sex: null, ageGroup: "35-44", datingInterest: null };
+
+  test("a reader inside the span matches it", () => {
+    assert.equal(pickVariant([forEarlyCareer, forLateCareer], young), forEarlyCareer);
+    assert.equal(pickVariant([forEarlyCareer, forLateCareer], older), forLateCareer);
+  });
+
+  // The band deliberately left out of both spans. Whoever wrote the general
+  // lesson wrote it for these readers, and they must still get it.
+  test("a reader between the spans gets the lesson as written", () => {
+    assert.equal(pickVariant([forEarlyCareer, forLateCareer], middle), null);
+  });
+
+  test("a reader who gave no band matches nothing", () => {
+    assert.equal(pickVariant([forEarlyCareer, forLateCareer], nobody), null);
+    assert.equal(scoreVariant({ age_groups: ["25-34"] }, nobody), null);
+  });
+
+  test("an exact band beats a span containing it", () => {
+    const forOneBand: LessonVariant = {
+      when: { age_group: "25-34" },
+      label: "If you are 25 to 34",
+    };
+    assert.equal(
+      pickVariant([forEarlyCareer, forOneBand], young),
+      forOneBand,
+      "naming the band is more specific than naming a range around it",
+    );
+  });
+
+  test("an empty span matches nobody rather than everybody", () => {
+    assert.equal(scoreVariant({ age_groups: [] }, young), null);
+  });
+
+  test("a span combines with the other conditions", () => {
+    const both: LessonVariant = {
+      when: { sex: "male", age_groups: ["18-24", "25-34"] },
+      label: "Both",
+    };
+    assert.equal(pickVariant([both], manIntoWomen), both);
+    assert.equal(
+      pickVariant([both], { ...manIntoWomen, ageGroup: "55-64" }),
+      null,
+      "the span still has to hold",
+    );
+  });
+});
 
 describe("matching a reader to a variant", () => {
   // The single most important case. The general lesson is correct for
