@@ -47,9 +47,15 @@ export async function proxy(request: NextRequest) {
   );
 
   if (!isSignedIn && !isPublic) {
+    // The query goes with it. Half the links into this app carry the context
+    // that stops the next page asking a question it has the answer to —
+    // /log?lesson=… above all — and sending only the pathname meant a signed
+    // out reader lost it in the bounce and got the empty version of the form.
+    const target = `${pathname}${request.nextUrl.search}`;
     const url = request.nextUrl.clone();
     url.pathname = "/sign-in";
-    url.searchParams.set("next", pathname);
+    url.search = "";
+    url.searchParams.set("next", target);
     return NextResponse.redirect(url);
   }
 

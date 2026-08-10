@@ -37,6 +37,7 @@ type Roleplay = {
   mode: string;
   transcript_json: Turn[];
   feedback_json: Feedback | DrillResult | null;
+  lesson_id: string;
   lessons: {
     title: string;
     sort_order: number;
@@ -217,7 +218,7 @@ const TITLES: Record<RehearsalMode, string> = {
 function LineRehearsal({ roleplay }: { roleplay: Roleplay }) {
   const spec = asLineSpec(roleplay.lessons.rehearsal_spec);
 
-  if (!spec) return <Unavailable />;
+  if (!spec) return <Unavailable lessonId={roleplay.lesson_id} />;
 
   const attempts: Attempt[] = roleplay.transcript_json
     .filter((turn) => turn.role === "user")
@@ -242,7 +243,7 @@ function LineRehearsal({ roleplay }: { roleplay: Roleplay }) {
 function ChoiceRehearsal({ roleplay }: { roleplay: Roleplay }) {
   const spec = asChoiceSpec(roleplay.lessons.rehearsal_spec);
 
-  if (!spec) return <Unavailable />;
+  if (!spec) return <Unavailable lessonId={roleplay.lesson_id} />;
 
   const picks = roleplay.transcript_json.filter((turn) => turn.role === "user");
 
@@ -274,7 +275,7 @@ function ChoiceRehearsal({ roleplay }: { roleplay: Roleplay }) {
   );
 }
 
-function Unavailable() {
+function Unavailable({ lessonId }: { lessonId: string }) {
   return (
     <div className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6">
       <h2 className="text-sm font-semibold text-ink">
@@ -285,7 +286,7 @@ function Unavailable() {
         have the real conversation instead — it was always worth more.
       </p>
       <Link
-        href="/log"
+        href={`/log?lesson=${lessonId}`}
         className="mt-4 inline-flex rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
       >
         Log a real rep
@@ -329,7 +330,7 @@ function CompletedRehearsal({
           {roleplay.lessons.mission_text}
         </p>
         <Link
-          href="/log"
+          href={`/log?lesson=${roleplay.lesson_id}`}
           className="mt-4 inline-flex rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
         >
           Log a real rep

@@ -5,16 +5,16 @@ import { useFormStatus } from "react-dom";
 
 import { XP_AWARD } from "@/lib/progress/rules";
 import { logRep, type LogRepState } from "./actions";
-import { RepFields, type SkillGroup } from "./rep-fields";
+import { RepFields, type KnownSkill, type SkillGroup } from "./rep-fields";
 
 export function LogForm({
   groups,
-  defaultSkillId,
+  knownSkill,
   lessonId,
   missionText,
 }: {
   groups: SkillGroup[];
-  defaultSkillId?: string;
+  knownSkill?: KnownSkill;
   lessonId?: string;
   missionText?: string;
 }) {
@@ -46,7 +46,11 @@ export function LogForm({
         </div>
       ) : null}
 
-      <RepFields groups={groups} values={{ skillId: defaultSkillId }} />
+      <RepFields
+        groups={groups}
+        values={{ skillId: knownSkill?.id }}
+        knownSkill={knownSkill}
+      />
 
       {state.error ? (
         <p

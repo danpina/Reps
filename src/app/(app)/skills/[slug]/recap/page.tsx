@@ -145,7 +145,7 @@ export default async function RecapPage({
           None of this counts until you have used it on someone.
         </p>
         <Link
-          href="/log"
+          href={`/log?skill=${recap.id}`}
           className="mt-3 inline-flex rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper-raised)]"
         >
           Log a real rep

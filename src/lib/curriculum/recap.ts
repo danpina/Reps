@@ -37,6 +37,7 @@ export type RecapLesson = {
 };
 
 export type Recap = {
+  id: string;
   slug: string;
   name: string;
   coreIdea: string;
@@ -100,6 +101,7 @@ export async function getRecap(slug: string): Promise<Recap | null> {
   const readCount = recapLessons.filter((l) => l.read).length;
 
   return {
+    id: skill.id,
     slug: skill.slug,
     name: skill.name,
     coreIdea: skill.core_idea,

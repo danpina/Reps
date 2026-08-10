@@ -20,6 +20,16 @@ import { WENT_LABELS } from "@/lib/progress/rules";
  */
 export type SkillGroup = { topic: string; skills: { id: string; name: string }[] };
 
+/**
+ * A skill the form already knows, because of where the reader came from.
+ *
+ * Arriving from a lesson and then being asked which skill this was is the app
+ * asking a question it has the answer to. So it settles instead — and keeps a
+ * way out, because the fastest route to logging a rep about something else is
+ * frequently the button on the page you happen to be on.
+ */
+export type KnownSkill = { id: string; name: string; topic: string };
+
 export type RepValues = {
   skillId?: string;
   went?: number;
@@ -38,38 +48,61 @@ const WENT_HINTS: Record<number, string> = {
 export function RepFields({
   groups,
   values = {},
+  knownSkill,
 }: {
   groups: SkillGroup[];
   values?: RepValues;
+  knownSkill?: KnownSkill;
 }) {
   const [went, setWent] = useState<number | null>(values.went ?? null);
+  const [picking, setPicking] = useState(!knownSkill);
 
   return (
     <>
       <div className="flex flex-col gap-2">
-        <label htmlFor="skill_id" className="text-sm font-medium text-ink">
+        <label
+          htmlFor={picking ? "skill_id" : undefined}
+          className="text-sm font-medium text-ink"
+        >
           Which skill
         </label>
-        <select
-          id="skill_id"
-          name="skill_id"
-          defaultValue={values.skillId ?? ""}
-          required
-          className="rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-        >
-          <option value="" disabled>
-            Pick one
-          </option>
-          {groups.map((group) => (
-            <optgroup key={group.topic} label={group.topic}>
-              {group.skills.map((skill) => (
-                <option key={skill.id} value={skill.id}>
-                  {skill.name}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
+        {picking ? (
+          <select
+            id="skill_id"
+            name="skill_id"
+            defaultValue={values.skillId ?? ""}
+            required
+            className="rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+          >
+            <option value="" disabled>
+              Pick one
+            </option>
+            {groups.map((group) => (
+              <optgroup key={group.topic} label={group.topic}>
+                {group.skills.map((skill) => (
+                  <option key={skill.id} value={skill.id}>
+                    {skill.name}
+                  </option>
+                ))}
+              </optgroup>
+            ))}
+          </select>
+        ) : (
+          <div className="flex items-center justify-between gap-3 rounded border border-[var(--rule-strong)] bg-[var(--paper-raised)] px-3 py-2.5">
+            <input type="hidden" name="skill_id" value={knownSkill!.id} />
+            <p className="text-sm text-ink">
+              <span className="text-ink-faint">{knownSkill!.topic} · </span>
+              {knownSkill!.name}
+            </p>
+            <button
+              type="button"
+              onClick={() => setPicking(true)}
+              className="shrink-0 text-[13px] text-ink-muted underline underline-offset-4 hover:text-ink"
+            >
+              Change
+            </button>
+          </div>
+        )}
       </div>
 
       <fieldset className="flex flex-col gap-2">
