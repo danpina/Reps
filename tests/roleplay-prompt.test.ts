@@ -263,6 +263,20 @@ const NOT_A_PROSPECT = new Map([
       "sex to who the reader dates would imply the friend is a prospect, and " +
       "would make a scene about photo slots depend on something irrelevant.",
   ],
+  [
+    "running-the-app",
+    "Sam is the friend you talk to about the app, not somebody on it. The " +
+      "whole track is about what using these products does to the person " +
+      "using them, so every scene is a conversation with somebody who is " +
+      "not a candidate and whose sex is nobody's business.",
+  ],
+  [
+    "where-it-is-breaking",
+    "The same Sam, going through the numbers with you. This track is a " +
+      "diagnosis of your own funnel and the partner is the person holding " +
+      "the spreadsheet — there is nobody in these scenes the reader could " +
+      "be interested in.",
+  ],
 ]);
 
 /** Which topic each skill is filed under, in both shapes the migrations use. */
