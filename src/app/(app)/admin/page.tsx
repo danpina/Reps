@@ -1,5 +1,6 @@
 import { BackLink } from "@/components/back-link";
 import { requireAdmin, type Theme } from "@/lib/auth/dal";
+import { getEveryoneProgress } from "@/lib/progress/admin-queries";
 import { adminIsConfigured, createAdminClient } from "@/lib/supabase/admin";
 import { AddUser } from "./add-user";
 import { UserRow } from "./user-row";
@@ -40,17 +41,23 @@ export default async function AdminPage() {
   // Email lives on the auth user and everything else lives on the profile, so
   // the list is a merge. Paged high rather than paginated: this is a personal
   // app, and a page of controls nobody can find is worse than a long list.
-  const [{ data: authUsers }, { data: profiles }, { data: roster }, { data: subs }] =
-    await Promise.all([
-      admin.auth.admin.listUsers({ page: 1, perPage: 200 }),
-      admin
-        .from("profiles")
-        .select("id, display_name, theme, blocked_at, blocked_reason"),
-      admin.from("admins").select("user_id"),
-      admin
-        .from("subscriptions")
-        .select("user_id, status, source, current_period_end"),
-    ]);
+  const [
+    { data: authUsers },
+    { data: profiles },
+    { data: roster },
+    { data: subs },
+    progress,
+  ] = await Promise.all([
+    admin.auth.admin.listUsers({ page: 1, perPage: 200 }),
+    admin
+      .from("profiles")
+      .select("id, display_name, theme, blocked_at, blocked_reason"),
+    admin.from("admins").select("user_id"),
+    admin
+      .from("subscriptions")
+      .select("user_id, status, source, current_period_end"),
+    getEveryoneProgress(admin),
+  ]);
 
   const byId = new Map(
     (profiles ?? []).map((p) => [p.id as string, p] as const),
@@ -117,7 +124,12 @@ export default async function AdminPage() {
 
       <ol className="mt-2">
         {users.map((user) => (
-          <UserRow key={user.id} user={user} isSelf={user.id === actor.id} />
+          <UserRow
+            key={user.id}
+            user={user}
+            isSelf={user.id === actor.id}
+            progress={progress.summaries.get(user.id) ?? progress.empty}
+          />
         ))}
       </ol>
     </main>

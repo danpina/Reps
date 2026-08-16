@@ -4,6 +4,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
 import type { ManagedUser } from "./page";
+import type { UserProgress } from "@/lib/progress/admin-summary";
 import { Feedback } from "./add-user";
 import {
   blockUser,
@@ -25,9 +26,11 @@ import {
 export function UserRow({
   user,
   isSelf,
+  progress,
 }: {
   user: ManagedUser;
   isSelf: boolean;
+  progress: UserProgress;
 }) {
   const blocked = Boolean(user.blockedAt);
   // Matches what the server will refuse, so the UI never offers an action
@@ -54,12 +57,14 @@ export function UserRow({
           {isSelf ? <Tag tone="muted">You</Tag> : null}
           {blocked ? <Tag tone="flag">Blocked</Tag> : null}
 
+          {/* The one number worth seeing without opening the row. Reps rather
+              than XP, because XP counts reading and this is the column you
+              scan to find out who is actually using the thing. */}
           <span className="tabular ml-auto text-xs text-ink-faint">
-            {new Date(user.createdAt).toLocaleDateString(undefined, {
-              day: "numeric",
-              month: "short",
-              year: "numeric",
-            })}
+            {progress.repsLogged === 0
+              ? "no reps"
+              : `${progress.repsLogged} ${progress.repsLogged === 1 ? "rep" : "reps"}`}
+            {progress.lastActive ? ` · ${sinceLabel(progress.lastActive)}` : ""}
           </span>
         </summary>
 
@@ -69,6 +74,8 @@ export function UserRow({
               Reason given: {user.blockedReason}
             </p>
           ) : null}
+
+          <Standing progress={progress} joined={user.createdAt} />
 
           <SettingsForm user={user} />
 
@@ -97,6 +104,116 @@ export function UserRow({
       </details>
     </li>
   );
+}
+
+/**
+ * Where somebody has got to.
+ *
+ * Reps first and XP second, in that order deliberately. XP counts reading, and
+ * two accounts on the same XP can be one person who has read forty cards and
+ * one who has had twelve conversations — which are not the same account at all,
+ * and the second one is the whole point of the product.
+ *
+ * Started, worked and finished are three different things and are kept apart
+ * for the same reason. Started means opened. Worked means a rep was logged
+ * against it. Finished means every card in the track has been read, which is
+ * the cheap kind of done and is labelled as reading rather than as completion.
+ */
+function Standing({
+  progress,
+  joined,
+}: {
+  progress: UserProgress;
+  joined: string;
+}) {
+  if (progress.isUntouched) {
+    return (
+      <div>
+        <h3 className="text-xs uppercase tracking-[0.14em] text-ink-faint">
+          Standing
+        </h3>
+        <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
+          Joined {formatDate(joined)} and has not opened a lesson yet.
+        </p>
+      </div>
+    );
+  }
+
+  const { rank } = progress;
+
+  return (
+    <div>
+      <h3 className="text-xs uppercase tracking-[0.14em] text-ink-faint">
+        Standing
+      </h3>
+
+      <dl className="mt-2 flex flex-col gap-1 text-[13px] leading-relaxed">
+        <Row label="Rank">
+          {rank.rank.name}{" "}
+          <span className="text-ink-faint">
+            ({rank.position} of {rank.total}) · {progress.totalXp.toLocaleString()} XP
+          </span>
+        </Row>
+        <Row label="Reps">
+          {progress.repsLogged}
+          {progress.skillsWorked > 0
+            ? ` across ${progress.skillsWorked} ${progress.skillsWorked === 1 ? "skill" : "skills"}`
+            : ""}
+        </Row>
+        <Row label="Streak">
+          {progress.currentStreak} day{progress.currentStreak === 1 ? "" : "s"}
+          <span className="text-ink-faint">
+            {" "}
+            · longest {progress.longestStreak}
+          </span>
+        </Row>
+        <Row label="Topics">
+          {progress.topicsStarted} of {progress.topicsTotal} started
+        </Row>
+        <Row label="Skills">
+          {progress.skillsStarted} of {progress.skillsTotal} started
+          <span className="text-ink-faint">
+            {" "}
+            · {progress.skillsFinished} read through
+          </span>
+        </Row>
+        <Row label="Lessons">
+          {progress.lessonsRead} of {progress.lessonsTotal} read
+        </Row>
+        {progress.badges > 0 ? (
+          <Row label="Badges">{progress.badges}</Row>
+        ) : null}
+        {progress.furthest ? (
+          <Row label="Last in">
+            {progress.furthest.topic} · {progress.furthest.skill} ·{" "}
+            {progress.furthest.lesson}
+          </Row>
+        ) : null}
+        <Row label="Active">
+          {progress.lastActive ? formatDate(progress.lastActive) : "never"}
+          <span className="text-ink-faint"> · joined {formatDate(joined)}</span>
+        </Row>
+      </dl>
+    </div>
+  );
+}
+
+/**
+ * How long ago, in the fewest words that still distinguish this week from last
+ * quarter. Anything older than a year is not worth counting precisely.
+ */
+function sinceLabel(iso: string): string {
+  const then = new Date(`${iso}T00:00:00`);
+  const now = new Date();
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const days = Math.round((today.getTime() - then.getTime()) / 86_400_000);
+
+  if (days <= 0) return "today";
+  if (days === 1) return "yesterday";
+  if (days < 7) return `${days}d ago`;
+  if (days < 60) return `${Math.floor(days / 7)}w ago`;
+  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
+  return "over a year";
 }
 
 function SettingsForm({ user }: { user: ManagedUser }) {
@@ -163,8 +280,17 @@ function accessLabel(user: ManagedUser): string {
   return user.subscription.status === "past_due" ? "Past due" : "Free";
 }
 
+/**
+ * Takes both a timestamp and a bare calendar day.
+ *
+ * The date-only case needs the time appended, because `new Date("2026-08-10")`
+ * is parsed as UTC midnight while `new Date("2026-08-10T00:00:00")` is local —
+ * so without this a logged day renders as the day before for anybody west of
+ * Greenwich, which is the kind of off-by-one nobody thinks to check.
+ */
 function formatDate(iso: string): string {
-  return new Date(iso).toLocaleDateString(undefined, {
+  const value = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T00:00:00` : iso;
+  return new Date(value).toLocaleDateString(undefined, {
     day: "numeric",
     month: "short",
     year: "numeric",
