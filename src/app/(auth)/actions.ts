@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 
+import { asLocale } from "@/lib/curriculum/locale";
 import { SITE_URL } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
@@ -40,6 +41,10 @@ export async function signUp(
 ): Promise<AuthState> {
   const { email, password } = readCredentials(formData);
   const displayName = String(formData.get("display_name") ?? "").trim();
+  // Anything unrecognised reads as English rather than failing the signup. The
+  // trigger validates it again on the way in, because this value reaches the
+  // database through client-written metadata.
+  const locale = asLocale(formData.get("locale"));
 
   if (!email) return { error: "Enter your email." };
   if (password.length < 8)
@@ -51,7 +56,10 @@ export async function signUp(
     password,
     options: {
       emailRedirectTo: `${SITE_URL}/auth/callback`,
-      data: displayName ? { display_name: displayName } : undefined,
+      data: {
+        ...(displayName ? { display_name: displayName } : {}),
+        locale,
+      },
     },
   });
 

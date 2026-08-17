@@ -86,10 +86,18 @@ const FIRST_PERSON = new Set([
 ]);
 
 /**
- * Lowercase, straighten the quotes, drop the punctuation.
+ * Lowercase, straighten the quotes, fold the accents, drop the punctuation.
  *
  * Apostrophes go rather than being kept, so "I've" becomes "ive" and matches
  * the list above without needing every contraction spelled out twice.
+ *
+ * Accents are folded to their base letter for a reason that only shows up once
+ * the curriculum is not in English: the punctuation filter below keeps a-z and
+ * nothing else, so "botón" was becoming "bot n" and could never match a reader
+ * who typed "boton" — which Spanish speakers do constantly, especially on a
+ * phone. Folding first means the accented and unaccented spellings both land on
+ * "boton", so a drill catches either. The same fold covers German umlauts, and
+ * ß is mapped by hand because it has no decomposed form to strip.
  */
 function normalise(text: string): string {
   return text
@@ -97,6 +105,9 @@ function normalise(text: string): string {
     .replace(/[‘’]/g, "'")
     .replace(/[“”]/g, '"')
     .replace(/['']/g, "")
+    .replace(/ß/g, "ss")
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
     .replace(/[^a-z0-9 ]+/g, " ")
     .replace(/\s+/g, " ")
     .trim();

@@ -2,8 +2,10 @@ import "server-only";
 
 import { cache } from "react";
 
+import { getLocale } from "@/lib/auth/dal";
 import { createClient } from "@/lib/supabase/server";
 import { asCheatSheet, type CheatSheet } from "./cheat-sheet";
+import { byId, DEFAULT_LOCALE, localise } from "./locale";
 import type { Lesson, LessonSummary, Skill, Topic } from "./types";
 
 export type SkillWithLessons = Skill & { lessons: LessonSummary[] };
@@ -26,16 +28,32 @@ const SKILL_COLUMNS =
  */
 const getLessonIndex = cache(async (): Promise<Map<string, LessonSummary[]>> => {
   const supabase = await createClient();
+  const locale = await getLocale();
 
-  const { data, error } = await supabase
-    .from("lesson_index")
-    .select("id, skill_id, sort_order, title, is_preview")
-    .order("sort_order");
+  // Titles come from a view that reads past the paywall, and so do their
+  // translations — otherwise a Spanish reader on a free account would get two
+  // lessons in Spanish and the locked ones in English, which reads as broken
+  // rather than as locked.
+  const [{ data, error }, { data: translated }] = await Promise.all([
+    supabase
+      .from("lesson_index")
+      .select("id, skill_id, sort_order, title, is_preview")
+      .order("sort_order"),
+    locale === DEFAULT_LOCALE
+      ? Promise.resolve({ data: null })
+      : supabase
+          .from("lesson_title_translations")
+          .select("lesson_id, title")
+          .eq("locale", locale),
+  ]);
 
   if (error) throw new Error(`Could not load the lesson index: ${error.message}`);
 
+  const titles = byId(translated as { lesson_id: string; title: string }[] | null, "lesson_id");
+
   const bySkill = new Map<string, LessonSummary[]>();
-  for (const lesson of (data ?? []) as LessonSummary[]) {
+  for (const row of (data ?? []) as LessonSummary[]) {
+    const lesson = localise(row, { title: titles.get(row.id)?.title });
     const list = bySkill.get(lesson.skill_id);
     if (list) list.push(lesson);
     else bySkill.set(lesson.skill_id, [lesson]);
@@ -46,25 +64,50 @@ const getLessonIndex = cache(async (): Promise<Map<string, LessonSummary[]>> => 
 
 export const getTopics = cache(async (): Promise<TopicWithSkills[]> => {
   const supabase = await createClient();
+  const locale = await getLocale();
+  const translated = locale !== DEFAULT_LOCALE;
 
-  const [{ data, error }, index] = await Promise.all([
+  // Two extra queries for a non-English reader, whatever proportion of the
+  // curriculum has been translated — the whole language is fetched at once and
+  // merged in memory rather than joined per row.
+  const [{ data, error }, index, topicRows, skillRows] = await Promise.all([
     supabase
       .from("topics")
       .select(`id, slug, name, description, promise, sort_order, skills(${SKILL_COLUMNS})`)
       .order("sort_order")
       .order("sort_order", { referencedTable: "skills" }),
     getLessonIndex(),
+    translated
+      ? supabase
+          .from("topic_translations")
+          .select("topic_id, name, description, promise")
+          .eq("locale", locale)
+          .then((r) => r.data)
+      : Promise.resolve(null),
+    translated
+      ? supabase
+          .from("skill_translations")
+          .select("skill_id, name, description, core_idea")
+          .eq("locale", locale)
+          .then((r) => r.data)
+      : Promise.resolve(null),
   ]);
 
   if (error) throw new Error(`Could not load topics: ${error.message}`);
 
-  return (data ?? []).map((topic) => ({
-    ...topic,
-    skills: (topic.skills as Skill[]).map((skill) => ({
-      ...skill,
-      lessons: index.get(skill.id) ?? [],
-    })),
-  }));
+  const topicText = byId(topicRows as Record<string, unknown>[] | null, "topic_id");
+  const skillText = byId(skillRows as Record<string, unknown>[] | null, "skill_id");
+
+  return (data ?? []).map((row) => {
+    const topic = localise(row as Topic, topicText.get(row.id));
+    return {
+      ...topic,
+      skills: ((row as { skills: Skill[] }).skills ?? []).map((s) => ({
+        ...localise(s, skillText.get(s.id)),
+        lessons: index.get(s.id) ?? [],
+      })),
+    };
+  });
 });
 
 export const getTopicBySlug = cache(
@@ -85,13 +128,27 @@ export const getCheatSheet = cache(
   async (topicSlug: string): Promise<CheatSheet | null> => {
     const supabase = await createClient();
 
+    const locale = await getLocale();
+
     const { data } = await supabase
       .from("topics")
-      .select("cheatsheet_json")
+      .select("id, cheatsheet_json")
       .eq("slug", topicSlug)
       .maybeSingle();
 
-    return asCheatSheet(data?.cheatsheet_json);
+    if (!data) return null;
+    if (locale === DEFAULT_LOCALE) return asCheatSheet(data.cheatsheet_json);
+
+    // A sheet is one JSON document, so it falls back whole rather than per
+    // concept. Half a sheet in each language would be worse than either.
+    const { data: translated } = await supabase
+      .from("topic_translations")
+      .select("cheatsheet_json")
+      .eq("topic_id", data.id as string)
+      .eq("locale", locale)
+      .maybeSingle();
+
+    return asCheatSheet(translated?.cheatsheet_json ?? data.cheatsheet_json);
   },
 );
 
@@ -146,6 +203,32 @@ export const getLesson = cache(
     if (!data) return null;
 
     const { skills, ...lesson } = data as Lesson & { skills: Skill };
-    return { skill: skills, lesson };
+    const locale = await getLocale();
+    if (locale === DEFAULT_LOCALE) return { skill: skills, lesson };
+
+    // Read after the lesson rather than joined to it, so that the entitlement
+    // check happens once, on the lesson. If the row above was refused this
+    // never runs, and the translations policy would refuse it too.
+    const [{ data: lessonText }, { data: skillText }] = await Promise.all([
+      supabase
+        .from("lesson_translations")
+        .select(
+          "title, theory_md, examples_json, checks_json, rubric_json, scenario_json, mission_text, rehearsal_spec",
+        )
+        .eq("lesson_id", lesson.id)
+        .eq("locale", locale)
+        .maybeSingle(),
+      supabase
+        .from("skill_translations")
+        .select("name, description, core_idea, takeaway_md")
+        .eq("skill_id", skills.id)
+        .eq("locale", locale)
+        .maybeSingle(),
+    ]);
+
+    return {
+      skill: localise(skills, skillText),
+      lesson: localise(lesson, lessonText),
+    };
   },
 );

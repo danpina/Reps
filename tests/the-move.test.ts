@@ -6,19 +6,34 @@ import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { extractTheMove } from "../src/lib/curriculum/the-move.ts";
+import {
+  extractTheMove,
+  MOVE_MARKERS,
+} from "../src/lib/curriculum/the-move.ts";
 
 const MIGRATIONS = join(import.meta.dirname, "..", "supabase", "migrations");
 
+/** Any language's way of stating the move, as it appears in a card. */
+const MARKERS = MOVE_MARKERS.map((m) => `**${m}**`);
+const statesAMove = (block: string) => MARKERS.some((m) => block.includes(m));
+
+/**
+ * Every theory card the migrations write, in any language.
+ *
+ * Translations are scanned as well as seeds, because a translated card can
+ * lose its move exactly as easily as an authored one — and more easily, since
+ * the marker itself has to be translated. Miss it and nothing throws: the
+ * rehearsal quietly shows the lesson title instead of the instruction.
+ */
 function allTheoryCards(): { file: string; theory: string }[] {
   const out: { file: string; theory: string }[] = [];
-  for (const file of readdirSync(MIGRATIONS).filter((f) =>
-    f.includes("seed_lessons_"),
+  for (const file of readdirSync(MIGRATIONS).filter(
+    (f) => f.includes("seed_lessons_") || f.includes("translate_"),
   )) {
     const sql = readFileSync(join(MIGRATIONS, file), "utf8");
     for (const [, block] of sql.matchAll(/\$md\$([\s\S]*?)\$md\$/g)) {
       // Theory cards are the long blocks; missions are short single lines.
-      if (block.includes("**The move:**") || block.length > 400) {
+      if (statesAMove(block) || block.length > 400) {
         out.push({ file, theory: block });
       }
     }
@@ -64,7 +79,7 @@ describe("the curriculum states its moves", () => {
   test("every theory card states a move", () => {
     for (const { file, theory } of cards) {
       assert.ok(
-        theory.includes("**The move:**"),
+        statesAMove(theory),
         `${file}: a card has no stated move: ${theory.slice(0, 60)}…`,
       );
     }
@@ -75,7 +90,8 @@ describe("the curriculum states its moves", () => {
       const move = extractTheMove(theory, "FALLBACK");
       assert.notEqual(move, "FALLBACK", `${file}: fell back`);
       assert.ok(move.length > 15, `${file}: move too thin: "${move}"`);
-      assert.match(move, /^[A-Z]/, `${file}: not capitalised: "${move}"`);
+      // Unicode-aware: a Spanish move can open on Á and a German one on Ü.
+      assert.match(move, /^\p{Lu}/u, `${file}: not capitalised: "${move}"`);
     }
   });
 });

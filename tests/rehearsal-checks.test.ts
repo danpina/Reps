@@ -21,6 +21,42 @@ describe("checking one rehearsed line", () => {
     assert.equal(checkLine("anything at all", []).landed, true);
   });
 
+  // Once the curriculum is not in English, the punctuation filter alone would
+  // turn "botón" into "bot n" and it could never match a reader who typed
+  // "boton" — which Spanish speakers do constantly, especially on a phone.
+  test("an accent is not required, and not forbidden either", () => {
+    const checks: LineCheck[] = [
+      { kind: "contains_any", requirement: "Name the thing", words: ["botón"] },
+    ];
+    assert.equal(checkLine("dale al botón", checks).landed, true);
+    assert.equal(checkLine("dale al boton", checks).landed, true);
+  });
+
+  test("it folds the same way whichever side carries the accent", () => {
+    const checks: LineCheck[] = [
+      { kind: "contains_any", requirement: "Name the thing", words: ["boton"] },
+    ];
+    assert.equal(checkLine("dale al botón", checks).landed, true);
+  });
+
+  test("a forbidden word is caught with or without its accent", () => {
+    const checks: LineCheck[] = [
+      { kind: "forbids_any", requirement: "No apologising", words: ["perdón"] },
+    ];
+    assert.equal(checkLine("perdón por molestarte", checks).landed, false);
+    assert.equal(checkLine("perdon por molestarte", checks).landed, false);
+    assert.equal(checkLine("una pregunta rápida", checks).landed, true);
+  });
+
+  // German needs the same fold, and ß has no decomposed form to strip.
+  test("umlauts fold and ß reads as ss", () => {
+    const checks: LineCheck[] = [
+      { kind: "contains_any", requirement: "Name it", words: ["straße"] },
+    ];
+    assert.equal(checkLine("in der Straße", checks).landed, true);
+    assert.equal(checkLine("in der Strasse", checks).landed, true);
+  });
+
   test("a question mark is caught wherever it sits", () => {
     const checks: LineCheck[] = [{ kind: "no_question", requirement: "No question mark" }];
     assert.equal(checkLine("That is a serious apron.", checks).landed, true);

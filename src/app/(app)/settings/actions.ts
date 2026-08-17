@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 
 import { requireUser, type Theme } from "@/lib/auth/dal";
+import { isLocale } from "@/lib/curriculum/locale";
 import {
   parseAgeGroup,
   parseDatingInterest,
@@ -38,6 +39,35 @@ export async function updateTheme(
   // The theme is rendered by the root layout, so the whole tree is stale.
   revalidatePath("/", "layout");
   return { done: "Theme saved." };
+}
+
+/**
+ * The language the curriculum is read in.
+ *
+ * Revalidates the whole tree for the same reason the theme does, and more
+ * urgently: every topic name, lesson title and cheat sheet in the app is
+ * cached per request, so anything already rendered is in the old language
+ * until it is thrown away.
+ */
+export async function updateLanguage(
+  _prev: SettingsState,
+  formData: FormData,
+): Promise<SettingsState> {
+  const user = await requireUser();
+  const choice = String(formData.get("locale") ?? "");
+
+  if (!isLocale(choice)) return { error: "That is not one of the languages." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("profiles")
+    .update({ locale: choice })
+    .eq("id", user.id);
+
+  if (error) return { error: "That did not save. Try again." };
+
+  revalidatePath("/", "layout");
+  return { done: "Language saved." };
 }
 
 /**

@@ -5,6 +5,7 @@ import { BackLink } from "@/components/back-link";
 import { getProfile, isAdmin, requireUser } from "@/lib/auth/dal";
 import { AboutYouForm } from "./about-you-form";
 import { PasswordForm } from "./password-form";
+import { LanguageForm } from "./language-form";
 import { ThemeForm } from "./theme-form";
 
 export const metadata = { title: "Settings — Reps" };
@@ -32,6 +33,13 @@ export default async function SettingsPage() {
             ageGroup={profile?.age_group ?? null}
             datingInterest={profile?.dating_interest ?? null}
           />
+        </Section>
+
+        <Section
+          title="Language"
+          description="Anything not yet translated stays in English until it is."
+        >
+          <LanguageForm current={profile?.locale ?? "en"} />
         </Section>
 
         <Section

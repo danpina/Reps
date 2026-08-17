@@ -3,6 +3,7 @@ import "server-only";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
+import { asLocale, type Locale } from "@/lib/curriculum/locale";
 import type { DatingInterest } from "@/lib/curriculum/variants";
 import type { AgeGroup, Sex } from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
@@ -52,6 +53,8 @@ export type Profile = {
   /** Who they are practising dating with. Only ever used by the Dating topic. */
   dating_interest: DatingInterest | null;
   theme: Theme;
+  /** The language the curriculum is read in. */
+  locale: Locale;
   blocked_at: string | null;
   blocked_reason: string | null;
   created_at: string;
@@ -65,12 +68,25 @@ export const getProfile = cache(async (): Promise<Profile | null> => {
   const { data } = await supabase
     .from("profiles")
     .select(
-      "id, display_name, timezone, onboarded_at, starting_topic_id, sex, age_group, dating_interest, theme, blocked_at, blocked_reason, created_at",
+      "id, display_name, timezone, onboarded_at, starting_topic_id, sex, age_group, dating_interest, theme, locale, blocked_at, blocked_reason, created_at",
     )
     .eq("id", user.id)
     .maybeSingle();
 
   return data;
+});
+
+/**
+ * The language to read the curriculum in.
+ *
+ * Its own function rather than a field read off the profile at every call
+ * site, because it is asked for on every curriculum query and there is exactly
+ * one right answer for somebody with no profile yet — English, rather than a
+ * crash or a blank page. Cached per request like everything else here.
+ */
+export const getLocale = cache(async (): Promise<Locale> => {
+  const profile = await getProfile();
+  return asLocale(profile?.locale);
 });
 
 /**
