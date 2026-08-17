@@ -93,14 +93,33 @@ describe("splitting a paragraph into emphasis runs", () => {
 
 const MIGRATIONS = join(import.meta.dirname, "..", "supabase", "migrations");
 
-/** Every dollar-quoted markdown block the seed migrations write. */
+/**
+ * Every block of authored prose a migration writes.
+ *
+ * Two shapes, because prose arrives two ways. Seed migrations write it in
+ * dollar-quoted `$md$` blocks. Later migrations that revise it write plain
+ * single-quoted literals instead, and for a long time this function only knew
+ * about the first kind — so a migration that rewrote fifty-one theory cards
+ * went past this guard entirely, and shipped one that printed its own
+ * asterisks. An edit is as capable of breaking the renderer as an insert.
+ */
 function authoredProse(): { file: string; body: string }[] {
   const blocks: { file: string; body: string }[] = [];
 
   for (const file of readdirSync(MIGRATIONS).filter((f) => f.endsWith(".sql"))) {
     const sql = readFileSync(join(MIGRATIONS, file), "utf8");
+
     for (const match of sql.matchAll(/\$md\$([\s\S]*?)\$md\$/g)) {
       blocks.push({ file, body: match[1] });
+    }
+
+    // `set theory_md = '…'`, and the same for the other prose columns. The
+    // literal runs to the first quote that is not doubled; '' is an escaped
+    // apostrophe and unescapes back to one.
+    for (const match of sql.matchAll(
+      /\b(?:theory_md|takeaway_md|core_idea|description|promise)\s*=\s*'((?:[^']|'')*)'/g,
+    )) {
+      blocks.push({ file, body: match[1].replace(/''/g, "'") });
     }
   }
 
