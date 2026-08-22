@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 
 import { ServiceWorker } from "@/components/service-worker";
 import { getProfile } from "@/lib/auth/dal";
+import { asLocale } from "@/lib/curriculum/locale";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -46,10 +47,16 @@ export default async function RootLayout({
   // stylesheet's prefers-color-scheme block is already there to handle.
   const profile = await getProfile();
   const theme = profile?.theme ?? "system";
+  // Follows the reader rather than the codebase. A screen reader pronounces
+  // the page in whatever this says, and a browser offers to translate a page
+  // whose lang does not match what is on it — so a Spanish reader on lang="en"
+  // gets English phonemes over Spanish words and a translation prompt for a
+  // page already in their language.
+  const lang = asLocale(profile?.locale);
 
   return (
     <html
-      lang="en"
+      lang={lang}
       className="h-full antialiased"
       data-theme={theme === "system" ? undefined : theme}
     >

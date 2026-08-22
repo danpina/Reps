@@ -64,7 +64,21 @@ export async function updateLanguage(
     .update({ locale: choice })
     .eq("id", user.id);
 
-  if (error) return { error: "That did not save. Try again." };
+  if (error) {
+    // The screen says "that did not save", which is all a reader needs and is
+    // useless to whoever has to fix it — and Next.js strips error messages in
+    // production, so nothing reaches the logs either unless it is put there.
+    // This one failed in production for a week as a missing column grant,
+    // which reports as "permission denied for table profiles" and reads like
+    // an RLS problem. That sentence would have saved the week.
+    console.error("[settings] locale update failed", {
+      code: error.code,
+      message: error.message,
+      details: error.details,
+      hint: error.hint,
+    });
+    return { error: "That did not save. Try again." };
+  }
 
   revalidatePath("/", "layout");
   return { done: "Language saved." };
