@@ -1,17 +1,22 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
-import { getProfile, requireUser } from "@/lib/auth/dal";
+import { getLocale, getProfile, requireUser } from "@/lib/auth/dal";
 import { MIN_REPS_FOR_REVIEW } from "@/lib/coach/eligibility";
-import { describeOther } from "@/lib/profile/demographics";
+import { describeOtherLocalized } from "@/lib/profile/demographics";
 import {
   getBadges,
   getFieldLog,
   getTotals,
   type FieldLogEntry,
 } from "@/lib/progress/queries";
-import { WENT_LABELS, XP_AWARD } from "@/lib/progress/rules";
+import { wentLabel, XP_AWARD } from "@/lib/progress/rules";
+import type { Translate } from "@/lib/i18n";
 
-export const metadata = { title: "Field log — Reps" };
+export async function generateMetadata() {
+  const t = await getTranslations("fieldLog");
+  return { title: t("pageTitle") };
+}
 
 const WENT_TONE: Record<number, string> = {
   1: "border-[var(--rule-strong)] text-ink-muted",
@@ -24,8 +29,13 @@ const WENT_TONE: Record<number, string> = {
  * as local rather than passed to `new Date(iso)`, which would read it as UTC
  * and shift the label by a day for anyone west of Greenwich.
  */
-function dayLabel(loggedDate: string, todayIso: string): string {
-  if (loggedDate === todayIso) return "Today";
+function dayLabel(
+  loggedDate: string,
+  todayIso: string,
+  locale: string,
+  t: Translate,
+): string {
+  if (loggedDate === todayIso) return t("today");
 
   const [y, m, d] = loggedDate.split("-").map(Number);
   const date = new Date(y, m - 1, d);
@@ -33,9 +43,9 @@ function dayLabel(loggedDate: string, todayIso: string): string {
   const [ty, tm, td] = todayIso.split("-").map(Number);
   const yesterday = new Date(ty, tm - 1, td - 1);
 
-  if (date.toDateString() === yesterday.toDateString()) return "Yesterday";
+  if (date.toDateString() === yesterday.toDateString()) return t("yesterday");
 
-  return date.toLocaleDateString(undefined, {
+  return date.toLocaleDateString(locale, {
     weekday: "long",
     day: "numeric",
     month: "long",
@@ -59,6 +69,9 @@ export default async function FieldLogPage({
   await requireUser();
   const profile = await getProfile();
   const params = await searchParams;
+  const t = await getTranslations("fieldLog");
+  const tWent = await getTranslations("went");
+  const locale = await getLocale();
 
   const justEarned = params.badges
     ? (await getBadges()).earned.filter((b) =>
@@ -123,10 +136,10 @@ export default async function FieldLogPage({
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="border-b border-rule pb-5">
         <h1 className="text-xl font-semibold tracking-tight text-ink">
-          Field log
+          {t("heading")}
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-          Every real conversation you have logged. This is the part that counts.
+          {t("subheading")}
         </p>
 
         {/* The threshold is stated here rather than only on the page behind
@@ -137,20 +150,22 @@ export default async function FieldLogPage({
           className="mt-3 inline-block text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline"
         >
           {totals.repsLogged >= MIN_REPS_FOR_REVIEW
-            ? "Have this log read for patterns →"
-            : `Have this log read for patterns — ${MIN_REPS_FOR_REVIEW - totals.repsLogged} more reps →`}
+            ? t("readForPatterns")
+            : t("readForPatternsWithCount", {
+                count: MIN_REPS_FOR_REVIEW - totals.repsLogged,
+              })}
         </Link>
 
         <dl className="mt-5 flex gap-8">
           <div>
             <dt className="tabular text-xs uppercase tracking-[0.14em] text-ink-faint">
-              Reps
+              {t("reps")}
             </dt>
             <dd className="tabular mt-1 text-2xl text-ink">{totals.repsLogged}</dd>
           </div>
           <div>
             <dt className="tabular text-xs uppercase tracking-[0.14em] text-ink-faint">
-              Streak
+              {t("streak")}
             </dt>
             <dd className="tabular mt-1 text-2xl text-ink">
               {totals.currentStreak}
@@ -158,7 +173,7 @@ export default async function FieldLogPage({
           </div>
           <div>
             <dt className="tabular text-xs uppercase tracking-[0.14em] text-ink-faint">
-              Longest
+              {t("longest")}
             </dt>
             <dd className="tabular mt-1 text-2xl text-ink">
               {totals.longestStreak}
@@ -173,14 +188,13 @@ export default async function FieldLogPage({
           className="mt-5 rounded border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3"
         >
           <p className="text-sm text-ink">
-            Logged, +{XP_AWARD.mission} XP. That one counts whether it went well
-            or not.
+            {t("loggedNotice", { xp: XP_AWARD.mission })}
           </p>
 
           {justEarned.length > 0 ? (
             <div className="mt-3 border-t border-[var(--accent)]/30 pt-3">
               <p className="tabular text-xs uppercase tracking-[0.14em] text-[var(--accent)]">
-                {justEarned.length === 1 ? "Badge earned" : "Badges earned"}
+                {t("badgesEarned", { count: justEarned.length })}
               </p>
               <ul className="mt-2 flex flex-col gap-1.5">
                 {justEarned.map((badge) => (
@@ -200,36 +214,34 @@ export default async function FieldLogPage({
           role="alert"
           className="mt-5 rounded border border-[var(--flag)] bg-[var(--flag-soft)] px-4 py-3 text-sm text-ink"
         >
-          That rep could not be deleted, so nothing has changed. Try again.
+          {t("deleteFailed")}
         </p>
       ) : params.edited || params.deleted ? (
         <p
           role="status"
           className="mt-5 rounded border border-rule bg-[var(--paper-raised)] px-4 py-3 text-sm text-ink"
         >
-          {params.deleted
-            ? "Rep deleted. The XP and the streak have been put back the way they were."
-            : "Rep updated."}
+          {params.deleted ? t("repDeleted") : t("repUpdated")}
         </p>
       ) : null}
 
       {entries.length > 0 || isFiltered ? (
         <nav
-          aria-label="Filter the field log"
+          aria-label={t("filterAriaLabel")}
           className="mt-6 flex flex-col gap-3 border-b border-rule pb-5"
         >
           <div className="flex flex-wrap items-center gap-2">
             <FilterChip
               href="/field-log"
               active={!isFiltered}
-              label="Everything"
+              label={t("everything")}
             />
             {[3, 2, 1].map((value) => (
               <FilterChip
                 key={value}
                 href={`/field-log?went=${value}`}
                 active={wentFilter === value}
-                label={WENT_LABELS[value]}
+                label={wentLabel(tWent, value)}
               />
             ))}
           </div>
@@ -265,13 +277,13 @@ export default async function FieldLogPage({
       ) : null}
 
       {entries.length === 0 ? (
-        <EmptyState filtered={isFiltered} />
+        <EmptyState filtered={isFiltered} t={t} />
       ) : (
         <div className="mt-2">
           {[...days.entries()].map(([day, dayEntries]) => (
             <section key={day} className="border-b border-rule py-6">
               <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
-                {dayLabel(day, todayIso)}
+                {dayLabel(day, todayIso, locale, t)}
               </h2>
 
               <ol className="mt-4 flex flex-col gap-5">
@@ -291,15 +303,15 @@ export default async function FieldLogPage({
 
                     <div className="mt-0.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                       <span className="text-sm font-medium text-ink">
-                        {entry.skills?.name ?? "A rep"}
+                        {entry.skills?.name ?? t("aRep")}
                       </span>
                       <span
                         className={`tabular rounded border px-1.5 py-0.5 text-[11px] ${WENT_TONE[entry.went]}`}
                       >
-                        {WENT_LABELS[entry.went]}
+                        {wentLabel(tWent, entry.went)}
                       </span>
                       <span className="tabular ml-auto text-xs text-ink-faint">
-                        {new Date(entry.logged_at).toLocaleTimeString(undefined, {
+                        {new Date(entry.logged_at).toLocaleTimeString(locale, {
                           hour: "2-digit",
                           minute: "2-digit",
                           timeZone: zone,
@@ -307,9 +319,9 @@ export default async function FieldLogPage({
                       </span>
                     </div>
 
-                    {entry.context_note || who(entry) ? (
+                    {entry.context_note || who(entry, t) ? (
                       <p className="mt-1.5 text-[13px] text-ink-muted">
-                        {[entry.context_note, who(entry)]
+                        {[entry.context_note, who(entry, t)]
                           .filter(Boolean)
                           .join(" · ")}
                       </p>
@@ -335,10 +347,12 @@ export default async function FieldLogPage({
                         difference between an affordance and a footnote. */}
                     <Link
                       href={`/field-log/${entry.id}`}
-                      aria-label={`Edit this ${entry.skills?.name ?? "rep"}`}
+                      aria-label={t("editThis", {
+                        name: entry.skills?.name ?? t("rep"),
+                      })}
                       className="mt-3 inline-flex items-center rounded border border-[var(--rule-strong)] px-2.5 py-1 text-[12px] text-ink-muted transition-colors hover:bg-[var(--paper-raised)] hover:text-ink"
                     >
-                      Edit
+                      {t("edit")}
                     </Link>
                   </li>
                 ))}
@@ -352,8 +366,8 @@ export default async function FieldLogPage({
 }
 
 /** Who the rep was with, when it was recorded. Sits beside the context note. */
-function who(entry: FieldLogEntry): string | null {
-  return describeOther(entry.other_sex, entry.other_age_group);
+function who(entry: FieldLogEntry, t: Translate): string | null {
+  return describeOtherLocalized(t, entry.other_sex, entry.other_age_group);
 }
 
 function FilterChip({
@@ -381,18 +395,18 @@ function FilterChip({
   );
 }
 
-function EmptyState({ filtered }: { filtered: boolean }) {
+function EmptyState({ filtered, t }: { filtered: boolean; t: Translate }) {
   if (filtered) {
     return (
       <div className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6">
         <p className="text-sm leading-relaxed text-ink">
-          No reps match that filter yet.
+          {t("noneMatchFilter")}
         </p>
         <Link
           href="/field-log"
           className="mt-3 inline-block text-sm font-medium text-ink underline underline-offset-4"
         >
-          Show everything
+          {t("showEverything")}
         </Link>
       </div>
     );
@@ -401,24 +415,23 @@ function EmptyState({ filtered }: { filtered: boolean }) {
   return (
     <div className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6">
       <h2 className="text-sm font-semibold text-ink">
-        Your first rep goes here
+        {t("firstRepHeading")}
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-        Read a card, go and have one real conversation, then log it. In two
-        months this screen is the proof you changed.
+        {t("firstRepBody")}
       </p>
       <div className="mt-4 flex flex-wrap gap-2">
         <Link
           href="/skills/openers/1"
           className="rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
         >
-          Start with Openers
+          {t("startWithOpeners")}
         </Link>
         <Link
           href="/log"
           className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper)]"
         >
-          Log one now
+          {t("logOneNow")}
         </Link>
       </div>
     </div>

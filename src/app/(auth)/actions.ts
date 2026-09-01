@@ -1,8 +1,10 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { cookies } from "next/headers";
+import { getTranslations } from "next-intl/server";
 
-import { asLocale } from "@/lib/curriculum/locale";
+import { asLocale, LOCALE_COOKIE } from "@/lib/curriculum/locale";
 import { SITE_URL } from "@/lib/env";
 import { createClient } from "@/lib/supabase/server";
 
@@ -24,13 +26,14 @@ export async function signIn(
   _state: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  const t = await getTranslations("auth.errors");
   const { email, password } = readCredentials(formData);
-  if (!email || !password) return { error: "Enter your email and password." };
+  if (!email || !password) return { error: t("missingCredentials") };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-  if (error) return { error: "That email and password don't match." };
+  if (error) return { error: t("wrongCredentials") };
 
   redirect(safeNext(formData.get("next")));
 }
@@ -39,6 +42,7 @@ export async function signUp(
   _state: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  const t = await getTranslations("auth.errors");
   const { email, password } = readCredentials(formData);
   const displayName = String(formData.get("display_name") ?? "").trim();
   // Anything unrecognised reads as English rather than failing the signup. The
@@ -46,9 +50,8 @@ export async function signUp(
   // database through client-written metadata.
   const locale = asLocale(formData.get("locale"));
 
-  if (!email) return { error: "Enter your email." };
-  if (password.length < 8)
-    return { error: "Use a password of at least 8 characters." };
+  if (!email) return { error: t("missingEmail") };
+  if (password.length < 8) return { error: t("passwordTooShort") };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signUp({
@@ -63,7 +66,15 @@ export async function signUp(
     },
   });
 
-  if (error) return { error: error.message };
+  // Never the SDK's own message — it comes back in English regardless of the
+  // reader's language, and it can name things (rate limits, provider quirks)
+  // a reader has no use for.
+  if (error) return { error: t("signUpFailed") };
+
+  // Set immediately, not after confirmation: check-email itself, and a sign-in
+  // attempt before the link is clicked, both render with no profile row yet.
+  const jar = await cookies();
+  jar.set(LOCALE_COOKIE, locale, { maxAge: 60 * 60 * 24 * 400, path: "/" });
 
   redirect("/check-email?reason=confirm");
 }
@@ -72,8 +83,9 @@ export async function sendMagicLink(
   _state: AuthState,
   formData: FormData,
 ): Promise<AuthState> {
+  const t = await getTranslations("auth.errors");
   const email = String(formData.get("email") ?? "").trim();
-  if (!email) return { error: "Enter your email first." };
+  if (!email) return { error: t("missingEmailFirst") };
 
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithOtp({
@@ -81,7 +93,7 @@ export async function sendMagicLink(
     options: { emailRedirectTo: `${SITE_URL}/auth/callback` },
   });
 
-  if (error) return { error: error.message };
+  if (error) return { error: t("magicLinkFailed") };
 
   redirect("/check-email?reason=link");
 }

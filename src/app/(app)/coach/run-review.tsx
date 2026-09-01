@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import { runReview, type CoachActionState } from "./actions";
 
@@ -44,6 +45,7 @@ export function RunReview({
 }
 
 function Submit({ disabled, label }: { disabled: boolean; label: string }) {
+  const t = useTranslations("coachPage");
   const { pending } = useFormStatus();
 
   return (
@@ -53,12 +55,11 @@ function Submit({ disabled, label }: { disabled: boolean; label: string }) {
         disabled={disabled || pending}
         className="rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-45"
       >
-        {pending ? "Reading your log…" : label}
+        {pending ? t("readingYourLogPending") : label}
       </button>
       {pending ? (
         <p className="mt-3 text-[13px] leading-relaxed text-ink-muted">
-          This takes a moment. It is reading every conversation properly rather
-          than skimming them.
+          {t("thisTakesAMoment")}
         </p>
       ) : null}
     </>

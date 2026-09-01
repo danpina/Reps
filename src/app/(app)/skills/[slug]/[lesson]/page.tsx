@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { BackLink } from "@/components/back-link";
 import { Prose } from "@/components/prose";
@@ -31,6 +32,7 @@ export default async function LessonPage({
 }) {
   await requireUser();
   const { slug, lesson: lessonParam } = await params;
+  const t = await getTranslations("lessonPage");
 
   const sortOrder = Number(lessonParam);
   if (!Number.isInteger(sortOrder) || sortOrder < 1) notFound();
@@ -73,7 +75,7 @@ export default async function LessonPage({
       <LockedLesson
         skillName={track.name}
         skillSlug={track.slug}
-        topicName={topic?.name ?? "this topic"}
+        topicName={topic?.name ?? t("thisTopic")}
         lessonTitle={entry.title}
         sortOrder={sortOrder}
         total={total}
@@ -133,7 +135,7 @@ export default async function LessonPage({
       <header className="border-b border-rule pb-5">
         <BackLink href={`/skills/${skill.slug}`} label={skill.name} />
         <p className="tabular mt-3 text-xs text-ink-faint">
-          Lesson {sortOrder} of {total}
+          {t("lessonOfTotal", { sortOrder, total })}
         </p>
         <h1 className="mt-1.5 text-xl font-semibold tracking-tight text-ink">
           {lesson.title}
@@ -148,7 +150,7 @@ export default async function LessonPage({
             id="examples"
             className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
           >
-            In practice
+            {t("inPractice")}
           </h2>
           <ol className="mt-4 flex flex-col gap-5">
             {examples.map((example, i) => (
@@ -171,7 +173,11 @@ export default async function LessonPage({
           <ComprehensionBeat
             key={i}
             check={check}
-            label={checks.length > 1 ? `Check ${i + 1} of ${checks.length}` : "One check"}
+            label={
+              checks.length > 1
+                ? t("checkOfTotal", { n: i + 1, total: checks.length })
+                : t("oneCheck")
+            }
           />
         ))}
 
@@ -192,19 +198,19 @@ export default async function LessonPage({
             id="mission"
             className="tabular text-xs uppercase tracking-[0.18em] text-[var(--accent)]"
           >
-            Today&rsquo;s field mission
+            {t("todaysFieldMission")}
           </h2>
           <p className="mt-3 text-[15px] leading-[1.6] text-ink">
             {lesson.mission_text}
           </p>
           <p className="mt-3 text-[13px] leading-relaxed text-ink-muted">
-            Go and do it, then log what happened. It counts either way.
+            {t("goAndDoIt")}
           </p>
           <Link
             href={`/log?lesson=${lesson.id}`}
             className="mt-4 inline-flex rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
           >
-            Log this rep
+            {t("logThisRep")}
           </Link>
           <span className="tabular ml-3 text-xs text-ink-faint">
             +{XP_AWARD.mission} XP
@@ -218,7 +224,7 @@ export default async function LessonPage({
             href={`/skills/${skill.slug}/${sortOrder - 1}`}
             className="text-ink-muted underline-offset-4 hover:underline"
           >
-            ← Previous
+            ← {t("previous")}
           </Link>
         ) : (
           <span />
@@ -228,7 +234,7 @@ export default async function LessonPage({
             href={`/skills/${skill.slug}/${sortOrder + 1}`}
             className="font-medium text-ink underline-offset-4 hover:underline"
           >
-            Next lesson →
+            {t("nextLesson")} →
           </Link>
         ) : (
           // The end of a track is exactly where a summary is worth most.
@@ -236,7 +242,7 @@ export default async function LessonPage({
             href={`/skills/${skill.slug}/recap`}
             className="font-medium text-ink underline-offset-4 hover:underline"
           >
-            What you learned →
+            {t("whatYouLearned")} →
           </Link>
         )}
       </nav>

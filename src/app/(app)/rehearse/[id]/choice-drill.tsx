@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import type { ChoiceBeat, ChoiceOption } from "@/lib/roleplay/modes";
 import { answerChoice, type DrillState } from "./drill-actions";
@@ -45,6 +46,7 @@ export function ChoiceDrill({
   options: { option: ChoiceOption; index: number }[];
   total: number;
 }) {
+  const t = useTranslations("choiceDrill");
   const [state, formAction] = useActionState<DrillState, FormData>(
     answerChoice,
     {},
@@ -55,7 +57,7 @@ export function ChoiceDrill({
       {answered.map((item, i) => (
         <section key={i} className="border-l-2 border-rule-strong pl-4">
           <p className="tabular text-[11px] uppercase tracking-[0.14em] text-ink-faint">
-            Situation {i + 1} of {total}
+            {t("situationOfTotal", { n: i + 1, total })}
           </p>
           <p className="mt-1.5 text-[13px] leading-relaxed text-ink-muted">
             {item.beat.situation}
@@ -84,7 +86,7 @@ export function ChoiceDrill({
                   <p className="text-[14px] leading-snug text-ink">
                     {option.text}
                     {picked ? (
-                      <span className="text-ink-faint"> — what you chose</span>
+                      <span className="text-ink-faint"> — {t("whatYouChose")}</span>
                     ) : null}
                   </p>
                   {worth ? (
@@ -102,7 +104,7 @@ export function ChoiceDrill({
       {current ? (
         <section>
           <p className="tabular text-[11px] uppercase tracking-[0.14em] text-ink-faint">
-            Situation {answered.length + 1} of {total}
+            {t("situationOfTotal", { n: answered.length + 1, total })}
           </p>
           <p className="mt-2 text-[15px] leading-[1.6] text-ink">
             {current.situation}
@@ -131,8 +133,8 @@ export function ChoiceDrill({
           className="rounded border border-rule bg-[var(--paper-raised)] px-4 py-3 text-sm leading-relaxed text-ink"
         >
           {answered.every((a) => a.correct)
-            ? "Both read correctly. The counting is the skill — keep doing it out loud in your head until it stops being deliberate."
-            : "Read the notes above rather than the score. The wrong option you took is a mistake almost everybody makes, which is why it is on the list."}
+            ? t("bothReadCorrectly")
+            : t("readTheNotesAbove")}
         </p>
       )}
 

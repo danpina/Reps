@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import { requireUser } from "@/lib/auth/dal";
 import { createClient } from "@/lib/supabase/server";
@@ -64,29 +65,30 @@ export async function attemptLine(
 ): Promise<DrillState> {
   await requireUser();
   const supabase = await createClient();
+  const t = await getTranslations("drillActions.errors");
 
   const id = String(formData.get("roleplay_id") ?? "");
   const line = String(formData.get("line") ?? "").trim();
 
-  if (!line) return { error: "Write the line first." };
+  if (!line) return { error: t("writeTheLineFirst") };
 
   const drill = await load(id);
-  if (!drill) return { error: "That rehearsal could not be found." };
-  if (drill.status === "complete") return { error: "This drill has finished." };
+  if (!drill) return { error: t("notFound") };
+  if (drill.status === "complete") return { error: t("drillFinished") };
 
   const spec = asLineSpec(drill.lessons.rehearsal_spec);
-  if (!spec) return { error: "This drill is not set up correctly." };
+  if (!spec) return { error: t("notSetUpCorrectly") };
 
   // Checked once the spec is loaded, because how much room a drill gives is
   // the lesson's decision rather than the app's. Still checked here and not
   // only by the textarea: a maxLength attribute is a courtesy, not a limit.
   if (line.length > (spec.maxChars ?? MAX_LINE_CHARS)) {
-    return { error: "That is longer than this one asks for. Tighten it." };
+    return { error: t("tooLongTightenIt") };
   }
 
   if (drill.transcript_json.length >= MAX_DRILL_ATTEMPTS) {
     return {
-      error: "That is enough attempts for one sitting. Read the examples below.",
+      error: t("enoughAttempts"),
     };
   }
 
@@ -105,7 +107,7 @@ export async function attemptLine(
     .update({ transcript_json: transcript })
     .eq("id", id);
 
-  if (error) return { error: "That attempt did not save. Try again." };
+  if (error) return { error: t("attemptDidNotSave") };
 
   revalidatePath(`/rehearse/${id}`);
   return {};
@@ -118,25 +120,26 @@ export async function answerChoice(
 ): Promise<DrillState> {
   await requireUser();
   const supabase = await createClient();
+  const t = await getTranslations("drillActions.errors");
 
   const id = String(formData.get("roleplay_id") ?? "");
   const picked = Number(formData.get("option"));
 
   const drill = await load(id);
-  if (!drill) return { error: "That rehearsal could not be found." };
-  if (drill.status === "complete") return { error: "This drill has finished." };
+  if (!drill) return { error: t("notFound") };
+  if (drill.status === "complete") return { error: t("drillFinished") };
 
   const spec = asChoiceSpec(drill.lessons.rehearsal_spec);
-  if (!spec) return { error: "This drill is not set up correctly." };
+  if (!spec) return { error: t("notSetUpCorrectly") };
 
   // Which beat is being answered is the count of answers so far, never a
   // number from the form. A client that could name its own beat could answer
   // the same easy one repeatedly, or skip the one it did not like.
   const beat = spec.beats[drill.transcript_json.length];
-  if (!beat) return { error: "Every situation here has been answered." };
+  if (!beat) return { error: t("everySituationAnswered") };
 
   const option = beat.options[picked];
-  if (!option) return { error: "Pick one of the options." };
+  if (!option) return { error: t("pickOneOfTheOptions") };
 
   const transcript: Turn[] = [
     ...drill.transcript_json,
@@ -153,7 +156,7 @@ export async function answerChoice(
     .update({ transcript_json: transcript })
     .eq("id", id);
 
-  if (error) return { error: "That answer did not save. Try again." };
+  if (error) return { error: t("answerDidNotSave") };
 
   revalidatePath(`/rehearse/${id}`);
   return {};
@@ -171,16 +174,17 @@ export async function finishDrill(
 ): Promise<DrillState> {
   const user = await requireUser();
   const supabase = await createClient();
+  const t = await getTranslations("drillActions.errors");
 
   const id = String(formData.get("roleplay_id") ?? "");
 
   const drill = await load(id);
-  if (!drill) return { error: "That rehearsal could not be found." };
+  if (!drill) return { error: t("notFound") };
   if (drill.status === "complete") return {};
 
   const attempts = drill.transcript_json;
   if (attempts.length === 0) {
-    return { error: "Have a go at it first." };
+    return { error: t("haveAGoFirst") };
   }
 
   const spec = asLineSpec(drill.lessons.rehearsal_spec);
@@ -214,7 +218,7 @@ export async function finishDrill(
     })
     .eq("id", id);
 
-  if (error) return { error: "That did not save. Try again." };
+  if (error) return { error: t("didNotSave") };
 
   await awardDrillXp(supabase, user.id, drill.lessons.skill_id, drill.lesson_id);
   await awardBadges(supabase, user.id);

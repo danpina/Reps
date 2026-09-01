@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
+import { getLocale } from "@/lib/auth/dal";
+import type { Translate } from "@/lib/i18n";
 import type { LessonRehearsals, Rehearsal } from "@/lib/roleplay/queries";
 
 /**
@@ -11,7 +14,10 @@ import type { LessonRehearsals, Rehearsal } from "@/lib/roleplay/queries";
  * different on each screen would be worse than no row at all.
  */
 
-export function RehearsalRow({ rehearsal }: { rehearsal: Rehearsal }) {
+export async function RehearsalRow({ rehearsal }: { rehearsal: Rehearsal }) {
+  const t = await getTranslations("rehearsalList");
+  const locale = await getLocale();
+
   return (
     <li className="border-b border-rule last:border-b-0">
       <Link
@@ -19,14 +25,14 @@ export function RehearsalRow({ rehearsal }: { rehearsal: Rehearsal }) {
         className="block py-3 transition-colors hover:bg-[var(--paper)]"
       >
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
-          <Verdict rehearsal={rehearsal} />
+          <Verdict rehearsal={rehearsal} t={t} />
 
           <span className="tabular text-xs text-ink-faint">
-            {countLabel(rehearsal)}
+            {countLabel(rehearsal, t)}
           </span>
 
           <span className="tabular ml-auto text-xs text-ink-faint">
-            {new Date(rehearsal.startedAt).toLocaleDateString(undefined, {
+            {new Date(rehearsal.startedAt).toLocaleDateString(locale, {
               day: "numeric",
               month: "short",
               year: "numeric",
@@ -51,11 +57,11 @@ export function RehearsalRow({ rehearsal }: { rehearsal: Rehearsal }) {
  * take, and inventing one out of four boolean checks would be a number that
  * looked like the AI scores without meaning anything like them.
  */
-function Verdict({ rehearsal }: { rehearsal: Rehearsal }) {
+function Verdict({ rehearsal, t }: { rehearsal: Rehearsal; t: Translate }) {
   if (rehearsal.status === "open") {
     return (
       <span className="tabular rounded border border-[var(--flag)] px-1.5 py-0.5 text-[11px] text-[var(--flag)]">
-        Unfinished
+        {t("unfinished")}
       </span>
     );
   }
@@ -63,11 +69,11 @@ function Verdict({ rehearsal }: { rehearsal: Rehearsal }) {
   if (rehearsal.landed !== null) {
     return rehearsal.landed ? (
       <span className="tabular rounded border border-[var(--accent)] px-1.5 py-0.5 text-[11px] text-[var(--accent)]">
-        Landed
+        {t("landed")}
       </span>
     ) : (
       <span className="tabular rounded border border-[var(--rule-strong)] px-1.5 py-0.5 text-[11px] text-ink-muted">
-        Not quite
+        {t("notQuite")}
       </span>
     );
   }
@@ -75,29 +81,29 @@ function Verdict({ rehearsal }: { rehearsal: Rehearsal }) {
   if (rehearsal.average !== null) {
     return (
       <span className="tabular rounded border border-[var(--accent)] px-1.5 py-0.5 text-[11px] text-[var(--accent)]">
-        {rehearsal.average.toFixed(1)} avg
+        {t("avg", { score: rehearsal.average.toFixed(1) })}
       </span>
     );
   }
 
   return (
     <span className="tabular rounded border border-[var(--rule-strong)] px-1.5 py-0.5 text-[11px] text-ink-muted">
-      Unscored
+      {t("unscored")}
     </span>
   );
 }
 
 /** Lines said in a conversation; attempts or situations read in a drill. */
-function countLabel(rehearsal: Rehearsal): string {
+function countLabel(rehearsal: Rehearsal, t: Translate): string {
   const n = rehearsal.lines;
 
   if (rehearsal.mode === "line") {
-    return `${n} ${n === 1 ? "attempt" : "attempts"}`;
+    return t("attempts", { count: n });
   }
   if (rehearsal.mode === "choice") {
-    return `${n} read`;
+    return t("read", { count: n });
   }
-  return `${n} ${n === 1 ? "line" : "lines"} said`;
+  return t("linesSaid", { count: n });
 }
 
 /**
@@ -148,7 +154,12 @@ export function RehearsalLessons({
   );
 }
 
-/** "3 rehearsals", said the same way everywhere it is said. */
-export function rehearsalCount(n: number): string {
-  return `${n} ${n === 1 ? "rehearsal" : "rehearsals"}`;
+/**
+ * "3 rehearsals", said the same way everywhere it is said.
+ *
+ * `t` must come from `getTranslations("rehearsalList")` /
+ * `useTranslations("rehearsalList")`.
+ */
+export function rehearsalCount(t: Translate, n: number): string {
+  return t("rehearsalsCount", { count: n });
 }

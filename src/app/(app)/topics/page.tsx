@@ -1,11 +1,15 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { requireUser } from "@/lib/auth/dal";
 import { FREE_PREVIEW_LESSONS, isPro } from "@/lib/billing/entitlement";
 import { getCurriculumProgress } from "@/lib/curriculum/progress";
 import { getTopics } from "@/lib/curriculum/queries";
 
-export const metadata = { title: "Topics — Reps" };
+export async function generateMetadata() {
+  const t = await getTranslations("topicsPage");
+  return { title: t("pageTitle") };
+}
 
 export default async function TopicsPage() {
   await requireUser();
@@ -14,17 +18,16 @@ export default async function TopicsPage() {
     getCurriculumProgress(),
     isPro(),
   ]);
+  const t = await getTranslations("topicsPage");
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="border-b border-rule pb-5">
         <h1 className="text-xl font-semibold tracking-tight text-ink">
-          What are you practising for?
+          {t("heading")}
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-          A topic is a situation. The skills inside it are written for that
-          situation and nowhere else, because an opener at a bar and an opener
-          in an interview are not the same craft.
+          {t("subheading")}
         </p>
       </header>
 
@@ -49,7 +52,7 @@ export default async function TopicsPage() {
                 <h2 className="text-base font-medium text-ink">{topic.name}</h2>
                 {written && !pro ? (
                   <span className="tabular ml-auto shrink-0 text-[11px] text-ink-faint">
-                    {FREE_PREVIEW_LESSONS} free
+                    {t("freeCount", { count: FREE_PREVIEW_LESSONS })}
                   </span>
                 ) : null}
               </div>
@@ -60,15 +63,16 @@ export default async function TopicsPage() {
 
               {written ? (
                 <p className="tabular mt-2.5 pl-8 text-xs text-ink-faint">
-                  {topic.skills.length}{" "}
-                  {topic.skills.length === 1 ? "skill" : "skills"} ·{" "}
-                  {lessons.length} lessons
-                  {read > 0 ? ` · ${read} read` : ""}
-                  {reps > 0 ? ` · ${reps} ${reps === 1 ? "rep" : "reps"}` : ""}
+                  {t("skillsAndLessons", {
+                    skills: topic.skills.length,
+                    lessons: lessons.length,
+                  })}
+                  {read > 0 ? ` · ${t("readCount", { count: read })}` : ""}
+                  {reps > 0 ? ` · ${t("repsCount", { count: reps })}` : ""}
                 </p>
               ) : (
                 <p className="tabular mt-2.5 pl-8 text-xs text-ink-faint">
-                  Being written
+                  {t("beingWritten")}
                 </p>
               )}
             </>
@@ -93,12 +97,12 @@ export default async function TopicsPage() {
 
       {pro ? null : (
         <p className="mt-8 text-[13px] leading-relaxed text-ink-muted">
-          Every topic opens with {FREE_PREVIEW_LESSONS} free lessons.{" "}
+          {t("everyTopicOpensWith", { count: FREE_PREVIEW_LESSONS })}{" "}
           <Link
             href="/pro"
             className="text-ink underline underline-offset-4"
           >
-            What a subscription adds
+            {t("whatASubscriptionAdds")}
           </Link>
           .
         </p>

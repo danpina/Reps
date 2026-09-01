@@ -1,5 +1,7 @@
 import "server-only";
 
+import { getLocale } from "@/lib/auth/dal";
+import { byId, DEFAULT_LOCALE, localise } from "@/lib/curriculum/locale";
 import type { AgeGroup, Sex } from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
 import type { Badge } from "./badges";
@@ -293,17 +295,32 @@ export async function getBadges(): Promise<{
   locked: Badge[];
 }> {
   const supabase = await createClient();
+  const locale = await getLocale();
+  const translated = locale !== DEFAULT_LOCALE;
 
-  const [{ data: all }, { data: mine }] = await Promise.all([
+  const [{ data: all }, { data: mine }, translations] = await Promise.all([
     supabase.from("badges").select("*").order("sort_order"),
     supabase.from("user_badges").select("badge_id, earned_at"),
+    translated
+      ? supabase
+          .from("badge_translations")
+          .select("badge_id, name, description")
+          .eq("locale", locale)
+          .then((r) => r.data)
+      : Promise.resolve(null),
   ]);
 
   const earnedAt = new Map(
     (mine ?? []).map((r) => [r.badge_id, r.earned_at as string]),
   );
+  const badgeText = byId(
+    translations as Record<string, unknown>[] | null,
+    "badge_id",
+  );
 
-  const badges = (all ?? []) as Badge[];
+  const badges = (all ?? []).map((b) =>
+    localise(b as Badge, badgeText.get((b as Badge).id)),
+  );
   return {
     earned: badges
       .filter((b) => earnedAt.has(b.id))

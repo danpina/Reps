@@ -1,10 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { AboutThemFields } from "@/components/about-you-fields";
 import type { AgeGroup, Sex } from "@/lib/profile/demographics";
-import { WENT_LABELS } from "@/lib/progress/rules";
+import { wentLabel } from "@/lib/progress/rules";
 
 /**
  * The fields a rep is made of, shared by logging one and correcting one.
@@ -39,12 +40,6 @@ export type RepValues = {
   otherAgeGroup?: AgeGroup | null;
 };
 
-const WENT_HINTS: Record<number, string> = {
-  1: "Fell flat, or you bailed",
-  2: "Some of it worked",
-  3: "That went somewhere",
-};
-
 export function RepFields({
   groups,
   values = {},
@@ -54,6 +49,8 @@ export function RepFields({
   values?: RepValues;
   knownSkill?: KnownSkill;
 }) {
+  const t = useTranslations("log");
+  const tWent = useTranslations("went");
   const [went, setWent] = useState<number | null>(values.went ?? null);
   const [picking, setPicking] = useState(!knownSkill);
 
@@ -64,7 +61,7 @@ export function RepFields({
           htmlFor={picking ? "skill_id" : undefined}
           className="text-sm font-medium text-ink"
         >
-          Which skill
+          {t("whichSkill")}
         </label>
         {picking ? (
           <select
@@ -75,7 +72,7 @@ export function RepFields({
             className="rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           >
             <option value="" disabled>
-              Pick one
+              {t("pickOne")}
             </option>
             {groups.map((group) => (
               <optgroup key={group.topic} label={group.topic}>
@@ -99,17 +96,18 @@ export function RepFields({
               onClick={() => setPicking(true)}
               className="shrink-0 text-[13px] text-ink-muted underline underline-offset-4 hover:text-ink"
             >
-              Change
+              {t("change")}
             </button>
           </div>
         )}
       </div>
 
       <fieldset className="flex flex-col gap-2">
-        <legend className="text-sm font-medium text-ink">How did it go?</legend>
+        <legend className="text-sm font-medium text-ink">
+          {t("howDidItGo")}
+        </legend>
         <p className="text-[13px] leading-relaxed text-ink-muted">
-          You get credit for doing it, not for it going well. A bad rep is worth
-          the same as a good one.
+          {t("wentCreditHint")}
         </p>
         <div className="mt-1 grid grid-cols-3 gap-2">
           {[1, 2, 3].map((value) => {
@@ -137,10 +135,10 @@ export function RepFields({
                   className="sr-only"
                 />
                 <span className="block text-sm font-medium text-ink">
-                  {WENT_LABELS[value]}
+                  {wentLabel(tWent, value)}
                 </span>
                 <span className="mt-1 block text-[12px] leading-snug text-ink-muted">
-                  {WENT_HINTS[value]}
+                  {t(`wentHint.${value}`)}
                 </span>
               </label>
             );
@@ -150,8 +148,10 @@ export function RepFields({
 
       <div className="flex flex-col gap-2">
         <label htmlFor="context_note" className="text-sm font-medium text-ink">
-          Who or where{" "}
-          <span className="font-normal text-ink-faint">— optional</span>
+          {t("whoOrWhere")}{" "}
+          <span className="font-normal text-ink-faint">
+            — {t("optional")}
+          </span>
         </label>
         <input
           id="context_note"
@@ -159,10 +159,10 @@ export function RepFields({
           type="text"
           maxLength={140}
           defaultValue={values.contextNote ?? ""}
-          placeholder="Barista, the 8:40 train, someone at the gym"
+          placeholder={t("whoOrWherePlaceholder")}
           className="rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         />
-        <p className="text-[12px] text-ink-faint">Your words. No names needed.</p>
+        <p className="text-[12px] text-ink-faint">{t("noNamesNeeded")}</p>
       </div>
 
       {/* Folded away, because it is a guess about a stranger and must never
@@ -172,8 +172,10 @@ export function RepFields({
           generation older, say. */}
       <details className="rounded border border-rule bg-[var(--paper-raised)] px-4 py-3">
         <summary className="cursor-pointer text-sm text-ink-muted">
-          Who you spoke to{" "}
-          <span className="text-ink-faint">— optional, and a guess is fine</span>
+          {t("whoYouSpokeTo")}{" "}
+          <span className="text-ink-faint">
+            — {t("whoYouSpokeToHint")}
+          </span>
         </summary>
         <div className="mt-4">
           <AboutThemFields
@@ -181,15 +183,17 @@ export function RepFields({
             ageGroup={values.otherAgeGroup ?? null}
           />
           <p className="mt-3 text-[12px] leading-relaxed text-ink-faint">
-            Only ever used to find patterns across your own log. Leave it blank
-            and nothing is lost except that.
+            {t("patternsOnlyHint")}
           </p>
         </div>
       </details>
 
       <div className="flex flex-col gap-2">
         <label htmlFor="reflection" className="text-sm font-medium text-ink">
-          One note <span className="font-normal text-ink-faint">— optional</span>
+          {t("oneNote")}{" "}
+          <span className="font-normal text-ink-faint">
+            — {t("optional")}
+          </span>
         </label>
         <textarea
           id="reflection"
@@ -197,7 +201,7 @@ export function RepFields({
           rows={3}
           maxLength={500}
           defaultValue={values.reflection ?? ""}
-          placeholder="What you tried, what happened, what you noticed."
+          placeholder={t("reflectionPlaceholder")}
           className="resize-none rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-sm leading-relaxed text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         />
       </div>

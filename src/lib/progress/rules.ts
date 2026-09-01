@@ -6,6 +6,8 @@
  * directly testable without a database in the way.
  */
 
+import type { Translate } from "@/lib/i18n";
+
 export const MAX_LEVEL = 10;
 
 /**
@@ -256,8 +258,10 @@ export function replayStreak(days: string[]): StreakState {
   return state;
 }
 
-export const WENT_LABELS: Record<number, string> = {
-  1: "Not well",
-  2: "Mixed",
-  3: "Went well",
-};
+export const WENT_VALUES = [1, 2, 3] as const;
+export type WentValue = (typeof WENT_VALUES)[number];
+
+/** `t` must come from `getTranslations("went")` / `useTranslations("went")` — a top-level namespace shared by every screen that shows this label. */
+export function wentLabel(t: Translate, value: number): string {
+  return t(String(value));
+}

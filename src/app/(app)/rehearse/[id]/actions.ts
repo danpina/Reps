@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import { getProfile, requireUser } from "@/lib/auth/dal";
 import { describeSelf } from "@/lib/profile/demographics";
@@ -96,37 +97,38 @@ export async function say(
 ): Promise<SayState> {
   const user = await requireUser();
   const supabase = await createClient();
+  const t = await getTranslations("chat.errors");
 
   const id = String(formData.get("roleplay_id") ?? "");
   const message = String(formData.get("message") ?? "").trim();
 
-  if (!message) return { error: "Say something first." };
+  if (!message) return { error: t("sayFirst") };
   if (message.length > MAX_LINE_CHARS) {
-    return { error: "That is longer than anyone speaks. Say it in fewer words." };
+    return { error: t("tooLong") };
   }
 
   const roleplay = await loadRoleplay(id);
-  if (!roleplay) return { error: "That rehearsal could not be found." };
+  if (!roleplay) return { error: t("notFound") };
   if (roleplay.status === "complete") {
-    return { error: "This scene has already ended." };
+    return { error: t("alreadyEnded") };
   }
 
   // Checked here and not only in the UI: a disabled textarea is a courtesy,
   // not a limit. This is the only place the count cannot be got around.
-  const said = roleplay.transcript_json.filter((t) => t.role === "user").length;
+  const said = roleplay.transcript_json.filter((turn) => turn.role === "user").length;
   if (sceneIsFull(said, capFor(roleplay))) {
     return {
       error:
         roleplay.mode === "beat"
-          ? "That is the whole sequence. End it and read the review."
-          : "This scene has run its course. End it and read the review.",
+          ? t("wholeSequenceDone")
+          : t("sceneRunItsCourse"),
     };
   }
 
   const limit = await checkRateLimit(supabase, "partner_turn");
   if (!limit.allowed) {
     return {
-      error: `You have hit the limit for now. Try again in ${describeWait(limit.retryAfterMinutes)}.`,
+      error: t("hitLimit", { wait: describeWait(limit.retryAfterMinutes) }),
     };
   }
 
@@ -136,7 +138,9 @@ export async function say(
   const refusals = await checkRateLimit(supabase, "refused_turn");
   if (!refusals.allowed) {
     return {
-      error: `Your partner has declined too many of these. Rehearsal is paused for ${describeWait(refusals.retryAfterMinutes)}.`,
+      error: t("partnerDeclinedTooMany", {
+        wait: describeWait(refusals.retryAfterMinutes),
+      }),
     };
   }
 
@@ -151,7 +155,7 @@ export async function say(
   // at all, the call does not happen — an uncounted turn is an unlimited one.
   const recorded = await recordAiRequest(supabase, user.id, "partner_turn");
   if (!recorded.ok) {
-    return { error: "Rehearsal is unavailable right now. Try again shortly." };
+    return { error: t("unavailableRightNow") };
   }
 
   let reply: string;
@@ -171,7 +175,7 @@ export async function say(
       error:
         error instanceof PartnerError
           ? error.userMessage
-          : "Your partner did not respond. Try that line again.",
+          : t("partnerDidNotRespond"),
     };
   }
 
@@ -185,7 +189,7 @@ export async function say(
     .update({ transcript_json: transcript })
     .eq("id", id);
 
-  if (error) return { error: "That line did not save. Try again." };
+  if (error) return { error: t("lineDidNotSave") };
 
   revalidatePath(`/rehearse/${id}`);
   return {};
@@ -198,27 +202,28 @@ export async function endScene(
 ): Promise<SayState> {
   const user = await requireUser();
   const supabase = await createClient();
+  const t = await getTranslations("chat.errors");
 
   const id = String(formData.get("roleplay_id") ?? "");
   const roleplay = await loadRoleplay(id);
-  if (!roleplay) return { error: "That rehearsal could not be found." };
+  if (!roleplay) return { error: t("notFound") };
   if (roleplay.status === "complete") return {};
 
-  const userTurns = roleplay.transcript_json.filter((t) => t.role === "user");
+  const userTurns = roleplay.transcript_json.filter((turn) => turn.role === "user");
   if (userTurns.length === 0) {
-    return { error: "Have the conversation first, then end the scene." };
+    return { error: t("haveTheConversationFirst") };
   }
 
   const limit = await checkRateLimit(supabase, "feedback");
   if (!limit.allowed) {
     return {
-      error: `You have hit the review limit. Try again in ${describeWait(limit.retryAfterMinutes)}.`,
+      error: t("hitReviewLimit", { wait: describeWait(limit.retryAfterMinutes) }),
     };
   }
 
   const recorded = await recordAiRequest(supabase, user.id, "feedback");
   if (!recorded.ok) {
-    return { error: "The review is unavailable right now. Try again shortly." };
+    return { error: t("reviewUnavailable") };
   }
 
   // A thrown error and a review the parser rejected are the same thing from
@@ -240,7 +245,7 @@ export async function endScene(
       reason:
         error instanceof PartnerError
           ? error.userMessage
-          : "The reviewer could not be reached.",
+          : t("reviewerUnreachable"),
     };
   }
 
@@ -252,7 +257,7 @@ export async function endScene(
       .update({ status: "complete", completed_at: new Date().toISOString() })
       .eq("id", id);
     revalidatePath(`/rehearse/${id}`);
-    return { error: `The review could not be produced: ${result.reason}` };
+    return { error: t("reviewNotProduced", { reason: result.reason }) };
   }
 
   await supabase

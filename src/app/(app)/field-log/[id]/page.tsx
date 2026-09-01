@@ -1,12 +1,16 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { BackLink } from "@/components/back-link";
-import { requireUser } from "@/lib/auth/dal";
+import { getLocale, requireUser } from "@/lib/auth/dal";
 import { getTopics } from "@/lib/curriculum/queries";
 import { createClient } from "@/lib/supabase/server";
 import { EditRepForm } from "./edit-rep-form";
 
-export const metadata = { title: "Edit a rep — Reps" };
+export async function generateMetadata() {
+  const t = await getTranslations("editRepPage");
+  return { title: t("pageTitle") };
+}
 
 export default async function EditRepPage({
   params,
@@ -15,6 +19,9 @@ export default async function EditRepPage({
 }) {
   await requireUser();
   const { id } = await params;
+  const t = await getTranslations("editRepPage");
+  const tNav = await getTranslations("nav");
+  const locale = await getLocale();
 
   const supabase = await createClient();
 
@@ -37,24 +44,24 @@ export default async function EditRepPage({
   return (
     <main className="mx-auto w-full max-w-xl px-5 py-12">
       <header className="border-b border-rule pb-5">
-        <BackLink href="/field-log" label="Field log" />
+        <BackLink href="/field-log" label={tNav("fieldLog")} />
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
-          Edit this rep
+          {t("heading")}
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-          Logged on{" "}
-          {new Date(`${entry.logged_date}T00:00:00`).toLocaleDateString(
-            undefined,
-            { weekday: "long", day: "numeric", month: "long" },
-          )}
-          . The date stays put — it is what your streak is counted from.
+          {t("loggedOn", {
+            date: new Date(`${entry.logged_date}T00:00:00`).toLocaleDateString(
+              locale,
+              { weekday: "long", day: "numeric", month: "long" },
+            ),
+          })}
         </p>
       </header>
 
       {entry.mission_text ? (
         <div className="mt-6 rounded border border-rule bg-[var(--paper-raised)] p-4">
           <p className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
-            The mission this was for
+            {t("theMissionThisWasFor")}
           </p>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
             {entry.mission_text}

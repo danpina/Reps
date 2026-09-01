@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { requireUser } from "@/lib/auth/dal";
 import { parseAgeGroup, parseSex } from "@/lib/profile/demographics";
@@ -28,6 +29,7 @@ export async function updateRep(
 ): Promise<EditRepState> {
   const user = await requireUser();
   const supabase = await createClient();
+  const t = await getTranslations("editRepPage.errors");
 
   const id = String(formData.get("id") ?? "").trim();
   const skillId = String(formData.get("skill_id") ?? "").trim();
@@ -35,9 +37,9 @@ export async function updateRep(
   const contextNote = String(formData.get("context_note") ?? "").trim() || null;
   const reflection = String(formData.get("reflection") ?? "").trim() || null;
 
-  if (!id) return { error: "That rep could not be found." };
-  if (!skillId) return { error: "Pick which skill this rep was for." };
-  if (![1, 2, 3].includes(went)) return { error: "Say how it went." };
+  if (!id) return { error: t("notFound") };
+  if (!skillId) return { error: t("pickWhichSkill") };
+  if (![1, 2, 3].includes(went)) return { error: t("sayHowItWent") };
 
   // Row level security scopes this to the signed-in user, so a missing row
   // means either no such rep or somebody else's — and both deserve the same
@@ -48,7 +50,7 @@ export async function updateRep(
     .eq("id", id)
     .maybeSingle();
 
-  if (!existing) return { error: "That rep could not be found." };
+  if (!existing) return { error: t("notFound") };
 
   const { error } = await supabase
     .from("field_logs")
@@ -62,7 +64,8 @@ export async function updateRep(
     })
     .eq("id", id);
 
-  if (error) return { error: `That did not save: ${error.message}` };
+  // Never the SDK's own message — see the note in settings/actions.ts.
+  if (error) return { error: t("didNotSave") };
 
   // Moving a rep to a different skill has to move its XP too, or the levels
   // stop describing the reps underneath them.

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { BackLink } from "@/components/back-link";
 import { requireUser } from "@/lib/auth/dal";
@@ -23,13 +24,14 @@ export default async function TopicPage({
     isPro(),
     getCheatSheet(slug),
   ]);
+  const t = await getTranslations("topicPage");
 
   if (!topic) notFound();
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="border-b border-rule pb-5">
-        <BackLink href="/topics" label="All topics" />
+        <BackLink href="/topics" label={t("allTopics")} />
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
           {topic.name}
         </h1>
@@ -45,14 +47,14 @@ export default async function TopicPage({
             href={`/topics/${topic.slug}/cheat-sheet`}
             className="mt-4 inline-block text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline"
           >
-            The whole topic on one page, to print →
+            {t("wholeTopicOnOnePage")} →
           </Link>
         ) : null}
       </header>
 
       {topic.skills.length === 0 ? (
         <p className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6 text-sm leading-relaxed text-ink-muted">
-          This topic is still being written. Pick another one for now.
+          {t("topicStillBeingWritten")}
         </p>
       ) : (
         <ol className="mt-2">
@@ -86,7 +88,7 @@ export default async function TopicPage({
                     </h2>
                     {read === total && total > 0 ? (
                       <span className="tabular ml-auto rounded border border-[var(--accent)] px-1.5 py-0.5 text-[11px] text-[var(--accent)]">
-                        All read
+                        {t("allRead")}
                       </span>
                     ) : shut ? (
                       <span className="ml-auto shrink-0 text-ink-faint">
@@ -108,9 +110,16 @@ export default async function TopicPage({
                       <div
                         className="flex gap-1"
                         role="img"
-                        aria-label={`${read} of ${total} lessons read${
-                          open < total ? `, ${total - open} locked` : ""
-                        }${reps > 0 ? `, ${reps} reps logged` : ""}`}
+                        aria-label={t("lessonsReadAriaLabel", {
+                          read,
+                          total,
+                          lockedClause:
+                            open < total
+                              ? t("ariaLockedClause", { count: total - open })
+                              : "",
+                          repsClause:
+                            reps > 0 ? t("ariaRepsLoggedClause", { count: reps }) : "",
+                        })}
                       >
                         {skill.lessons.map((lesson) => {
                           const locked = !pro && !lesson.is_preview;
@@ -131,21 +140,19 @@ export default async function TopicPage({
                       </div>
                       <p className="tabular mt-2 text-xs text-ink-faint">
                         {read === 0
-                          ? `${total} ${total === 1 ? "lesson" : "lessons"}`
-                          : `${read} of ${total} read`}
-                        {reps > 0
-                          ? ` · ${reps} ${reps === 1 ? "rep" : "reps"} logged`
-                          : ""}
+                          ? t("lessonsCount", { count: total })
+                          : t("readOfTotal", { read, total })}
+                        {reps > 0 ? ` · ${t("repsLoggedClause", { count: reps })}` : ""}
                         {!inOrder
-                          ? ` · after ${topic.skills[index - 1].name.toLowerCase()}`
+                          ? ` · ${t("afterSkill", { name: topic.skills[index - 1].name.toLowerCase() })}`
                           : !pro && open > 0 && open < total
-                            ? ` · ${open} free`
+                            ? ` · ${t("freeCount", { count: open })}`
                             : ""}
                       </p>
                     </div>
                   ) : (
                     <p className="tabular mt-2 pl-8 text-xs text-ink-faint">
-                      Not written yet
+                      {t("notWrittenYet")}
                     </p>
                   )}
               </>
@@ -173,10 +180,12 @@ export default async function TopicPage({
 
       {pro || topic.skills.length === 0 ? null : (
         <p className="mt-8 text-[13px] leading-relaxed text-ink-muted">
-          You can read the first {FREE_PREVIEW_LESSONS} lessons of{" "}
-          {topic.skills[0].name.toLowerCase()} without paying for anything.{" "}
+          {t("readFirstNLessons", {
+            count: FREE_PREVIEW_LESSONS,
+            name: topic.skills[0].name.toLowerCase(),
+          })}{" "}
           <Link href="/pro" className="text-ink underline underline-offset-4">
-            The rest is a subscription
+            {t("restIsSubscription")}
           </Link>
           .
         </p>

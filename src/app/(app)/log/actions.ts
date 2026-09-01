@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { requireUser } from "@/lib/auth/dal";
 import { parseAgeGroup, parseSex } from "@/lib/profile/demographics";
@@ -41,6 +42,7 @@ export async function logRep(
 ): Promise<LogRepState> {
   const user = await requireUser();
   const supabase = await createClient();
+  const t = await getTranslations("logPage.errors");
 
   const skillId = String(formData.get("skill_id") ?? "").trim();
   const went = Number(formData.get("went"));
@@ -49,8 +51,8 @@ export async function logRep(
   const contextNote = String(formData.get("context_note") ?? "").trim() || null;
   const reflection = String(formData.get("reflection") ?? "").trim() || null;
 
-  if (!skillId) return { error: "Pick which skill this rep was for." };
-  if (![1, 2, 3].includes(went)) return { error: "Say how it went." };
+  if (!skillId) return { error: t("pickWhichSkill") };
+  if (![1, 2, 3].includes(went)) return { error: t("sayHowItWent") };
 
   const today = resolveLoggedDate(formData.get("local_date"));
 
@@ -76,7 +78,8 @@ export async function logRep(
   });
 
   if (insertError) {
-    return { error: `That did not save: ${insertError.message}` };
+    // Never the SDK's own message — see the note in settings/actions.ts.
+    return { error: t("didNotSave") };
   }
 
   await rememberTimezone(supabase, user.id, formData.get("timezone"));

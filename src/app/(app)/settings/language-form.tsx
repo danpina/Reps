@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import { LOCALES, LOCALE_NAMES, type Locale } from "@/lib/curriculum/locale";
 import { updateLanguage, type SettingsState } from "./actions";
@@ -11,6 +12,7 @@ import { updateLanguage, type SettingsState } from "./actions";
  * finds it. A Spanish reader scans for "Español", not for "Spanish".
  */
 export function LanguageForm({ current }: { current: Locale }) {
+  const t = useTranslations("settings.language");
   const [state, formAction] = useActionState<SettingsState, FormData>(
     updateLanguage,
     {},
@@ -19,7 +21,7 @@ export function LanguageForm({ current }: { current: Locale }) {
   return (
     <form action={formAction}>
       <fieldset>
-        <legend className="sr-only">Language</legend>
+        <legend className="sr-only">{t("legend")}</legend>
         <div className="flex flex-col gap-2">
           {LOCALES.map((locale) => (
             <label
@@ -40,12 +42,13 @@ export function LanguageForm({ current }: { current: Locale }) {
       </fieldset>
 
       <Feedback state={state} />
-      <Save label="Save language" />
+      <Save label={t("save")} />
     </form>
   );
 }
 
 function Save({ label }: { label: string }) {
+  const t = useTranslations("common");
   const { pending } = useFormStatus();
   return (
     <button
@@ -53,7 +56,7 @@ function Save({ label }: { label: string }) {
       disabled={pending}
       className="mt-4 rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
-      {pending ? "Saving…" : label}
+      {pending ? t("saving") : label}
     </button>
   );
 }

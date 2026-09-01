@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { BackLink } from "@/components/back-link";
 import { DoneMark, stateLabel, type LessonState } from "@/components/done-mark";
@@ -28,6 +29,9 @@ export default async function SkillPage({
     getRehearsalsForSkill(slug),
     getSkillTakeaway(slug),
   ]);
+  const t = await getTranslations("skillPage");
+  const tRehearsal = await getTranslations("rehearsalList");
+  const tLessonState = await getTranslations("lessonState");
 
   if (!skill) notFound();
 
@@ -43,7 +47,7 @@ export default async function SkillPage({
       <header className="border-b border-rule pb-5">
         <BackLink
           href={topic ? `/topics/${topic.slug}` : "/topics"}
-          label={topic?.name ?? "All topics"}
+          label={topic?.name ?? t("allTopics")}
         />
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
           {skill.name}
@@ -60,7 +64,7 @@ export default async function SkillPage({
             href={`/skills/${skill.slug}/recap`}
             className="mt-4 inline-block text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline"
           >
-            What this track covers, in one page
+            {t("whatThisTrackCovers")}
           </Link>
         ) : null}
       </header>
@@ -85,13 +89,13 @@ export default async function SkillPage({
               id="takeaway"
               className="tabular text-xs uppercase tracking-[0.18em] text-[var(--accent)]"
             >
-              What to take with you
+              {t("whatToTakeWithYou")}
             </h2>
             <Link
               href={`/skills/${skill.slug}/recap`}
               className="text-xs text-ink-muted underline-offset-4 hover:text-ink hover:underline"
             >
-              Every move in one page →
+              {t("everyMoveInOnePage")} →
             </Link>
           </div>
           <div className="mt-3">
@@ -102,7 +106,7 @@ export default async function SkillPage({
 
       {skill.lessons.length === 0 ? (
         <p className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6 text-sm leading-relaxed text-ink-muted">
-          This track has not been written yet. Pick another skill for now.
+          {t("trackNotWrittenYet")}
         </p>
       ) : (
         <ol className="mt-2">
@@ -142,7 +146,11 @@ export default async function SkillPage({
                     state === "used" ? "text-[var(--accent)]" : "text-ink-faint",
                   ].join(" ")}
                 >
-                  {!inOrder ? "Next up" : locked ? "Locked" : stateLabel(state)}
+                  {!inOrder
+                    ? t("nextUp")
+                    : locked
+                      ? t("locked")
+                      : stateLabel(tLessonState, state)}
                 </span>
               </>
             );
@@ -178,7 +186,7 @@ export default async function SkillPage({
       {rehearsed.total > 0 ? (
         <details className="mt-8 rounded border border-rule bg-[var(--paper-raised)] px-5 py-4">
           <summary className="cursor-pointer text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline">
-            {rehearsalCount(rehearsed.total)} on this track
+            {t("countOnThisTrack", { count: rehearsalCount(tRehearsal, rehearsed.total) })}
           </summary>
           <div className="mt-4">
             <RehearsalLessons lessons={rehearsed.lessons} skillSlug={slug} />
@@ -191,9 +199,9 @@ export default async function SkillPage({
           to go from them. */}
       {!pro && skill.lessons.some((l) => !l.is_preview) ? (
         <p className="mt-6 text-[13px] leading-relaxed text-ink-muted">
-          The rest of this track is part of the subscription.{" "}
+          {t("restOfTrackIsSubscription")}{" "}
           <Link href="/pro" className="text-ink underline underline-offset-4">
-            See what it unlocks
+            {t("seeWhatItUnlocks")}
           </Link>
           .
         </p>

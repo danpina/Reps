@@ -1,30 +1,33 @@
 import type { Metadata, Viewport } from "next";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getTranslations } from "next-intl/server";
 
 import { ServiceWorker } from "@/components/service-worker";
-import { getProfile } from "@/lib/auth/dal";
-import { asLocale } from "@/lib/curriculum/locale";
+import { getLocale, getProfile } from "@/lib/auth/dal";
 import "./globals.css";
 
-export const metadata: Metadata = {
-  title: "Reps — learn to talk to anyone",
-  description:
-    "Talking to people is a skill, not a personality. It decides who you meet, who hires you, and who you end up close to. REPS trains it one idea and one real conversation at a time, and keeps the record that proves it worked.",
-  applicationName: "Reps",
-  icons: {
-    icon: [
-      { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-    ],
-    apple: "/apple-touch-icon.png",
-  },
-  appleWebApp: {
-    capable: true,
-    title: "Reps",
-    statusBarStyle: "black-translucent",
-  },
-  // A private record of someone's practice has no business in search results.
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("metadata");
+  return {
+    title: t("title"),
+    description: t("description"),
+    applicationName: "Reps",
+    icons: {
+      icon: [
+        { url: "/icon.svg", type: "image/svg+xml" },
+        { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      ],
+      apple: "/apple-touch-icon.png",
+    },
+    appleWebApp: {
+      capable: true,
+      title: "Reps",
+      statusBarStyle: "black-translucent",
+    },
+    // A private record of someone's practice has no business in search results.
+    robots: { index: false, follow: false },
+  };
+}
 
 export const viewport: Viewport = {
   themeColor: [
@@ -52,7 +55,9 @@ export default async function RootLayout({
   // whose lang does not match what is on it — so a Spanish reader on lang="en"
   // gets English phonemes over Spanish words and a translation prompt for a
   // page already in their language.
-  const lang = asLocale(profile?.locale);
+  const lang = await getLocale();
+  const messages = await getMessages();
+  const t = await getTranslations("common");
 
   return (
     <html
@@ -61,15 +66,17 @@ export default async function RootLayout({
       data-theme={theme === "system" ? undefined : theme}
     >
       <body className="flex min-h-full flex-col">
-        {/* Visible only once focused, so a keyboard user can jump the nav. */}
-        <a
-          href="#main"
-          className="sr-only rounded bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--accent-ink)] focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50"
-        >
-          Skip to content
-        </a>
-        {children}
-        <ServiceWorker />
+        <NextIntlClientProvider locale={lang} messages={messages}>
+          {/* Visible only once focused, so a keyboard user can jump the nav. */}
+          <a
+            href="#main"
+            className="sr-only rounded bg-[var(--accent)] px-4 py-2 text-sm font-medium text-[var(--accent-ink)] focus:not-sr-only focus:absolute focus:left-3 focus:top-3 focus:z-50"
+          >
+            {t("skipToContent")}
+          </a>
+          {children}
+          <ServiceWorker />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

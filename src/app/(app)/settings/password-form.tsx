@@ -2,10 +2,12 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import { changePassword, type SettingsState } from "./actions";
 
 export function PasswordForm() {
+  const t = useTranslations("settings.password");
   const [state, formAction] = useActionState<SettingsState, FormData>(
     changePassword,
     {},
@@ -18,18 +20,18 @@ export function PasswordForm() {
       <div className="flex flex-col gap-4">
         <Field
           name="current_password"
-          label="Current password"
+          label={t("currentPassword")}
           autoComplete="current-password"
         />
         <Field
           name="new_password"
-          label="New password"
+          label={t("newPassword")}
           autoComplete="new-password"
-          hint="At least 8 characters."
+          hint={t("newPasswordHint")}
         />
         <Field
           name="confirm_password"
-          label="New password again"
+          label={t("newPasswordAgain")}
           autoComplete="new-password"
         />
       </div>
@@ -83,6 +85,7 @@ function Field({
 }
 
 function Save() {
+  const t = useTranslations("settings.password");
   const { pending } = useFormStatus();
   return (
     <button
@@ -90,7 +93,7 @@ function Save() {
       disabled={pending}
       className="mt-4 rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
-      {pending ? "Changing…" : "Change password"}
+      {pending ? t("changing") : t("changePassword")}
     </button>
   );
 }

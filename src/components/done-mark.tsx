@@ -1,3 +1,5 @@
+import type { Translate } from "@/lib/i18n";
+
 /**
  * How far through a lesson someone is.
  *
@@ -35,8 +37,6 @@ export function DoneMark({ state }: { state: LessonState }) {
 }
 
 /** The same information in words, for screen readers and for the label line. */
-export function stateLabel(state: LessonState): string {
-  if (state === "used") return "Used for real";
-  if (state === "read") return "Read";
-  return "Not read yet";
+export function stateLabel(t: Translate, state: LessonState): string {
+  return t(`lessonState.${state}`);
 }

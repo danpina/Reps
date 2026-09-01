@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import type { WorkedExample } from "@/lib/curriculum/types";
 import type { CheckResult } from "@/lib/roleplay/checks";
@@ -44,6 +45,7 @@ export function LineDrill({
   /** How much room this drill gives, where the lesson wants more than the default. */
   maxChars?: number;
 }) {
+  const t = useTranslations("lineDrill");
   const [state, formAction] = useActionState<DrillState, FormData>(
     attemptLine,
     {},
@@ -58,7 +60,7 @@ export function LineDrill({
       {says ? (
         <div>
           <p className="tabular text-[11px] uppercase tracking-[0.14em] text-ink-faint">
-            They say
+            {t("theySay")}
           </p>
           <p className="mt-1.5 border-l-2 border-rule-strong pl-4 text-[17px] leading-[1.5] text-ink">
             {says}
@@ -75,7 +77,7 @@ export function LineDrill({
             id="must"
             className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
           >
-            This one must
+            {t("thisOneMust")}
           </h2>
           <ul className="mt-2.5 flex flex-col gap-1.5">
             {requirements.map((requirement) => (
@@ -90,22 +92,21 @@ export function LineDrill({
         // mildly exposing, and describing a thing at the wrong scale. Better to
         // say so than to invent a rule and pretend it measured something.
         <p className="text-[13px] leading-relaxed text-ink-muted">
-          Nothing to tick off on this one. Write your line, then read the three
-          below and see how yours compares.
+          {t("nothingToTickOff")}
         </p>
       )}
 
       {attempts.length > 0 ? (
-        <ol aria-label="Your attempts" className="flex flex-col gap-5">
+        <ol aria-label={t("yourAttempts")} className="flex flex-col gap-5">
           {attempts.map((attempt, i) => (
             <li key={i}>
               <div className="flex items-baseline gap-3">
                 <span className="tabular text-[11px] uppercase tracking-[0.14em] text-ink-faint">
-                  {i === attempts.length - 1 ? "You said" : `Try ${i + 1}`}
+                  {i === attempts.length - 1 ? t("youSaid") : t("tryN", { n: i + 1 })}
                 </span>
                 {attempt.landed ? (
                   <span className="tabular rounded border border-[var(--accent)] px-1.5 py-0.5 text-[11px] text-[var(--accent)]">
-                    Landed
+                    {t("landed")}
                   </span>
                 ) : null}
               </div>
@@ -138,7 +139,7 @@ export function LineDrill({
                           <span className="text-ink-muted"> — {result.why}</span>
                         ) : null}
                         <span className="sr-only">
-                          {result.ok ? " — met" : " — not met"}
+                          {result.ok ? t("srMet") : t("srNotMet")}
                         </span>
                       </span>
                     </li>
@@ -154,9 +155,9 @@ export function LineDrill({
         <form action={formAction}>
           <input type="hidden" name="roleplay_id" value={roleplayId} />
           <label htmlFor="line" className="sr-only">
-            Your line
+            {t("yourLine")}
           </label>
-          <LineBox defaultValue={last?.line ?? ""} maxChars={maxChars} />
+          <LineBox defaultValue={last?.line ?? ""} maxChars={maxChars} t={t} />
 
           {state.error ? (
             <p
@@ -176,15 +177,13 @@ export function LineDrill({
           role="status"
           className="rounded border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3 text-sm leading-relaxed text-ink"
         >
-          That is the shape. Read the three below, then go and use it on
-          somebody real — that is the part that counts.
+          {t("thatIsTheShape")}
         </p>
       ) : null}
 
       {spent && !landed ? (
         <p className="rounded border border-rule bg-[var(--paper-raised)] px-4 py-3 text-sm leading-relaxed text-ink-muted">
-          That is enough goes at it for now. Read the three below — seeing it
-          done is worth more than a ninth attempt.
+          {t("enoughGoesForNow")}
         </p>
       ) : null}
 
@@ -202,7 +201,7 @@ export function LineDrill({
           className="rounded border border-rule bg-[var(--paper-raised)] px-5 py-4"
         >
           <summary className="cursor-pointer text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline">
-            One that works here
+            {t("oneThatWorksHere")}
           </summary>
           <p className="mt-3 border-l-2 border-[var(--accent)] pl-4 text-[17px] leading-[1.5] text-ink">
             {model.line}
@@ -227,6 +226,7 @@ function Examples({
   examples: WorkedExample[];
   open: boolean;
 }) {
+  const t = useTranslations("lineDrill");
   if (examples.length === 0) return null;
 
   return (
@@ -235,7 +235,7 @@ function Examples({
       className="rounded border border-rule bg-[var(--paper-raised)] px-5 py-4"
     >
       <summary className="cursor-pointer text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline">
-        Three that work, and why
+        {t("threeThatWorkAndWhy")}
       </summary>
       <ol className="mt-4 flex flex-col gap-5">
         {examples.map((example, i) => (
@@ -259,9 +259,11 @@ function Examples({
 function LineBox({
   defaultValue,
   maxChars,
+  t,
 }: {
   defaultValue: string;
   maxChars: number;
+  t: ReturnType<typeof useTranslations>;
 }) {
   const [used, setUsed] = useState(defaultValue.length);
   const left = maxChars - used;
@@ -281,12 +283,12 @@ function LineBox({
         required
         defaultValue={defaultValue}
         onChange={(e) => setUsed(e.target.value.length)}
-        placeholder={long ? "What do you say? Take the room you need." : "What do you say?"}
+        placeholder={long ? t("whatDoYouSayLong") : t("whatDoYouSay")}
         className="w-full resize-none rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-[15px] leading-relaxed text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
       />
       {left <= Math.max(40, Math.round(maxChars * 0.1)) ? (
         <p className="tabular mt-2 text-right text-xs text-ink-faint" aria-live="polite">
-          {left} {left === 1 ? "character" : "characters"} left
+          {t("charactersLeft", { count: left })}
         </p>
       ) : null}
     </>
@@ -294,6 +296,7 @@ function LineBox({
 }
 
 function Submit({ again }: { again: boolean }) {
+  const t = useTranslations("lineDrill");
   const { pending } = useFormStatus();
   return (
     <button
@@ -301,7 +304,7 @@ function Submit({ again }: { again: boolean }) {
       disabled={pending}
       className="mt-3 rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
-      {pending ? "Checking…" : again ? "Try that again" : "Say it"}
+      {pending ? t("checkingPending") : again ? t("tryThatAgain") : t("sayIt")}
     </button>
   );
 }
@@ -342,6 +345,7 @@ export function FinishForm({
 }
 
 function Finish() {
+  const t = useTranslations("lineDrill");
   const { pending } = useFormStatus();
   return (
     <button
@@ -349,7 +353,7 @@ function Finish() {
       disabled={pending}
       className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper-raised)] disabled:opacity-60"
     >
-      {pending ? "Finishing…" : "Finish this drill"}
+      {pending ? t("finishingPending") : t("finishThisDrill")}
     </button>
   );
 }

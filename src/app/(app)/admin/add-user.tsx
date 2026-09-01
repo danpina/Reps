@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import { createUser, inviteUser, type AdminState } from "./actions";
 
@@ -14,14 +15,15 @@ import { createUser, inviteUser, type AdminState } from "./actions";
  * hand someone credentials you also know.
  */
 export function AddUser() {
+  const t = useTranslations("adminPage.addUser");
   return (
     <section className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-5">
-      <h2 className="text-sm font-semibold text-ink">Add someone</h2>
+      <h2 className="text-sm font-semibold text-ink">{t("addSomeone")}</h2>
       <InviteForm />
 
       <details className="mt-5 border-t border-rule pt-4">
         <summary className="cursor-pointer text-xs text-ink-faint underline-offset-4 hover:underline">
-          Or create an account directly, if email is not working
+          {t("orCreateDirectly")}
         </summary>
         <CreateForm />
       </details>
@@ -30,6 +32,7 @@ export function AddUser() {
 }
 
 function InviteForm() {
+  const t = useTranslations("adminPage.addUser");
   const [state, formAction] = useActionState<AdminState, FormData>(
     inviteUser,
     {},
@@ -38,7 +41,7 @@ function InviteForm() {
   return (
     <form key={state.done ?? "inviting"} action={formAction} className="mt-3">
       <label htmlFor="invite_email" className="sr-only">
-        Email to invite
+        {t("emailToInvite")}
       </label>
       <div className="flex flex-wrap gap-2">
         <input
@@ -49,10 +52,10 @@ function InviteForm() {
           placeholder="them@example.com"
           className="min-w-0 flex-1 rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         />
-        <Submit idle="Send invite" busy="Sending…" />
+        <Submit idle={t("sendInvite")} busy={t("sendingPending")} />
       </div>
       <p className="mt-2 text-xs text-ink-faint">
-        They set their own password from the email.
+        {t("theySetOwnPassword")}
       </p>
       <Feedback state={state} />
     </form>
@@ -60,6 +63,7 @@ function InviteForm() {
 }
 
 function CreateForm() {
+  const t = useTranslations("adminPage.addUser");
   const [state, formAction] = useActionState<AdminState, FormData>(
     createUser,
     {},
@@ -69,7 +73,7 @@ function CreateForm() {
     <form key={state.done ?? "creating"} action={formAction} className="mt-3">
       <div className="flex flex-col gap-2">
         <label htmlFor="create_email" className="sr-only">
-          Email
+          {t("email")}
         </label>
         <input
           id="create_email"
@@ -80,7 +84,7 @@ function CreateForm() {
           className="w-full rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         />
         <label htmlFor="create_password" className="sr-only">
-          Initial password
+          {t("initialPassword")}
         </label>
         <input
           id="create_password"
@@ -88,16 +92,16 @@ function CreateForm() {
           type="password"
           required
           autoComplete="new-password"
-          placeholder="Initial password, at least 8 characters"
+          placeholder={t("initialPasswordPlaceholder")}
           className="w-full rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         />
       </div>
       <p className="mt-2 text-xs text-ink-faint">
-        You will know this password. Ask them to change it once they are in.
+        {t("youWillKnowThisPassword")}
       </p>
       <Feedback state={state} />
       <div className="mt-3">
-        <Submit idle="Create account" busy="Creating…" />
+        <Submit idle={t("createAccount")} busy={t("creatingPending")} />
       </div>
     </form>
   );

@@ -2,17 +2,15 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import type { Theme } from "@/lib/auth/dal";
 import { updateTheme, type SettingsState } from "./actions";
 
-const CHOICES: { value: Theme; label: string; hint: string }[] = [
-  { value: "system", label: "Match my device", hint: "Follows your system setting" },
-  { value: "light", label: "Light", hint: "Always the light palette" },
-  { value: "dark", label: "Dark", hint: "Always the dark palette" },
-];
+const CHOICES: Theme[] = ["system", "light", "dark"];
 
 export function ThemeForm({ current }: { current: Theme }) {
+  const t = useTranslations("settings.appearance");
   const [state, formAction] = useActionState<SettingsState, FormData>(
     updateTheme,
     {},
@@ -21,24 +19,26 @@ export function ThemeForm({ current }: { current: Theme }) {
   return (
     <form action={formAction}>
       <fieldset>
-        <legend className="sr-only">Theme</legend>
+        <legend className="sr-only">{t("legend")}</legend>
         <div className="flex flex-col gap-2">
           {CHOICES.map((choice) => (
             <label
-              key={choice.value}
+              key={choice}
               className="flex cursor-pointer items-baseline gap-3 rounded border border-rule px-4 py-3 transition-colors hover:bg-[var(--paper-raised)] has-[:checked]:border-[var(--accent)] has-[:checked]:bg-[var(--accent-soft)]"
             >
               <input
                 type="radio"
                 name="theme"
-                value={choice.value}
-                defaultChecked={choice.value === current}
+                value={choice}
+                defaultChecked={choice === current}
                 className="accent-[var(--accent)]"
               />
               <span>
-                <span className="block text-sm text-ink">{choice.label}</span>
+                <span className="block text-sm text-ink">
+                  {t(`${choice}.label`)}
+                </span>
                 <span className="block text-xs text-ink-faint">
-                  {choice.hint}
+                  {t(`${choice}.hint`)}
                 </span>
               </span>
             </label>
@@ -47,12 +47,13 @@ export function ThemeForm({ current }: { current: Theme }) {
       </fieldset>
 
       <Feedback state={state} />
-      <Save label="Save theme" />
+      <Save label={t("save")} />
     </form>
   );
 }
 
 function Save({ label }: { label: string }) {
+  const t = useTranslations("common");
   const { pending } = useFormStatus();
   return (
     <button
@@ -60,7 +61,7 @@ function Save({ label }: { label: string }) {
       disabled={pending}
       className="mt-4 rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
-      {pending ? "Saving…" : label}
+      {pending ? t("saving") : label}
     </button>
   );
 }

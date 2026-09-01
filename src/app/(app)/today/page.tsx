@@ -1,11 +1,12 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { signOut } from "@/app/(auth)/actions";
 import { FactBanner } from "@/components/fact-banner";
 import { Heatmap } from "@/components/heatmap";
 import { Button } from "@/components/ui";
-import { getProfile, requireUser } from "@/lib/auth/dal";
-import { randomFact } from "@/lib/facts";
+import { getLocale, getProfile, requireUser } from "@/lib/auth/dal";
+import { factForLocale } from "@/lib/facts";
 import {
   getBadges,
   getHeatmap,
@@ -17,10 +18,10 @@ import {
 } from "@/lib/progress/queries";
 import {
   REPS_TO_THEORY_RATIO,
-  XP_TABLE,
-  describeNextLevel,
+  describeNextLevelLocalized,
+  xpTable,
 } from "@/lib/progress/explain";
-import { rankProgress, repsToNextRank } from "@/lib/progress/ranks";
+import { rankName, rankNote, rankProgress, repsToNextRank } from "@/lib/progress/ranks";
 import { XP_AWARD } from "@/lib/progress/rules";
 import { rehearsalCount } from "@/components/rehearsal-list";
 import { countRehearsals } from "@/lib/roleplay/queries";
@@ -39,7 +40,10 @@ export default async function TodayPage() {
       countRehearsals(),
     ]);
 
-  const fact = randomFact();
+  const t = await getTranslations("today");
+  const tRehearsal = await getTranslations("rehearsalList");
+  const locale = await getLocale();
+  const fact = factForLocale(locale);
   const name = profile?.display_name?.trim();
   // Only skills with something in them, then grouped, so a topic heading only
   // appears once there is something under it.
@@ -57,11 +61,11 @@ export default async function TodayPage() {
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="flex items-baseline justify-between gap-4 border-b border-rule pb-5">
         <h1 className="text-xl font-semibold tracking-tight text-ink">
-          {name ? `Good to see you, ${name}` : "Good to see you"}
+          {name ? t("greetingWithName", { name }) : t("greeting")}
         </h1>
         <form action={signOut}>
           <Button variant="quiet" type="submit" className="px-3 py-1.5 text-xs">
-            Sign out
+            {t("signOut")}
           </Button>
         </form>
       </header>
@@ -72,12 +76,10 @@ export default async function TodayPage() {
 
       <section className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6">
         <h2 className="text-sm font-semibold text-ink">
-          {totals.repsLogged === 0 ? "Start a track" : "Had a conversation today?"}
+          {totals.repsLogged === 0 ? t("startATrack") : t("hadAConversation")}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-          {totals.repsLogged === 0
-            ? "Pick a skill, read the card, then go and have the conversation."
-            : "Log it while it is fresh. Thirty seconds is plenty, and a bad rep counts the same as a good one."}
+          {totals.repsLogged === 0 ? t("startATrackBody") : t("logItBody")}
         </p>
 
         <div className="mt-4 flex flex-wrap gap-2">
@@ -85,13 +87,13 @@ export default async function TodayPage() {
             href="/log"
             className="rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
           >
-            Log a rep
+            {t("logARep")}
           </Link>
           <Link
             href={totals.repsLogged === 0 ? "/topics" : "/field-log"}
             className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper)]"
           >
-            {totals.repsLogged === 0 ? "Browse topics" : "See your reps"}
+            {totals.repsLogged === 0 ? t("browseTopics") : t("seeYourReps")}
           </Link>
         </div>
 
@@ -103,7 +105,7 @@ export default async function TodayPage() {
             href="/rehearse"
             className="mt-3 inline-block text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline"
           >
-            {rehearsalCount(rehearsals)} →
+            {rehearsalCount(tRehearsal, rehearsals)} →
           </Link>
         ) : null}
 
@@ -111,13 +113,13 @@ export default async function TodayPage() {
             something specific rather than averaging nine skills into one
             number. */}
         <dl className="mt-6 grid grid-cols-2 gap-4 border-t border-rule pt-5">
-          <Stat label="Reps logged" value={totals.repsLogged} />
+          <Stat label={t("repsLogged")} value={totals.repsLogged} />
           <Stat
-            label="Current streak"
+            label={t("currentStreak")}
             value={totals.currentStreak}
             note={
               totals.longestStreak > totals.currentStreak
-                ? `best ${totals.longestStreak}`
+                ? t("bestStreak", { count: totals.longestStreak })
                 : undefined
             }
           />
@@ -136,10 +138,10 @@ export default async function TodayPage() {
               id="rank"
               className="text-base font-medium tracking-tight text-ink"
             >
-              {rank.rank.name}
+              {rankName(t, rank.rank)}
             </h3>
             <span className="tabular shrink-0 text-xs text-ink-faint">
-              {rank.xp} XP · rank {rank.position} of {rank.total}
+              {t("rankXp", { xp: rank.xp, position: rank.position, total: rank.total })}
             </span>
           </div>
 
@@ -150,7 +152,9 @@ export default async function TodayPage() {
             aria-valuemin={0}
             aria-valuemax={100}
             aria-label={
-              rank.next ? `Progress to ${rank.next.name}` : "Every rank earned"
+              rank.next
+                ? t("progressToRank", { name: rankName(t, rank.next) })
+                : t("everyRankEarnedAria")
             }
           >
             <div
@@ -164,27 +168,26 @@ export default async function TodayPage() {
               {/* Said in conversations, not points. Nobody has a feel for 450
                   XP, and reps are the only currency the app wants spent. */}
               <span className="text-ink">
-                {repsToNextRank(rank.toNext, XP_AWARD.mission)} more{" "}
-                {repsToNextRank(rank.toNext, XP_AWARD.mission) === 1
-                  ? "conversation"
-                  : "conversations"}
+                {t("moreConversations", {
+                  count: repsToNextRank(rank.toNext, XP_AWARD.mission),
+                })}
               </span>{" "}
-              to {rank.next.name} — {rank.next.note}.
+              {t("toRank", { name: rankName(t, rank.next), note: rankNote(t, rank.next) })}
             </p>
           ) : (
             <p className="mt-2.5 text-[13px] leading-relaxed text-ink-muted">
-              Every rank earned — {rank.rank.note}.
+              {t("everyRankEarned", { note: rankNote(t, rank.rank) })}
             </p>
           )}
         </section>
 
         <details className="mt-5 border-t border-rule pt-4">
           <summary className="cursor-pointer text-xs text-ink-faint underline-offset-4 hover:underline">
-            How progress works
+            {t("howProgressWorks")}
           </summary>
 
           <dl className="mt-3 flex flex-col gap-2.5">
-            {XP_TABLE.map((row) => (
+            {xpTable(t).map((row) => (
               <div key={row.label} className="flex items-baseline gap-3">
                 <dt className="flex-1 text-[13px] leading-snug text-ink">
                   {row.label}
@@ -198,9 +201,7 @@ export default async function TodayPage() {
           </dl>
 
           <p className="mt-3 border-t border-rule pt-3 text-[12px] leading-relaxed text-ink-muted">
-            One real conversation is worth {REPS_TO_THEORY_RATIO} theory cards.
-            That ratio is deliberate: you cannot get good at this from the sofa,
-            so the app will not let you level up from there either.
+            {t("theoryRatio", { ratio: REPS_TO_THEORY_RATIO })}
           </p>
         </details>
       </section>
@@ -208,7 +209,7 @@ export default async function TodayPage() {
       {resume ? (
         <section className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-5">
           <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
-            Pick up where you left off
+            {t("pickUpWhereYouLeftOff")}
           </h2>
           {/* Topic, then skill, then lesson. With one topic the skill name was
               enough to place you; with seven, "Openers" could be three
@@ -217,21 +218,21 @@ export default async function TodayPage() {
             {resume.topicName} · {resume.skillName}
           </p>
           <p className="mt-1 text-base font-medium text-ink">
-            Lesson {resume.lessonSortOrder} · {resume.lessonTitle}
+            {t("lessonNumber", { number: resume.lessonSortOrder, title: resume.lessonTitle })}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <Link
               href={`/skills/${resume.skillSlug}/${resume.lessonSortOrder}`}
               className="rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
             >
-              Back to this lesson
+              {t("backToThisLesson")}
             </Link>
             {resume.nextSortOrder ? (
               <Link
                 href={`/skills/${resume.skillSlug}/${resume.nextSortOrder}`}
                 className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper)]"
               >
-                Next lesson
+                {t("nextLesson")}
               </Link>
             ) : null}
           </div>
@@ -241,18 +242,19 @@ export default async function TodayPage() {
       {hasReview ? (
         <section className="mt-8 rounded border border-[var(--flag)] bg-[var(--flag-soft)] p-5">
           <h2 className="tabular text-xs uppercase tracking-[0.18em] text-[var(--flag)]">
-            This week
+            {t("thisWeek")}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-ink">
-            {review.reps} {review.reps === 1 ? "rep" : "reps"} across{" "}
-            {review.skillsTouched.length}{" "}
-            {review.skillsTouched.length === 1 ? "skill" : "skills"}.
+            {t("repsAcrossSkills", {
+              reps: review.reps,
+              skills: review.skillsTouched.length,
+            })}
           </p>
           <Link
             href="/review"
             className="mt-3 inline-block text-sm font-medium text-ink underline underline-offset-4"
           >
-            Open the weekly review
+            {t("openWeeklyReview")}
           </Link>
         </section>
       ) : null}
@@ -266,7 +268,7 @@ export default async function TodayPage() {
       {started.length > 0 ? (
         <section className="mt-9">
           <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
-            Where you are
+            {t("whereYouAre")}
           </h2>
           {/* One fold per topic. With a single topic on the go this was a
               short list; someone working through four is looking at twenty
@@ -300,9 +302,10 @@ export default async function TodayPage() {
                     {topic.name}
                   </span>
                   <span className="tabular ml-auto text-xs text-ink-faint">
-                    {topic.reps} {topic.reps === 1 ? "rep" : "reps"} ·{" "}
-                    {topic.skills.length}{" "}
-                    {topic.skills.length === 1 ? "skill" : "skills"}
+                    {t("repsAcrossSkills", {
+                      reps: topic.reps,
+                      skills: topic.skills.length,
+                    })}
                   </span>
                 </summary>
 
@@ -317,15 +320,15 @@ export default async function TodayPage() {
                           {skill.name}
                         </Link>
                         <span className="tabular text-xs text-ink-faint">
-                          Level {skill.progress.level}
+                          {t("levelNumber", { level: skill.progress.level })}
                           {skill.progress.isMax
                             ? ""
-                            : ` · ${describeNextLevel(skill.progress)}`}
+                            : ` · ${describeNextLevelLocalized(t, skill.progress)}`}
                         </span>
                       </div>
                       <Bar
                         fraction={skill.progress.fraction}
-                        label={`${skill.name} progress to the next level`}
+                        label={t("progressToNextLevel", { name: skill.name })}
                       />
                     </li>
                   ))}
@@ -337,7 +340,7 @@ export default async function TodayPage() {
                   href={`/topics/${topic.slug}`}
                   className="mt-3 inline-block text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline"
                 >
-                  All of {topic.name} →
+                  {t("allOfTopic", { name: topic.name })} →
                 </Link>
               </details>
             ))}
@@ -348,12 +351,12 @@ export default async function TodayPage() {
       {badges.earned.length > 0 || totals.repsLogged > 0 ? (
         <section className="mt-9">
           <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
-            Badges
+            {t("badges")}
           </h2>
 
           {badges.earned.length === 0 ? (
             <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-              None yet. The first one arrives with your first logged rep.
+              {t("noBadgesYet")}
             </p>
           ) : (
             <ul className="mt-4 flex flex-col gap-3">
@@ -374,7 +377,7 @@ export default async function TodayPage() {
           {badges.locked.length > 0 ? (
             <details className="mt-4">
               <summary className="cursor-pointer text-xs text-ink-faint underline-offset-4 hover:underline">
-                {badges.locked.length} still to earn
+                {t("stillToEarn", { count: badges.locked.length })}
               </summary>
               <ul className="mt-3 flex flex-col gap-2">
                 {badges.locked.map((badge) => (
@@ -393,8 +396,8 @@ export default async function TodayPage() {
       {/* Wraps rather than truncating: a long email on a narrow phone would
           otherwise push the credit off the edge of the screen. */}
       <footer className="mt-10 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 text-xs text-ink-faint">
-        <p>Signed in as {user.email ?? "your account"}.</p>
-        <p>Designed by DR-P</p>
+        <p>{t("signedInAs", { email: user.email ?? t("yourAccount") })}</p>
+        <p>{t("designedBy")}</p>
       </footer>
     </main>
   );

@@ -1,12 +1,14 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 
 import { signUp, type AuthState } from "../actions";
 import { Button, Field, Notice } from "@/components/ui";
 import { DEFAULT_LOCALE, LOCALES, LOCALE_NAMES } from "@/lib/curriculum/locale";
 
 export function SignUpForm() {
+  const t = useTranslations("auth.signUp");
   const [state, action, pending] = useActionState<AuthState, FormData>(
     signUp,
     undefined,
@@ -19,15 +21,15 @@ export function SignUpForm() {
       <Field
         id="display_name"
         name="display_name"
-        label="What should we call you?"
+        label={t("displayNameLabel")}
         autoComplete="nickname"
-        hint="Only you ever see this."
+        hint={t("displayNameHint")}
       />
       <Field
         id="email"
         name="email"
         type="email"
-        label="Email"
+        label={t("emailLabel")}
         autoComplete="email"
         required
       />
@@ -35,17 +37,17 @@ export function SignUpForm() {
         id="password"
         name="password"
         type="password"
-        label="Password"
+        label={t("passwordLabel")}
         autoComplete="new-password"
         minLength={8}
         required
-        hint="At least 8 characters."
+        hint={t("passwordHint")}
       />
 
       {/* Each language named in itself, so somebody looking for their own can
           find it without reading English first. */}
       <label className="flex flex-col gap-1.5">
-        <span className="text-sm text-ink">Language</span>
+        <span className="text-sm text-ink">{t("languageLabel")}</span>
         <select
           name="locale"
           defaultValue={DEFAULT_LOCALE}
@@ -57,14 +59,11 @@ export function SignUpForm() {
             </option>
           ))}
         </select>
-        <span className="text-xs text-ink-faint">
-          You can change this later. Anything not yet translated stays in
-          English.
-        </span>
+        <span className="text-xs text-ink-faint">{t("languageHint")}</span>
       </label>
 
       <Button type="submit" disabled={pending}>
-        {pending ? "Creating…" : "Create account"}
+        {pending ? t("submitPending") : t("submit")}
       </Button>
     </form>
   );

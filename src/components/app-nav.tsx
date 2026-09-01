@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 /**
  * Persistent navigation for signed-in screens.
@@ -13,7 +14,8 @@ import { usePathname } from "next/navigation";
 
 type Item = {
   href: string;
-  label: string;
+  /** A key under the "nav" message namespace, resolved at render time. */
+  labelKey: string;
   /** Only ever drawn in the bottom bar, so a desktop-only item has none. */
   icon?: React.ReactNode;
   /**
@@ -40,7 +42,7 @@ const stroke = {
 const ITEMS: Item[] = [
   {
     href: "/today",
-    label: "Today",
+    labelKey: "today",
     match: (p) => p === "/today",
     icon: (
       <svg viewBox="0 0 20 20" aria-hidden className="h-5 w-5">
@@ -51,7 +53,7 @@ const ITEMS: Item[] = [
   },
   {
     href: "/topics",
-    label: "Learn",
+    labelKey: "learn",
     // A skill is reached through its topic, and /pro is reached from the locks
     // inside one, so all three light the same tab.
     match: (p) =>
@@ -64,7 +66,7 @@ const ITEMS: Item[] = [
   },
   {
     href: "/log",
-    label: "Log",
+    labelKey: "log",
     match: (p) => p === "/log",
     icon: (
       <svg viewBox="0 0 20 20" aria-hidden className="h-5 w-5">
@@ -75,7 +77,7 @@ const ITEMS: Item[] = [
   },
   {
     href: "/field-log",
-    label: "Field log",
+    labelKey: "fieldLog",
     match: (p) => p.startsWith("/field-log"),
     icon: (
       <svg viewBox="0 0 20 20" aria-hidden className="h-5 w-5">
@@ -85,7 +87,7 @@ const ITEMS: Item[] = [
   },
   {
     href: "/rehearse",
-    label: "Rehearsals",
+    labelKey: "rehearsals",
     wideOnly: true,
     // A scene is reached from the lesson it belongs to, so /rehearse/:id lights
     // this rather than Learn.
@@ -93,7 +95,7 @@ const ITEMS: Item[] = [
   },
   {
     href: "/settings",
-    label: "Settings",
+    labelKey: "settings",
     // Admin lives behind settings rather than in the nav: it is not a place
     // most accounts can go, and a tab that only some people have is a tab that
     // has to explain itself.
@@ -112,6 +114,7 @@ const ITEMS: Item[] = [
 
 export function AppNav() {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   // Pulled out by name rather than by index, so reordering ITEMS cannot
   // silently promote something else into the corner.
@@ -125,7 +128,7 @@ export function AppNav() {
         className="sticky top-0 z-20 hidden border-b border-rule bg-[var(--paper)]/90 backdrop-blur sm:block"
       >
         <nav
-          aria-label="Main"
+          aria-label={t("mainNavAriaLabel")}
           className="mx-auto flex w-full max-w-2xl items-center gap-1 px-5 py-3"
         >
           <Link
@@ -151,7 +154,7 @@ export function AppNav() {
                     : "text-ink-muted hover:bg-[var(--paper-raised)] hover:text-ink",
                 ].join(" ")}
               >
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             );
           })}
@@ -161,7 +164,7 @@ export function AppNav() {
             aria-current={pathname === "/log" ? "page" : undefined}
             className="ml-auto rounded bg-[var(--accent)] px-3.5 py-1.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
           >
-            Log a rep
+            {t("logARep")}
           </Link>
 
           {/* Off to the side rather than in the run of tabs, because it is
@@ -180,14 +183,14 @@ export function AppNav() {
             ].join(" ")}
           >
             {settings.icon}
-            <span>Settings</span>
+            <span>{t("settings")}</span>
           </Link>
         </nav>
       </header>
 
       {/* Phones: tabs under the thumb. */}
       <nav
-        aria-label="Main"
+        aria-label={t("mainNavAriaLabel")}
         data-print="hide"
         className="fixed inset-x-0 bottom-0 z-20 border-t border-rule bg-[var(--paper)]/95 backdrop-blur sm:hidden"
         style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
@@ -206,7 +209,7 @@ export function AppNav() {
                   ].join(" ")}
                 >
                   {item.icon}
-                  <span>{item.label}</span>
+                  <span>{t(item.labelKey)}</span>
                 </Link>
               </li>
             );

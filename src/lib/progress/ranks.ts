@@ -15,6 +15,8 @@
  * would be lying to people who still get nervous, which is everyone.
  */
 
+import type { Translate } from "@/lib/i18n";
+
 export type Rank = {
   /** Total XP at which this rank begins. */
   at: number;
@@ -156,4 +158,20 @@ export function rankProgress(xp: number): RankProgress {
 export function repsToNextRank(toNext: number, xpPerRep: number): number {
   if (toNext <= 0) return 0;
   return Math.ceil(toNext / xpPerRep);
+}
+
+/**
+ * The reader-facing name and note for a rank, translated.
+ *
+ * RANKS itself stays in English and untouched — tests pin its exact wording
+ * and punctuation, and rankProgress hands back a reference into that array
+ * rather than a copy. These look the rank back up by position in RANKS and
+ * read the translated version from the messages catalog instead.
+ */
+export function rankName(t: Translate, rank: Rank): string {
+  return t(`ranks.${RANKS.indexOf(rank)}.name`);
+}
+
+export function rankNote(t: Translate, rank: Rank): string {
+  return t(`ranks.${RANKS.indexOf(rank)}.note`);
 }

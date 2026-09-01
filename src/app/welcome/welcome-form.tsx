@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import { AboutYouFields } from "@/components/about-you-fields";
 import { completeOnboarding, type WelcomeState } from "./actions";
@@ -19,6 +20,7 @@ export function WelcomeForm({
   suggestedName?: string;
   topics: TopicChoice[];
 }) {
+  const t = useTranslations("welcome");
   const [state, formAction] = useActionState<WelcomeState, FormData>(
     completeOnboarding,
     {},
@@ -35,7 +37,7 @@ export function WelcomeForm({
 
       <div className="flex flex-col gap-2">
         <label htmlFor="display_name" className="text-sm font-medium text-ink">
-          What should we call you?
+          {t("whatShouldWeCallYou")}
         </label>
         <input
           id="display_name"
@@ -45,7 +47,7 @@ export function WelcomeForm({
           maxLength={60}
           autoComplete="given-name"
           defaultValue={suggestedName ?? ""}
-          placeholder="Your first name is plenty"
+          placeholder={t("firstNamePlenty")}
           className="rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         />
       </div>
@@ -55,20 +57,16 @@ export function WelcomeForm({
       <div className="flex flex-col gap-2">
         <AboutYouFields sex={null} ageGroup={null} datingInterest={null} />
         <p className="text-[13px] leading-relaxed text-ink-muted">
-          All optional. They change which version of a lesson you are shown and
-          how your practice gets reviewed — advice about flirting, or about
-          talking to your boss, is different at twenty-two and at fifty-five,
-          and an app that does not know cannot tell.
+          {t("aboutYouHint")}
         </p>
       </div>
 
       <fieldset className="flex flex-col gap-2">
         <legend className="text-sm font-medium text-ink">
-          Where do you most want to get better?
+          {t("whereDoYouWantToImprove")}
         </legend>
         <p className="text-[13px] leading-relaxed text-ink-muted">
-          This only picks where you start. Every topic stays available, and more
-          are being written.
+          {t("thisOnlyPicksWhereYouStart")}
         </p>
 
         <div className="mt-2 flex flex-col gap-2">
@@ -122,6 +120,7 @@ export function WelcomeForm({
 }
 
 function Submit() {
+  const t = useTranslations("welcome");
   const { pending } = useFormStatus();
   return (
     <button
@@ -129,7 +128,7 @@ function Submit() {
       disabled={pending}
       className="rounded bg-[var(--accent)] px-4 py-3 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
-      {pending ? "Setting up…" : "Start"}
+      {pending ? t("settingUpPending") : t("start")}
     </button>
   );
 }

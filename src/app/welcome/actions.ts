@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import { requireUser } from "@/lib/auth/dal";
 import { getTopics } from "@/lib/curriculum/queries";
@@ -20,18 +21,19 @@ export async function completeOnboarding(
 ): Promise<WelcomeState> {
   const user = await requireUser();
   const supabase = await createClient();
+  const t = await getTranslations("welcome.errors");
 
   const displayName = String(formData.get("display_name") ?? "").trim();
   const topicSlug = String(formData.get("topic") ?? "");
   const timezone = String(formData.get("timezone") ?? "").trim();
 
-  if (!displayName) return { error: "What should the app call you?" };
-  if (displayName.length > 60) return { error: "That name is a bit long." };
+  if (!displayName) return { error: t("whatShouldWeCallYou") };
+  if (displayName.length > 60) return { error: t("nameTooLong") };
 
   // Checked against the topics that actually exist rather than a list kept in
   // the code, so adding a topic is one migration and nothing else.
-  const topic = (await getTopics()).find((t) => t.slug === topicSlug);
-  if (!topic) return { error: "Pick where you want to start." };
+  const topic = (await getTopics()).find((topic) => topic.slug === topicSlug);
+  if (!topic) return { error: t("pickWhereToStart") };
 
   const patch: Record<string, string | null> = {
     display_name: displayName,
@@ -55,7 +57,8 @@ export async function completeOnboarding(
     .update(patch)
     .eq("id", user.id);
 
-  if (error) return { error: `That did not save: ${error.message}` };
+  // Never the SDK's own message — see the note in settings/actions.ts.
+  if (error) return { error: t("didNotSave") };
 
   revalidatePath("/today");
 

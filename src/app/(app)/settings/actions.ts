@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { cookies } from "next/headers";
+import { getTranslations } from "next-intl/server";
 
 import { requireUser, type Theme } from "@/lib/auth/dal";
-import { isLocale } from "@/lib/curriculum/locale";
+import { isLocale, LOCALE_COOKIE } from "@/lib/curriculum/locale";
 import {
   parseAgeGroup,
   parseDatingInterest,
@@ -24,9 +26,10 @@ export async function updateTheme(
   formData: FormData,
 ): Promise<SettingsState> {
   const user = await requireUser();
+  const t = await getTranslations("settings.messages");
   const choice = String(formData.get("theme") ?? "");
 
-  if (!isTheme(choice)) return { error: "That is not one of the themes." };
+  if (!isTheme(choice)) return { error: t("notAValidTheme") };
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -34,11 +37,11 @@ export async function updateTheme(
     .update({ theme: choice })
     .eq("id", user.id);
 
-  if (error) return { error: "That did not save. Try again." };
+  if (error) return { error: t("didNotSave") };
 
   // The theme is rendered by the root layout, so the whole tree is stale.
   revalidatePath("/", "layout");
-  return { done: "Theme saved." };
+  return { done: t("themeSaved") };
 }
 
 /**
@@ -54,9 +57,10 @@ export async function updateLanguage(
   formData: FormData,
 ): Promise<SettingsState> {
   const user = await requireUser();
+  const t = await getTranslations("settings.messages");
   const choice = String(formData.get("locale") ?? "");
 
-  if (!isLocale(choice)) return { error: "That is not one of the languages." };
+  if (!isLocale(choice)) return { error: t("notAValidLanguage") };
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -77,11 +81,16 @@ export async function updateLanguage(
       details: error.details,
       hint: error.hint,
     });
-    return { error: "That did not save. Try again." };
+    return { error: t("didNotSave") };
   }
 
+  // Mirrors the profile so the choice survives a later sign-out, when there is
+  // no profile row left to read it from — see getLocale in dal.ts.
+  const jar = await cookies();
+  jar.set(LOCALE_COOKIE, choice, { maxAge: 60 * 60 * 24 * 400, path: "/" });
+
   revalidatePath("/", "layout");
-  return { done: "Language saved." };
+  return { done: t("languageSaved") };
 }
 
 /**
@@ -96,6 +105,7 @@ export async function updateAboutYou(
   formData: FormData,
 ): Promise<SettingsState> {
   const user = await requireUser();
+  const t = await getTranslations("settings.messages");
 
   const supabase = await createClient();
   const { error } = await supabase
@@ -107,10 +117,10 @@ export async function updateAboutYou(
     })
     .eq("id", user.id);
 
-  if (error) return { error: "That did not save. Try again." };
+  if (error) return { error: t("didNotSave") };
 
   revalidatePath("/settings");
-  return { done: "Saved." };
+  return { done: t("saved") };
 }
 
 export async function changePassword(
@@ -118,18 +128,19 @@ export async function changePassword(
   formData: FormData,
 ): Promise<SettingsState> {
   const user = await requireUser();
+  const t = await getTranslations("settings.messages");
 
   const current = String(formData.get("current_password") ?? "");
   const next = String(formData.get("new_password") ?? "");
   const confirm = String(formData.get("confirm_password") ?? "");
 
-  if (!current) return { error: "Enter your current password." };
+  if (!current) return { error: t("enterCurrentPassword") };
   if (next.length < 8) {
-    return { error: "Use a new password of at least 8 characters." };
+    return { error: t("newPasswordTooShort") };
   }
-  if (next !== confirm) return { error: "The two new passwords do not match." };
+  if (next !== confirm) return { error: t("passwordsDoNotMatch") };
   if (next === current) {
-    return { error: "That is the password you already have." };
+    return { error: t("samePassword") };
   }
 
   const supabase = await createClient();
@@ -139,17 +150,18 @@ export async function changePassword(
   // take the account permanently. Proving the current password first is what
   // stops that, and it is the reason this asks for it at all.
   if (!user.email) {
-    return { error: "This account has no email, so it cannot be verified." };
+    return { error: t("noEmailOnAccount") };
   }
 
   const { error: wrongPassword } = await supabase.auth.signInWithPassword({
     email: user.email,
     password: current,
   });
-  if (wrongPassword) return { error: "That is not your current password." };
+  if (wrongPassword) return { error: t("wrongCurrentPassword") };
 
   const { error } = await supabase.auth.updateUser({ password: next });
-  if (error) return { error: error.message };
+  // Never the SDK's own message — see the note in (auth)/actions.ts.
+  if (error) return { error: t("passwordChangeFailed") };
 
-  return { done: "Password changed." };
+  return { done: t("passwordChanged") };
 }

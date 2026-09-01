@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+
 import { BackLink } from "@/components/back-link";
 import { requireAdmin, type Theme } from "@/lib/auth/dal";
 import { getEveryoneProgress } from "@/lib/progress/admin-queries";
@@ -5,7 +7,10 @@ import { adminIsConfigured, createAdminClient } from "@/lib/supabase/admin";
 import { AddUser } from "./add-user";
 import { UserRow } from "./user-row";
 
-export const metadata = { title: "Users — Reps" };
+export async function generateMetadata() {
+  const t = await getTranslations("adminPage");
+  return { title: t("pageTitle") };
+}
 
 export type ManagedUser = {
   id: string;
@@ -28,13 +33,14 @@ export type ManagedUser = {
 
 export default async function AdminPage() {
   const actor = await requireAdmin();
+  const t = await getTranslations("adminPage");
 
   // Asked before the client is built. Without this the page throws during
   // render, and an error page at that moment names no environment variable
   // and offers no way forward — which is the whole failure mode this screen
   // has, because the key is set per environment and production is the one
   // most likely to be missing it.
-  if (!adminIsConfigured()) return <NotConfigured />;
+  if (!adminIsConfigured()) return <NotConfigured t={t} />;
 
   const admin = createAdminClient();
 
@@ -109,14 +115,15 @@ export default async function AdminPage() {
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="border-b border-rule pb-5">
-        <BackLink href="/settings" label="Settings" />
+        <BackLink href="/settings" label={t("settings")} />
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
-          Users
+          {t("users")}
         </h1>
         <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-          {users.length} {users.length === 1 ? "account" : "accounts"},{" "}
-          {users.filter((u) => u.isPro || u.isAdmin).length} with full access.
-          Admin access is granted in SQL, not here.
+          {t("accountsSummary", {
+            accounts: users.length,
+            fullAccess: users.filter((u) => u.isPro || u.isAdmin).length,
+          })}
         </p>
       </header>
 
@@ -143,29 +150,27 @@ export default async function AdminPage() {
  * set it, and "something went wrong" would send them to the logs to find out
  * what this sentence could have told them.
  */
-function NotConfigured() {
+function NotConfigured({ t }: { t: Awaited<ReturnType<typeof getTranslations>> }) {
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="border-b border-rule pb-5">
-        <BackLink href="/settings" label="Settings" />
+        <BackLink href="/settings" label={t("settings")} />
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
-          Users
+          {t("users")}
         </h1>
       </header>
 
       <div className="mt-8 rounded border border-[var(--flag)] bg-[var(--flag-soft)] p-5">
         <h2 className="text-sm font-semibold text-ink">
-          Admin is not configured on this deployment
+          {t("adminNotConfigured")}
         </h2>
         <p className="mt-2 text-sm leading-relaxed text-ink">
-          Managing users needs the Supabase secret key, and this environment
-          does not have one. Set <code>SUPABASE_SECRET_KEY</code> and redeploy —
-          environment variables are read at deploy time, so adding it without
-          redeploying changes nothing.
+          {t.rich("adminNotConfiguredBody", {
+            code: (chunks) => <code>{chunks}</code>,
+          })}
         </p>
         <p className="mt-3 text-[13px] leading-relaxed text-ink-muted">
-          Nothing else in the app depends on it. Your account and everyone
-          else&rsquo;s are unaffected.
+          {t("nothingElseDependsOnIt")}
         </p>
       </div>
     </main>

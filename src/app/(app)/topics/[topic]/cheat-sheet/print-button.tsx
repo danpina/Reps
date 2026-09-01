@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 /**
  * Opens the browser's own print dialog, which is also where Save as PDF lives.
  *
@@ -12,6 +14,7 @@
  * opens a print dialog is a small lie.
  */
 export function PrintButton() {
+  const t = useTranslations("cheatSheet");
   return (
     <button
       type="button"
@@ -19,7 +22,7 @@ export function PrintButton() {
       onClick={() => window.print()}
       className="rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
     >
-      Print, or save as PDF
+      {t("printOrSaveAsPdf")}
     </button>
   );
 }

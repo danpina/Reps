@@ -18,6 +18,16 @@ export type Locale = (typeof LOCALES)[number];
 
 export const DEFAULT_LOCALE: Locale = "en";
 
+/**
+ * The cookie a returning-but-signed-out visitor is read from.
+ *
+ * The profile column is the source of truth once somebody is signed in, but
+ * sign-in, sign-up and check-email all render before a session exists to read
+ * it from — this is what keeps a person who has already chosen Spanish from
+ * landing back on an English sign-in screen after being signed out.
+ */
+export const LOCALE_COOKIE = "locale";
+
 /** The name of a language in that language, which is how pickers should read. */
 export const LOCALE_NAMES: Record<Locale, string> = {
   en: "English",

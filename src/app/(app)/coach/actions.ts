@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import { getProfile, requireUser } from "@/lib/auth/dal";
 import { isPro } from "@/lib/billing/entitlement";
@@ -26,9 +27,10 @@ export async function runReview(
   formData: FormData,
 ): Promise<CoachActionState> {
   const user = await requireUser();
+  const t = await getTranslations("coachPage.errors");
 
   if (!(await isPro())) {
-    return { error: "A read of your log is part of the subscription." };
+    return { error: t("partOfSubscription") };
   }
 
   const state = await getCoachState();
@@ -39,21 +41,22 @@ export async function runReview(
   const seenWatermark = String(formData.get("since") ?? "");
   if (seenWatermark !== (state.latest?.coversThrough ?? "")) {
     return {
-      error: "Your log has been read since this page loaded. Reload to see it.",
+      error: t("logReadSinceLoaded"),
     };
   }
 
   if (state.eligibility.state === "locked") {
     return {
-      error: `Log ${state.eligibility.repsNeeded} more ${
-        state.eligibility.repsNeeded === 1 ? "conversation" : "conversations"
-      } first. There is no pattern in fewer than ten.`,
+      error: t("logMoreFirst", { count: state.eligibility.repsNeeded }),
     };
   }
 
   if (state.eligibility.state === "waiting") {
     return {
-      error: `Only ${state.eligibility.newReps} new since the last read. Have ${state.eligibility.newRepsNeeded} more and there will be something new to say.`,
+      error: t("onlyNewSinceLast", {
+        newReps: state.eligibility.newReps,
+        newRepsNeeded: state.eligibility.newRepsNeeded,
+      }),
     };
   }
 
@@ -62,7 +65,7 @@ export async function runReview(
   const limit = await checkRateLimit(supabase, "rep_review");
   if (!limit.allowed) {
     return {
-      error: `That is enough reads for now. Try again in ${describeWait(limit.retryAfterMinutes)}.`,
+      error: t("enoughReadsForNow", { wait: describeWait(limit.retryAfterMinutes) }),
     };
   }
 
@@ -74,14 +77,14 @@ export async function runReview(
   );
 
   if (reps.length === 0 || !newest) {
-    return { error: "There is nothing new to read." };
+    return { error: t("nothingNewToRead") };
   }
 
   // Counted before the call rather than after it. A call that cannot be
   // written to the ledger is a call the limits will never see.
   const counted = await recordAiRequest(supabase, user.id, "rep_review");
   if (!counted.ok) {
-    return { error: "That could not be started right now. Try again shortly." };
+    return { error: t("couldNotStartNow") };
   }
 
   const result = await readTheLog({
@@ -107,7 +110,7 @@ export async function runReview(
   });
 
   if (error) {
-    return { error: "The read was produced but could not be saved. Try again." };
+    return { error: t("readProducedNotSaved") };
   }
 
   revalidatePath("/coach");

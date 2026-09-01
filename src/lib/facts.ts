@@ -11,7 +11,17 @@
  * how much people underestimate talking to strangers) it is stated
  * qualitatively, because a precise number nobody can check is worse than an
  * honest sentence.
+ *
+ * Translated by hand rather than through next-intl's message catalogs, since
+ * these are prose-quality sentences that read the same as curriculum content,
+ * not app chrome — the Spanish array below follows the same faithful, tú-form
+ * conventions as the lesson translations. `factForLocale` takes the reader's
+ * locale as a plain argument rather than resolving it itself, so this file
+ * stays free of `@/`-aliased runtime imports and the existing tests (which
+ * `node --test` resolves by relative path only) keep working untouched.
  */
+
+import type { Locale } from "@/lib/curriculum/locale";
 
 export type Fact = { text: string; area: FactArea };
 
@@ -76,6 +86,60 @@ export const FACTS: Fact[] = [
   { area: "confidence", text: "Nobody is born good at this. The ones who look natural have simply had more repetitions." },
 ];
 
+/** Same facts, same order, in Spanish. */
+export const FACTS_ES: Fact[] = [
+  // Work
+  { area: "work", text: "La mayoría de los puestos se cubren antes de anunciarse. Los primeros en enterarse son los que hablan con todo el mundo, no los del mejor currículum." },
+  { area: "work", text: "Que se te dé bien hablar se confunde a menudo con que se te dé bien tu trabajo. No es justo, y aun así conviene saberlo." },
+  { area: "work", text: "El compañero que charla dos minutos antes de que empiece una reunión es al que la gente le cuenta los problemas primero." },
+  { area: "work", text: "Los ascensos se deciden en salas donde tú no estás, por gente que te describe en una frase. La charla informal es cómo consiguen esa frase." },
+  { area: "work", text: "Los clientes rara vez se van porque el trabajo fuera malo. Se van porque nadie les habló." },
+  { area: "work", text: "Cinco minutos con alguien de otro equipo valen más que una hora leyendo su documentación." },
+  { area: "work", text: "Las negociaciones van mejor entre personas que han hablado de algo distinto a la negociación." },
+  { area: "work", text: "Las presentaciones más útiles vienen de gente que conoces solo un poco. La charla informal es cómo llegas a conocer a alguien un poco." },
+  { area: "work", text: "A la persona callada que nunca habla en la cocina no la recuerdan como misteriosa. Sencillamente no la recuerdan." },
+
+  // Friendship
+  { area: "friendship", text: "Las amistades adultas casi nunca empiezan con una conversación profunda. Empiezan con una trivial que pasó dos veces." },
+  { area: "friendship", text: "La mayoría de la gente con la que congeniarías está a tu alcance varias veces por semana. La brecha no es la oportunidad, es la frase para empezar." },
+  { area: "friendship", text: "La soledad no suele ser falta de gente. Es falta de conversaciones sin importancia." },
+  { area: "friendship", text: "Las amistades se forman por contacto repetido y de bajo riesgo, no por intensidad." },
+  { area: "friendship", text: "La persona junto a la que te has sentado un año sin hablarle podría haber sido tu amiga durante un año." },
+  { area: "friendship", text: "Nadie recuerda lo que dijiste en una primera conversación. Recuerdan si resultó fácil." },
+  { area: "friendship", text: "No necesitas ser interesante. Necesitas estar interesado, y luego decir algo de ti a cambio." },
+  { area: "friendship", text: "Mudarte a un sitio nuevo no es lo que hace que la gente se sienta sola. No hablar con nadie allí, sí." },
+
+  // Dating
+  { area: "dating", text: "La atracción se construye mucho más a menudo con conversación fácil y repetida que con una actuación impresionante." },
+  { area: "dating", text: "A la mayoría de la gente le alivia que sea otro quien empiece la conversación. Les estás haciendo un favor." },
+  { area: "dating", text: "Leer el desinterés con precisión es lo que hace que coquetear sea seguro de practicar, para ellos y para ti." },
+  { area: "dating", text: "Saber terminar una conversación con calidez hace que empezar una dé mucho menos miedo." },
+  { area: "dating", text: "La confianza al ligar es sobre todo el recuerdo acumulado de conversaciones que no salieron mal." },
+  { area: "dating", text: "Quienes parecen tener esto sin esfuerzo no son más valientes que tú. Han tenido más intentos." },
+
+  // Health
+  { area: "health", text: "La conexión social predice cuánto vive la gente casi tan bien como cualquier otra cosa dentro de su control." },
+  { area: "health", text: "Los intercambios breves y amistosos con desconocidos mejoran el ánimo de forma fiable, incluso en quien estaba seguro de que le disgustaría." },
+  { area: "health", text: "La gente subestima sistemáticamente cuánto va a disfrutar hablando con un desconocido, y cuánto lo va a disfrutar el desconocido también." },
+  { area: "health", text: "El aislamiento y el ánimo bajo se alimentan mutuamente. Una conversación de dos minutos interrumpe el ciclo." },
+  { area: "health", text: "Un día con tres conversaciones pequeñas se siente materialmente distinto a uno sin ninguna." },
+
+  // Luck and opportunity
+  { area: "luck", text: "La gente con suerte suele ser, sencillamente, gente que habla con más gente." },
+  { area: "luck", text: "Las oportunidades viajan por conversación mucho antes de viajar por correo electrónico." },
+  { area: "luck", text: "No puedes saber de antemano qué conversación va a importar. Ese es todo el argumento para tener más." },
+  { area: "luck", text: "Casi todo lo bueno que le pasa a la mayoría de la gente llega a través de otra persona." },
+  { area: "luck", text: "La conversación que no empezaste es la única que tiene garantizado no llevar a ningún sitio." },
+
+  // Confidence
+  { area: "confidence", text: "El miedo a la charla informal es sobre todo el miedo a un silencio que no sabes cómo terminar. Eso es una habilidad, no un rasgo de personalidad." },
+  { area: "confidence", text: "La torpeza se desvanece con la práctica. No hay otra ruta fiable para superarla." },
+  { area: "confidence", text: "La mayoría de la gente no está juzgando tu frase de apertura. Les alivia no haber tenido que pensar una ellos." },
+  { area: "confidence", text: "Que se te dé mal esto no es un rasgo fijo. Es uno sin entrenar." },
+  { area: "confidence", text: "Tienes varios cientos de aperturas de bajo riesgo cada semana y no usas casi ninguna." },
+  { area: "confidence", text: "Nadie nace con esto. A quienes les parece natural, sencillamente, han tenido más repeticiones." },
+];
+
 /**
  * Picks a fact.
  *
@@ -85,4 +149,19 @@ export const FACTS: Fact[] = [
  */
 export function randomFact(random: () => number = Math.random): Fact {
   return FACTS[Math.floor(random() * FACTS.length)];
+}
+
+/**
+ * Same as `randomFact`, in the reader's own language.
+ *
+ * Falls back to English for a locale without a translated set (German is not
+ * covered yet) rather than throwing, matching the fallback rule the rest of
+ * the app uses for untranslated content.
+ */
+export function factForLocale(
+  locale: Locale,
+  random: () => number = Math.random,
+): Fact {
+  const pool = locale === "es" ? FACTS_ES : FACTS;
+  return pool[Math.floor(random() * pool.length)];
 }

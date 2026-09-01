@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import { XP_AWARD } from "@/lib/progress/rules";
 import { saveRewrite, type RewriteState } from "./actions";
@@ -13,6 +14,7 @@ export function RewriteForm({
   logId: string;
   existing?: string | null;
 }) {
+  const t = useTranslations("review.rewrite");
   const [state, formAction] = useActionState<RewriteState, FormData>(
     saveRewrite,
     {},
@@ -24,7 +26,7 @@ export function RewriteForm({
         role="status"
         className="mt-4 rounded border border-[var(--accent)] bg-[var(--accent-soft)] px-4 py-3 text-sm leading-relaxed text-ink"
       >
-        Saved. That is the useful part of a rep that went badly.
+        {t("saved")}
       </p>
     );
   }
@@ -33,7 +35,7 @@ export function RewriteForm({
     <form action={formAction} className="mt-4">
       <input type="hidden" name="log_id" value={logId} />
       <label htmlFor="rewrite" className="text-sm font-medium text-ink">
-        What would you say instead?
+        {t("label")}
       </label>
       <textarea
         id="rewrite"
@@ -42,7 +44,7 @@ export function RewriteForm({
         defaultValue={existing ?? ""}
         maxLength={500}
         required
-        placeholder="The actual words, not the lesson. Write the line."
+        placeholder={t("placeholder")}
         className="mt-2 w-full resize-none rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-sm leading-relaxed text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
       />
 
@@ -66,6 +68,7 @@ export function RewriteForm({
 }
 
 function Submit() {
+  const t = useTranslations("review.rewrite");
   const { pending } = useFormStatus();
   return (
     <button
@@ -73,7 +76,7 @@ function Submit() {
       disabled={pending}
       className="rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
-      {pending ? "Saving…" : "Save this"}
+      {pending ? t("saving") : t("save")}
     </button>
   );
 }

@@ -1,18 +1,26 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { BackLink } from "@/components/back-link";
-import { requireUser } from "@/lib/auth/dal";
+import { getLocale, requireUser } from "@/lib/auth/dal";
 import { getWeeklyReview } from "@/lib/progress/queries";
-import { WENT_LABELS } from "@/lib/progress/rules";
+import { wentLabel } from "@/lib/progress/rules";
 import { RewriteForm } from "./rewrite-form";
 
-export const metadata = { title: "Weekly review — Reps" };
+export async function generateMetadata() {
+  const t = await getTranslations("review");
+  return { title: t("pageTitle") };
+}
 
 export default async function ReviewPage() {
   await requireUser();
   const review = await getWeeklyReview();
+  const t = await getTranslations("review");
+  const tNav = await getTranslations("nav");
+  const tWent = await getTranslations("went");
+  const locale = await getLocale();
 
-  const weekLabel = new Date(review.weekStart).toLocaleDateString(undefined, {
+  const weekLabel = new Date(review.weekStart).toLocaleDateString(locale, {
     day: "numeric",
     month: "long",
   });
@@ -20,27 +28,28 @@ export default async function ReviewPage() {
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="border-b border-rule pb-5">
-        <BackLink href="/today" label="Today" />
+        <BackLink href="/today" label={tNav("today")} />
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
-          Weekly review
+          {t("heading")}
         </h1>
         <p className="tabular mt-2 text-xs text-ink-faint">
-          Week beginning {weekLabel}
+          {t("weekBeginning", { date: weekLabel })}
         </p>
       </header>
 
       {review.reps === 0 ? (
         <div className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6">
-          <h2 className="text-sm font-semibold text-ink">Nothing logged yet</h2>
+          <h2 className="text-sm font-semibold text-ink">
+            {t("nothingLoggedYet")}
+          </h2>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            The review fills up as you log reps. One conversation is enough to
-            start it.
+            {t("nothingLoggedYetBody")}
           </p>
           <Link
             href="/log"
             className="mt-4 inline-block rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
           >
-            Log a rep
+            {t("logARep")}
           </Link>
         </div>
       ) : (
@@ -48,13 +57,13 @@ export default async function ReviewPage() {
           <dl className="mt-7 flex gap-8">
             <div>
               <dt className="tabular text-xs uppercase tracking-[0.14em] text-ink-faint">
-                Reps
+                {t("reps")}
               </dt>
               <dd className="tabular mt-1 text-2xl text-ink">{review.reps}</dd>
             </div>
             <div>
               <dt className="tabular text-xs uppercase tracking-[0.14em] text-ink-faint">
-                Skills touched
+                {t("skillsTouched")}
               </dt>
               <dd className="tabular mt-1 text-2xl text-ink">
                 {review.skillsTouched.length}
@@ -71,16 +80,16 @@ export default async function ReviewPage() {
           {review.worstRep ? (
             <section className="mt-9 rounded border border-rule bg-[var(--paper-raised)] p-5">
               <h2 className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
-                Worth a second look
+                {t("worthASecondLook")}
               </h2>
 
               <div className="mt-4 border-l-2 border-rule-strong pl-4">
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                   <span className="text-sm font-medium text-ink">
-                    {review.worstRep.skills?.name ?? "A rep"}
+                    {review.worstRep.skills?.name ?? t("aRep")}
                   </span>
                   <span className="tabular rounded border border-[var(--rule-strong)] px-1.5 py-0.5 text-[11px] text-ink-muted">
-                    {WENT_LABELS[review.worstRep.went]}
+                    {wentLabel(tWent, review.worstRep.went)}
                   </span>
                 </div>
 
@@ -102,11 +111,10 @@ export default async function ReviewPage() {
           ) : (
             <section className="mt-9 rounded border border-rule bg-[var(--paper-raised)] p-5">
               <h2 className="text-sm font-semibold text-ink">
-                Nothing left to rewrite
+                {t("nothingLeftToRewrite")}
               </h2>
               <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-                You have been back through every rep this week. That is the
-                whole review done.
+                {t("nothingLeftToRewriteBody")}
               </p>
             </section>
           )}

@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { BackLink } from "@/components/back-link";
 import { requireUser } from "@/lib/auth/dal";
@@ -8,7 +9,10 @@ import { getCheatSheet, getTopicBySlug } from "@/lib/curriculum/queries";
 
 import { PrintButton } from "./print-button";
 
-export const metadata = { title: "Cheat sheet — Reps" };
+export async function generateMetadata() {
+  const t = await getTranslations("cheatSheet");
+  return { title: t("pageTitle") };
+}
 
 export default async function CheatSheetPage({
   params,
@@ -23,6 +27,7 @@ export default async function CheatSheetPage({
     getCheatSheet(slug),
     isPro(),
   ]);
+  const t = await getTranslations("cheatSheet");
 
   if (!topic) notFound();
 
@@ -42,7 +47,7 @@ export default async function CheatSheetPage({
 
       <header className="mt-3 border-b border-rule pb-5" data-print="keep">
         <p className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint">
-          {topic.name} · cheat sheet
+          {t("topicCheatSheet", { name: topic.name })}
         </p>
         <h1 className="mt-2 text-2xl font-semibold tracking-tight text-ink">
           {topic.promise}
@@ -82,7 +87,7 @@ export default async function CheatSheetPage({
         {/* Kept on the printed page as well. Somebody reading this on a train
             is about to walk into a room, and the ratio is the whole argument. */}
         <p className="text-[13px] leading-relaxed text-ink-muted">
-          None of this counts until you have used it on someone.
+          {t("noneOfThisCountsUntilUsed")}
         </p>
       </footer>
     </main>

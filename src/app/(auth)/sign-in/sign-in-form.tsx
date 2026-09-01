@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { sendMagicLink, signIn, type AuthState } from "../actions";
 import { Button, Field, Notice } from "@/components/ui";
@@ -12,6 +13,7 @@ export function SignInForm({
   next: string;
   linkError: boolean;
 }) {
+  const t = useTranslations("auth.signIn");
   const [email, setEmail] = useState("");
 
   const [passwordState, passwordAction, passwordPending] = useActionState<
@@ -28,9 +30,7 @@ export function SignInForm({
 
   return (
     <div className="flex flex-col gap-5">
-      {linkError ? (
-        <Notice>That link has expired or was already used. Try again.</Notice>
-      ) : null}
+      {linkError ? <Notice>{t("linkExpired")}</Notice> : null}
       {error ? <Notice>{error}</Notice> : null}
 
       <form action={passwordAction} className="flex flex-col gap-4">
@@ -39,7 +39,7 @@ export function SignInForm({
           id="email"
           name="email"
           type="email"
-          label="Email"
+          label={t("emailLabel")}
           autoComplete="email"
           required
           value={email}
@@ -49,28 +49,25 @@ export function SignInForm({
           id="password"
           name="password"
           type="password"
-          label="Password"
+          label={t("passwordLabel")}
           autoComplete="current-password"
           required
         />
         <Button type="submit" disabled={passwordPending}>
-          {passwordPending ? "Signing in…" : "Sign in"}
+          {passwordPending ? t("submitPending") : t("submit")}
         </Button>
       </form>
 
       <form action={linkAction} className="border-t border-rule pt-5">
         <input type="hidden" name="email" value={email} />
-        <p className="mb-3 text-sm text-ink-muted">
-          Or sign in without a password. We&rsquo;ll email a one-time link to the
-          address above.
-        </p>
+        <p className="mb-3 text-sm text-ink-muted">{t("magicLinkHint")}</p>
         <Button
           type="submit"
           variant="quiet"
           className="w-full"
           disabled={linkPending || email.trim() === ""}
         >
-          {linkPending ? "Sending…" : "Email me a link"}
+          {linkPending ? t("magicLinkPending") : t("magicLinkSubmit")}
         </Button>
       </form>
     </div>

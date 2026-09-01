@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { BackLink } from "@/components/back-link";
+import type { Translate } from "@/lib/i18n";
 import { extractTheMove } from "@/lib/curriculum/the-move";
 import { getProfile, requireUser } from "@/lib/auth/dal";
 import { createClient } from "@/lib/supabase/server";
@@ -29,7 +31,10 @@ import { ChoiceDrill, type AnsweredBeat } from "./choice-drill";
 import { EndScene } from "./end-scene";
 import { LineDrill, type Attempt } from "./line-drill";
 
-export const metadata = { title: "Rehearsal — Reps" };
+export async function generateMetadata() {
+  const t = await getTranslations("rehearseScreen");
+  return { title: t("pageTitle") };
+}
 
 type Roleplay = {
   id: string;
@@ -60,6 +65,7 @@ export default async function RehearsePage({
 }) {
   await requireUser();
   const { id } = await params;
+  const t = await getTranslations("rehearseScreen");
 
   const profile = await getProfile();
   const supabase = await createClient();
@@ -109,7 +115,7 @@ export default async function RehearsePage({
           label={lesson.title}
         />
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
-          {TITLES[mode]}
+          {t(`titles.${mode}`)}
         </h1>
 
         {/* A drill is not a conversation, so it does not get a partner card
@@ -121,15 +127,16 @@ export default async function RehearsePage({
               {scenario.setting}
             </p>
             <p className="mt-2 text-sm leading-relaxed text-ink">
-              You are talking to <strong>{scenario.partner.name}</strong>,{" "}
-              {scenario.partner.role}.
+              {t.rich("talkingTo", {
+                name: scenario.partner.name,
+                role: scenario.partner.role,
+                strong: (chunks) => <strong>{chunks}</strong>,
+              })}
             </p>
             {costsMoney(mode) ? (
               <p className="tabular mt-2 text-xs text-ink-faint">
-                Openness {scenario.partner.openness} of 5
-                {scenario.partner.openness <= 2
-                  ? " — they will make you work, and that is the drill"
-                  : ""}
+                {t("opennessOfFive", { openness: scenario.partner.openness })}
+                {scenario.partner.openness <= 2 ? t("opennessHardWork") : ""}
               </p>
             ) : null}
           </div>
@@ -143,7 +150,7 @@ export default async function RehearsePage({
             id="target"
             className="tabular text-xs uppercase tracking-[0.18em] text-[var(--accent)]"
           >
-            What you are practising
+            {t("whatYouArePractising")}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-ink">{theMove}</p>
           {lesson.rehearsal_note ? (
@@ -173,18 +180,17 @@ export default async function RehearsePage({
 
         {costsMoney(mode) && !isUsingRealModel() ? (
           <p className="mt-3 text-[12px] leading-relaxed text-ink-faint">
-            Practising against a scripted partner. It honours the openness level
-            but will not surprise you — the real one arrives with the AI engine.
+            {t("scriptedPartnerNote")}
           </p>
         ) : null}
       </header>
 
       {complete ? (
-        <CompletedRehearsal roleplay={roleplay} mode={mode} />
+        <CompletedRehearsal roleplay={roleplay} mode={mode} t={t} />
       ) : mode === "line" ? (
-        <LineRehearsal roleplay={roleplay} />
+        <LineRehearsal roleplay={roleplay} t={t} />
       ) : mode === "choice" ? (
-        <ChoiceRehearsal roleplay={roleplay} />
+        <ChoiceRehearsal roleplay={roleplay} t={t} />
       ) : (
         <>
           <Chat
@@ -201,13 +207,6 @@ export default async function RehearsePage({
   );
 }
 
-const TITLES: Record<RehearsalMode, string> = {
-  line: "One line",
-  beat: "A short sequence",
-  choice: "Read it",
-  scene: "Rehearsal",
-};
-
 /**
  * Verdicts are recomputed from the stored attempts rather than saved beside
  * them. The checks are pure and the authored rules are the source of truth, so
@@ -215,10 +214,10 @@ const TITLES: Record<RehearsalMode, string> = {
  * rules — which is the answer a learner would expect, and the alternative is a
  * page showing a tick next to something that no longer passes.
  */
-function LineRehearsal({ roleplay }: { roleplay: Roleplay }) {
+function LineRehearsal({ roleplay, t }: { roleplay: Roleplay; t: Translate }) {
   const spec = asLineSpec(roleplay.lessons.rehearsal_spec);
 
-  if (!spec) return <Unavailable lessonId={roleplay.lesson_id} />;
+  if (!spec) return <Unavailable lessonId={roleplay.lesson_id} t={t} />;
 
   const attempts: Attempt[] = roleplay.transcript_json
     .filter((turn) => turn.role === "user")
@@ -240,10 +239,10 @@ function LineRehearsal({ roleplay }: { roleplay: Roleplay }) {
   );
 }
 
-function ChoiceRehearsal({ roleplay }: { roleplay: Roleplay }) {
+function ChoiceRehearsal({ roleplay, t }: { roleplay: Roleplay; t: Translate }) {
   const spec = asChoiceSpec(roleplay.lessons.rehearsal_spec);
 
-  if (!spec) return <Unavailable lessonId={roleplay.lesson_id} />;
+  if (!spec) return <Unavailable lessonId={roleplay.lesson_id} t={t} />;
 
   const picks = roleplay.transcript_json.filter((turn) => turn.role === "user");
 
@@ -275,21 +274,20 @@ function ChoiceRehearsal({ roleplay }: { roleplay: Roleplay }) {
   );
 }
 
-function Unavailable({ lessonId }: { lessonId: string }) {
+function Unavailable({ lessonId, t }: { lessonId: string; t: Translate }) {
   return (
     <div className="mt-8 rounded border border-rule bg-[var(--paper-raised)] p-6">
       <h2 className="text-sm font-semibold text-ink">
-        This drill is not ready
+        {t("drillNotReady")}
       </h2>
       <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-        The lesson has not been set up for this kind of practice yet. Go and
-        have the real conversation instead — it was always worth more.
+        {t("drillNotReadyBody")}
       </p>
       <Link
         href={`/log?lesson=${lessonId}`}
         className="mt-4 inline-flex rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
       >
-        Log a real rep
+        {t("logARealRep")}
       </Link>
     </div>
   );
@@ -298,24 +296,29 @@ function Unavailable({ lessonId }: { lessonId: string }) {
 function CompletedRehearsal({
   roleplay,
   mode,
+  t,
 }: {
   roleplay: Roleplay;
   mode: RehearsalMode;
+  t: Translate;
 }) {
   const result = roleplay.feedback_json;
 
   return (
     <div className="mt-7 flex flex-col gap-9">
       {isDrillResult(result) ? (
-        <DrillOutcome result={result} examples={roleplay.lessons.examples_json ?? []} />
+        <DrillOutcome
+          result={result}
+          examples={roleplay.lessons.examples_json ?? []}
+          t={t}
+        />
       ) : result ? (
-        <SceneReview feedback={result} rubric={roleplay.lessons.rubric_json} />
+        <SceneReview feedback={result} rubric={roleplay.lessons.rubric_json} t={t} />
       ) : (
         <section className="rounded border border-rule bg-[var(--paper-raised)] p-5">
-          <h2 className="text-sm font-semibold text-ink">Scene ended</h2>
+          <h2 className="text-sm font-semibold text-ink">{t("sceneEnded")}</h2>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            The review could not be produced for this one, but the transcript is
-            saved below.
+            {t("sceneEndedBody")}
           </p>
         </section>
       )}
@@ -324,7 +327,7 @@ function CompletedRehearsal({
           saying so at the moment it would be easiest to forget. */}
       <section className="rounded border border-[var(--accent)] bg-[var(--accent-soft)] p-5">
         <h2 className="tabular text-xs uppercase tracking-[0.18em] text-[var(--accent)]">
-          Now the real one
+          {t("nowTheRealOne")}
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-ink">
           {roleplay.lessons.mission_text}
@@ -333,19 +336,19 @@ function CompletedRehearsal({
           href={`/log?lesson=${roleplay.lesson_id}`}
           className="mt-4 inline-flex rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
         >
-          Log a real rep
+          {t("logARealRep")}
         </Link>
       </section>
 
       <details className="border-t border-rule pt-5">
         <summary className="cursor-pointer text-xs text-ink-faint underline-offset-4 hover:underline">
-          {mode === "choice" ? "What you chose" : "Read the transcript"}
+          {mode === "choice" ? t("whatYouChose") : t("readTheTranscript")}
         </summary>
         <ol className="mt-4 flex flex-col gap-3">
           {roleplay.transcript_json.map((turn, i) => (
             <li key={i} className="text-sm leading-relaxed">
               <span className="tabular text-[11px] uppercase tracking-[0.14em] text-ink-faint">
-                {turn.role === "user" ? "You" : "Them"}
+                {turn.role === "user" ? t("you") : t("them")}
               </span>
               <p className="mt-0.5 text-ink">{turn.content}</p>
             </li>
@@ -359,9 +362,11 @@ function CompletedRehearsal({
 function DrillOutcome({
   result,
   examples,
+  t,
 }: {
   result: DrillResult;
   examples: WorkedExample[];
+  t: Translate;
 }) {
   return (
     <>
@@ -381,12 +386,17 @@ function DrillOutcome({
             result.landed ? "text-[var(--accent)]" : "text-ink-faint",
           ].join(" ")}
         >
-          {result.landed ? "Landed it" : "Not quite"}
+          {result.landed ? t("landedIt") : t("notQuite")}
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-ink">
           {result.landed
-            ? `Every requirement met${result.attempts > 1 ? `, on attempt ${result.attempts}` : " first time"}. The shape is the transferable part — take it outside.`
-            : "You settled on one that still missed something. That is a perfectly good place to stop; the drill will still be here."}
+            ? t("everyRequirementMet", {
+                attemptClause:
+                  result.attempts > 1
+                    ? t("onAttempt", { n: result.attempts })
+                    : t("firstTime"),
+              })
+            : t("settledOnOneThatMissed")}
         </p>
 
         {result.missed.length > 0 ? (
@@ -406,7 +416,7 @@ function DrillOutcome({
             id="worked-examples"
             className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
           >
-            Three that work
+            {t("threeThatWork")}
           </h2>
           <ol className="mt-4 flex flex-col gap-5">
             {examples.map((example, i) => (
@@ -432,9 +442,11 @@ function DrillOutcome({
 function SceneReview({
   feedback,
   rubric,
+  t,
 }: {
   feedback: Feedback;
   rubric: Rubric;
+  t: Translate;
 }) {
   return (
     <>
@@ -443,7 +455,7 @@ function SceneReview({
           id="scores"
           className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
         >
-          How it went
+          {t("howItWent")}
         </h2>
         <dl className="mt-4 flex flex-col gap-3">
           {rubric.criteria.map((criterion) => {
@@ -481,7 +493,7 @@ function SceneReview({
           id="worked"
           className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
         >
-          What worked
+          {t("whatWorked")}
         </h2>
         <ul className="mt-3 flex flex-col gap-2">
           {feedback.worked.map((item, i) => (
@@ -504,7 +516,7 @@ function SceneReview({
           id="fix"
           className="tabular text-xs uppercase tracking-[0.18em] text-[var(--flag)]"
         >
-          The one thing to change
+          {t("theOneThingToChange")}
         </h2>
         <p className="mt-3 text-[15px] leading-[1.6] text-ink">{feedback.fix}</p>
       </section>
@@ -518,14 +530,14 @@ function SceneReview({
             id="rewrite"
             className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
           >
-            One line, rewritten
+            {t("oneLineRewritten")}
           </h2>
           <div className="mt-4 border-l-2 border-rule-strong pl-4">
-            <p className="text-[13px] text-ink-muted">You said</p>
+            <p className="text-[13px] text-ink-muted">{t("youSaid")}</p>
             <p className="mt-1 text-[15px] leading-[1.55] text-ink">
               &ldquo;{feedback.rewrite.original}&rdquo;
             </p>
-            <p className="mt-3 text-[13px] text-ink-muted">Try</p>
+            <p className="mt-3 text-[13px] text-ink-muted">{t("try")}</p>
             <p className="mt-1 text-[15px] leading-[1.55] text-ink">
               &ldquo;{feedback.rewrite.better}&rdquo;
             </p>
@@ -539,8 +551,7 @@ function SceneReview({
       ) : (
         <section className="border-l-2 border-rule pl-4">
           <p className="text-[13px] leading-relaxed text-ink-muted">
-            No line-level rewrite for this one. Rewriting a specific sentence
-            well means understanding it, which arrives with the AI partner.
+            {t("noLineLevelRewrite")}
           </p>
         </section>
       )}

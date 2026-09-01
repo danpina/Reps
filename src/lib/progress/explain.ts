@@ -1,6 +1,7 @@
 // Explicit extension so Node's test runner can resolve this directly; the
 // bundler is happy either way.
-import { XP_AWARD, type LevelProgress } from "./rules.ts";
+import { MAX_LEVEL, XP_AWARD, type LevelProgress } from "./rules.ts";
+import type { Translate } from "@/lib/i18n";
 
 /**
  * Making the XP economy legible.
@@ -27,6 +28,21 @@ export function describeNextLevel(progress: LevelProgress): string {
   return reps === 1
     ? `1 more rep to level ${progress.level + 1}`
     : `${reps} more reps to level ${progress.level + 1}`;
+}
+
+/** The reader-facing version of describeNextLevel, translated. */
+export function describeNextLevelLocalized(
+  t: Translate,
+  progress: LevelProgress,
+): string {
+  if (progress.isMax) {
+    return t("progress.maxLevel", { level: MAX_LEVEL });
+  }
+
+  return t("progress.moreRepsToLevel", {
+    reps: repsToNextLevel(progress),
+    level: progress.level + 1,
+  });
 }
 
 export type XpRow = {
@@ -69,3 +85,34 @@ export const XP_TABLE: XpRow[] = [
 export const REPS_TO_THEORY_RATIO = Math.round(
   XP_AWARD.mission / XP_AWARD.theory,
 );
+
+/**
+ * The reader-facing version of XP_TABLE, translated.
+ *
+ * XP_TABLE itself stays in English and untouched, since tests assert its
+ * exact wording and its rows have to line up with XP_AWARD by value.
+ */
+export function xpTable(t: Translate): XpRow[] {
+  return [
+    {
+      label: t("progress.xpTable.mission.label"),
+      xp: XP_AWARD.mission,
+      note: t("progress.xpTable.mission.note"),
+    },
+    {
+      label: t("progress.xpTable.roleplay.label"),
+      xp: XP_AWARD.roleplay,
+      note: t("progress.xpTable.roleplay.note"),
+    },
+    {
+      label: t("progress.xpTable.rewrite.label"),
+      xp: XP_AWARD.rewrite,
+      note: t("progress.xpTable.rewrite.note"),
+    },
+    {
+      label: t("progress.xpTable.theory.label"),
+      xp: XP_AWARD.theory,
+      note: t("progress.xpTable.theory.note"),
+    },
+  ];
+}

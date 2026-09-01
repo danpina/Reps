@@ -1,9 +1,10 @@
 import "server-only";
 
+import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
-import { asLocale, type Locale } from "@/lib/curriculum/locale";
+import { asLocale, LOCALE_COOKIE, type Locale } from "@/lib/curriculum/locale";
 import type { DatingInterest } from "@/lib/curriculum/variants";
 import type { AgeGroup, Sex } from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
@@ -77,16 +78,21 @@ export const getProfile = cache(async (): Promise<Profile | null> => {
 });
 
 /**
- * The language to read the curriculum in.
+ * The language to read the app in.
  *
  * Its own function rather than a field read off the profile at every call
- * site, because it is asked for on every curriculum query and there is exactly
- * one right answer for somebody with no profile yet — English, rather than a
- * crash or a blank page. Cached per request like everything else here.
+ * site, because it is asked for on every curriculum query and every render of
+ * the UI shell. The profile is the source of truth once someone is signed in;
+ * before that — sign-in, sign-up, check-email — there is no profile row to
+ * read, so this falls back to the cookie `updateLanguage` and `signUp` write,
+ * and only then to English. Cached per request like everything else here.
  */
 export const getLocale = cache(async (): Promise<Locale> => {
   const profile = await getProfile();
-  return asLocale(profile?.locale);
+  if (profile) return asLocale(profile.locale);
+
+  const jar = await cookies();
+  return asLocale(jar.get(LOCALE_COOKIE)?.value);
 });
 
 /**

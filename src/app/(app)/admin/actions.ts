@@ -1,17 +1,13 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import { SITE_URL } from "@/lib/env";
 import { requireAdmin, type Theme } from "@/lib/auth/dal";
 import { adminIsConfigured, createAdminClient } from "@/lib/supabase/admin";
 
 export type AdminState = { error?: string; done?: string };
-
-// Not exported: a "use server" file may only export async functions, since
-// every export becomes a callable endpoint.
-const NOT_CONFIGURED =
-  "Admin is not configured on this deployment: SUPABASE_SECRET_KEY is missing. Set it and redeploy.";
 
 /**
  * Proves admin, then proves the deployment can actually act.
@@ -25,7 +21,10 @@ async function begin(): Promise<
   | { ok: false; error: string }
 > {
   const actor = await requireAdmin();
-  if (!adminIsConfigured()) return { ok: false, error: NOT_CONFIGURED };
+  if (!adminIsConfigured()) {
+    const t = await getTranslations("adminPage.actions");
+    return { ok: false, error: t("notConfigured") };
+  }
   return { ok: true, admin: createAdminClient(), actorId: actor.id };
 }
 
@@ -47,8 +46,10 @@ async function assertActionable(
   actorId: string,
   targetId: string,
 ): Promise<string | null> {
-  if (!targetId) return "No user was given.";
-  if (targetId === actorId) return "You cannot do that to your own account.";
+  const t = await getTranslations("adminPage.actions");
+
+  if (!targetId) return t("noUserGiven");
+  if (targetId === actorId) return t("cannotActOnSelf");
 
   const { data } = await admin
     .from("admins")
@@ -57,7 +58,7 @@ async function assertActionable(
     .maybeSingle();
 
   if (data) {
-    return "That user is an admin. Remove them from the roster in SQL first.";
+    return t("targetIsAdmin");
   }
   return null;
 }
@@ -68,9 +69,10 @@ export async function inviteUser(
 ): Promise<AdminState> {
   const session = await begin();
   if (!session.ok) return { error: session.error };
+  const t = await getTranslations("adminPage.actions");
 
   const email = String(formData.get("email") ?? "").trim();
-  if (!email) return { error: "Enter an email address." };
+  if (!email) return { error: t("enterEmail") };
 
   const { error } = await session.admin.auth.admin.inviteUserByEmail(email, {
     redirectTo: `${SITE_URL}/auth/callback`,
@@ -79,7 +81,7 @@ export async function inviteUser(
   if (error) return { error: error.message };
 
   revalidatePath("/admin");
-  return { done: `Invited ${email}.` };
+  return { done: t("invited", { email }) };
 }
 
 /**
@@ -94,13 +96,14 @@ export async function createUser(
 ): Promise<AdminState> {
   const session = await begin();
   if (!session.ok) return { error: session.error };
+  const t = await getTranslations("adminPage.actions");
 
   const email = String(formData.get("email") ?? "").trim();
   const password = String(formData.get("password") ?? "");
 
-  if (!email) return { error: "Enter an email address." };
+  if (!email) return { error: t("enterEmail") };
   if (password.length < 8) {
-    return { error: "Use a password of at least 8 characters." };
+    return { error: t("passwordTooShort") };
   }
 
   const { error } = await session.admin.auth.admin.createUser({
@@ -114,7 +117,7 @@ export async function createUser(
   if (error) return { error: error.message };
 
   revalidatePath("/admin");
-  return { done: `Created ${email}. Tell them to change the password.` };
+  return { done: t("createdTellThemToChangePassword", { email }) };
 }
 
 export async function blockUser(
@@ -124,6 +127,7 @@ export async function blockUser(
   const session = await begin();
   if (!session.ok) return { error: session.error };
   const { admin } = session;
+  const t = await getTranslations("adminPage.actions");
 
   const userId = String(formData.get("user_id") ?? "");
   const reason = String(formData.get("reason") ?? "").trim();
@@ -148,10 +152,10 @@ export async function blockUser(
     })
     .eq("id", userId);
 
-  if (error) return { error: "Banned, but the reason did not save." };
+  if (error) return { error: t("bannedReasonDidNotSave") };
 
   revalidatePath("/admin");
-  return { done: "User blocked." };
+  return { done: t("userBlocked") };
 }
 
 export async function unblockUser(
@@ -161,9 +165,10 @@ export async function unblockUser(
   const session = await begin();
   if (!session.ok) return { error: session.error };
   const { admin } = session;
+  const t = await getTranslations("adminPage.actions");
 
   const userId = String(formData.get("user_id") ?? "");
-  if (!userId) return { error: "No user was given." };
+  if (!userId) return { error: t("noUserGiven") };
 
   // Clear the column first here, for the same reason the ban went first when
   // blocking: whichever write lands alone, the account stays blocked.
@@ -171,7 +176,7 @@ export async function unblockUser(
     .from("profiles")
     .update({ blocked_at: null, blocked_reason: null })
     .eq("id", userId);
-  if (error) return { error: "That did not save. Try again." };
+  if (error) return { error: t("didNotSave") };
 
   const { error: banError } = await admin.auth.admin.updateUserById(userId, {
     ban_duration: "none",
@@ -179,7 +184,7 @@ export async function unblockUser(
   if (banError) return { error: banError.message };
 
   revalidatePath("/admin");
-  return { done: "User unblocked." };
+  return { done: t("userUnblocked") };
 }
 
 /**
@@ -193,6 +198,7 @@ export async function deleteUser(
   const session = await begin();
   if (!session.ok) return { error: session.error };
   const { admin } = session;
+  const t = await getTranslations("adminPage.actions");
 
   const userId = String(formData.get("user_id") ?? "");
   const confirmation = String(formData.get("confirm") ?? "").trim();
@@ -203,14 +209,14 @@ export async function deleteUser(
   // Typed, not clicked. This is the one action in the app that cannot be
   // undone, and a button alone is too easy to hit by accident.
   if (confirmation !== "DELETE") {
-    return { error: "Type DELETE to confirm. Nothing was deleted." };
+    return { error: t("typeDeleteToConfirmError") };
   }
 
   const { error } = await admin.auth.admin.deleteUser(userId);
   if (error) return { error: error.message };
 
   revalidatePath("/admin");
-  return { done: "User deleted." };
+  return { done: t("userDeleted") };
 }
 
 /**
@@ -253,14 +259,15 @@ export async function grantPro(
 ): Promise<AdminState> {
   const session = await begin();
   if (!session.ok) return { error: session.error };
+  const t = await getTranslations("adminPage.actions");
 
   const userId = String(formData.get("user_id") ?? "");
   const note = String(formData.get("note") ?? "").trim();
   const duration = String(formData.get("duration") ?? "none");
 
-  if (!userId) return { error: "No user was given." };
+  if (!userId) return { error: t("noUserGiven") };
   if (!(DURATIONS as readonly string[]).includes(duration)) {
-    return { error: "That is not one of the durations." };
+    return { error: t("notAValidDuration") };
   }
 
   const endsAt = periodEndFor(duration as Duration);
@@ -277,13 +284,13 @@ export async function grantPro(
     { onConflict: "user_id" },
   );
 
-  if (error) return { error: `That did not save: ${error.message}` };
+  if (error) return { error: t("didNotSave") };
 
   revalidatePath("/admin");
   return {
     done: endsAt
-      ? `Granted until ${new Date(endsAt).toLocaleDateString()}.`
-      : "Granted, with no end date.",
+      ? t("grantedUntil", { date: new Date(endsAt).toLocaleDateString("en-GB") })
+      : t("grantedNoEndDate"),
   };
 }
 
@@ -300,19 +307,20 @@ export async function revokePro(
 ): Promise<AdminState> {
   const session = await begin();
   if (!session.ok) return { error: session.error };
+  const t = await getTranslations("adminPage.actions");
 
   const userId = String(formData.get("user_id") ?? "");
-  if (!userId) return { error: "No user was given." };
+  if (!userId) return { error: t("noUserGiven") };
 
   const { error } = await session.admin
     .from("subscriptions")
     .update({ status: "canceled" })
     .eq("user_id", userId);
 
-  if (error) return { error: `That did not save: ${error.message}` };
+  if (error) return { error: t("didNotSave") };
 
   revalidatePath("/admin");
-  return { done: "Subscription revoked." };
+  return { done: t("subscriptionRevoked") };
 }
 
 /** Lets an admin fix someone's settings for them. */
@@ -322,17 +330,18 @@ export async function updateUserSettings(
 ): Promise<AdminState> {
   const session = await begin();
   if (!session.ok) return { error: session.error };
+  const t = await getTranslations("adminPage.actions");
 
   const userId = String(formData.get("user_id") ?? "");
   const displayName = String(formData.get("display_name") ?? "").trim();
   const theme = String(formData.get("theme") ?? "");
 
-  if (!userId) return { error: "No user was given." };
+  if (!userId) return { error: t("noUserGiven") };
   if (!(THEMES as string[]).includes(theme)) {
-    return { error: "That is not one of the themes." };
+    return { error: t("notAValidTheme") };
   }
   if (displayName.length > 60) {
-    return { error: "That display name is too long." };
+    return { error: t("displayNameTooLong") };
   }
 
   const { error } = await session.admin
@@ -340,8 +349,8 @@ export async function updateUserSettings(
     .update({ display_name: displayName || null, theme })
     .eq("id", userId);
 
-  if (error) return { error: "That did not save. Try again." };
+  if (error) return { error: t("didNotSave") };
 
   revalidatePath("/admin");
-  return { done: "Settings updated." };
+  return { done: t("settingsUpdated") };
 }

@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { signOut } from "@/app/(auth)/actions";
 import { getProfile, getSessionUser } from "@/lib/auth/dal";
@@ -19,14 +20,15 @@ export default async function BlockedPage() {
   // Nothing to see here once the block is lifted.
   if (!profile?.blocked_at) redirect("/today");
 
+  const t = await getTranslations("blockedPage");
+
   return (
     <main className="mx-auto flex w-full max-w-md flex-col justify-center px-5 py-16">
       <h1 className="text-xl font-semibold tracking-tight text-ink">
-        This account is blocked
+        {t("heading")}
       </h1>
       <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-        You cannot practise or log reps while the block is in place. Your
-        history has not been deleted.
+        {t("body")}
       </p>
 
       {/* Shown when there is one. An unexplained block is worse than a blunt
@@ -42,7 +44,7 @@ export default async function BlockedPage() {
           type="submit"
           className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper-raised)]"
         >
-          Sign out
+          {t("signOut")}
         </button>
       </form>
     </main>

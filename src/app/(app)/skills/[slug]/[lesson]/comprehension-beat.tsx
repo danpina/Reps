@@ -1,16 +1,18 @@
 "use client";
 
 import { useId, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import type { ComprehensionCheck } from "@/lib/curriculum/types";
 
 export function ComprehensionBeat({
   check,
-  label = "One check",
+  label,
 }: {
   check: ComprehensionCheck;
-  label?: string;
+  label: string;
 }) {
+  const t = useTranslations("lessonPage");
   const [picked, setPicked] = useState<number | null>(null);
   // Unique per check, since a lesson now renders more than one.
   const promptId = useId();
@@ -59,9 +61,9 @@ export function ComprehensionBeat({
                       <span className="sr-only">
                         {option.correct
                           ? isPicked
-                            ? "Correct, and this was your answer."
-                            : "This was the correct answer."
-                          : "Your answer, which was not correct."}
+                            ? t("srCorrectYourAnswer")
+                            : t("srCorrectAnswer")
+                          : t("srYourAnswerWrong")}
                       </span>
                     </>
                   ) : null}

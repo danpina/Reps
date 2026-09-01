@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { BackLink } from "@/components/back-link";
 import { Prose } from "@/components/prose";
@@ -7,7 +8,10 @@ import { requireUser } from "@/lib/auth/dal";
 import { isPro } from "@/lib/billing/entitlement";
 import { getRecap } from "@/lib/curriculum/recap";
 
-export const metadata = { title: "Recap — Reps" };
+export async function generateMetadata() {
+  const t = await getTranslations("recapPage");
+  return { title: t("pageTitle") };
+}
 
 export default async function RecapPage({
   params,
@@ -24,6 +28,7 @@ export default async function RecapPage({
   if (!(await isPro())) redirect("/pro");
 
   const recap = await getRecap(slug);
+  const t = await getTranslations("recapPage");
 
   if (!recap) notFound();
 
@@ -34,12 +39,16 @@ export default async function RecapPage({
       <header className="border-b border-rule pb-5">
         <BackLink href={`/skills/${recap.slug}`} label={recap.name} />
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
-          {recap.complete ? "What you learned" : "What you have covered"}
+          {recap.complete ? t("whatYouLearned") : t("whatYouHaveCovered")}
         </h1>
         <p className="tabular mt-2 text-xs text-ink-faint">
-          {recap.name} · {recap.readCount} of {recap.total} lessons read ·
-          level {recap.level} · {recap.reps}{" "}
-          {recap.reps === 1 ? "rep" : "reps"} logged
+          {t("summaryLine", {
+            name: recap.name,
+            read: recap.readCount,
+            total: recap.total,
+            level: recap.level,
+            reps: recap.reps,
+          })}
         </p>
       </header>
 
@@ -48,7 +57,7 @@ export default async function RecapPage({
           id="idea"
           className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
         >
-          The idea
+          {t("theIdea")}
         </h2>
         <p className="mt-3 border-l-2 border-[var(--accent)] pl-4 text-[15px] leading-[1.6] text-ink">
           {recap.coreIdea}
@@ -62,7 +71,7 @@ export default async function RecapPage({
           id="moves"
           className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
         >
-          The moves
+          {t("theMoves")}
         </h2>
         <ol className="mt-4 flex flex-col gap-4">
           {recap.lessons.map((lesson) => (
@@ -88,7 +97,7 @@ export default async function RecapPage({
                 </Link>
                 {!lesson.read ? (
                   <span className="tabular ml-auto text-[11px] text-ink-faint">
-                    not read yet
+                    {t("notReadYet")}
                   </span>
                 ) : null}
               </div>
@@ -114,7 +123,7 @@ export default async function RecapPage({
             id="takeaway"
             className="tabular text-xs uppercase tracking-[0.18em] text-[var(--accent)]"
           >
-            What to take with you
+            {t("whatToTakeWithYou")}
           </h2>
           <div className="mt-3">
             <Prose markdown={recap.takeaway} />
@@ -123,17 +132,17 @@ export default async function RecapPage({
       ) : (
         <section className="mt-9 rounded border border-rule bg-[var(--paper-raised)] p-5">
           <h2 className="text-sm font-semibold text-ink">
-            {recap.total - recap.readCount} still to read
+            {t("stillToRead", { count: recap.total - recap.readCount })}
           </h2>
           <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-            Finish the track and this becomes the summary worth keeping.
+            {t("finishTheTrack")}
           </p>
           {nextUnread ? (
             <Link
               href={`/skills/${recap.slug}/${nextUnread.sortOrder}`}
               className="mt-4 inline-flex rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90"
             >
-              Read lesson {nextUnread.sortOrder}
+              {t("readLessonN", { n: nextUnread.sortOrder })}
             </Link>
           ) : null}
         </section>
@@ -142,13 +151,13 @@ export default async function RecapPage({
       {/* However good the recap, it is still reading. */}
       <section className="mt-9 border-t border-rule pt-5">
         <p className="text-sm leading-relaxed text-ink-muted">
-          None of this counts until you have used it on someone.
+          {t("noneOfThisCountsUntilUsed")}
         </p>
         <Link
           href={`/log?skill=${recap.id}`}
           className="mt-3 inline-flex rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper-raised)]"
         >
-          Log a real rep
+          {t("logARealRep")}
         </Link>
       </section>
     </main>

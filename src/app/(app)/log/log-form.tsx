@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import { XP_AWARD } from "@/lib/progress/rules";
 import { logRep, type LogRepState } from "./actions";
@@ -18,6 +19,7 @@ export function LogForm({
   lessonId?: string;
   missionText?: string;
 }) {
+  const t = useTranslations("logPage");
   const [state, formAction] = useActionState<LogRepState, FormData>(logRep, {});
 
   return (
@@ -40,7 +42,7 @@ export function LogForm({
       {missionText ? (
         <div className="rounded border border-[var(--accent)] bg-[var(--accent-soft)] p-4">
           <p className="tabular text-xs uppercase tracking-[0.18em] text-[var(--accent)]">
-            The mission
+            {t("theMission")}
           </p>
           <p className="mt-2 text-sm leading-relaxed text-ink">{missionText}</p>
         </div>
@@ -66,7 +68,7 @@ export function LogForm({
         {/* Stated before the action, not just after it, so the ratio between a
             real conversation and everything else is visible where it matters. */}
         <span className="tabular text-xs text-ink-faint">
-          +{XP_AWARD.mission} XP, the most anything is worth here
+          {t("xpMostAnythingIsWorth", { xp: XP_AWARD.mission })}
         </span>
       </div>
     </form>
@@ -74,6 +76,7 @@ export function LogForm({
 }
 
 function Submit() {
+  const t = useTranslations("logPage");
   const { pending } = useFormStatus();
   return (
     <button
@@ -81,7 +84,7 @@ function Submit() {
       disabled={pending}
       className="rounded bg-[var(--accent)] px-4 py-3 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
-      {pending ? "Logging…" : "Log this rep"}
+      {pending ? t("loggingPending") : t("logThisRep")}
     </button>
   );
 }

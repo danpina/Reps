@@ -2,6 +2,7 @@
 
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import { RepFields, type RepValues, type SkillGroup } from "../../log/rep-fields";
 import { deleteRep, updateRep, type EditRepState } from "../actions";
@@ -45,6 +46,7 @@ export function EditRepForm({
 }
 
 function Save() {
+  const t = useTranslations("editRepPage");
   const { pending } = useFormStatus();
   return (
     <button
@@ -52,7 +54,7 @@ function Save() {
       disabled={pending}
       className="self-start rounded bg-[var(--accent)] px-4 py-3 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
-      {pending ? "Saving…" : "Save changes"}
+      {pending ? t("savingPending") : t("saveChanges")}
     </button>
   );
 }
@@ -65,16 +67,16 @@ function Save() {
  * a save button gets hit eventually.
  */
 function DeleteRep({ id }: { id: string }) {
+  const t = useTranslations("editRepPage");
   const [armed, setArmed] = useState(false);
 
   return (
     <section className="mt-10 border-t border-rule pt-6">
       <h2 className="text-xs uppercase tracking-[0.14em] text-ink-faint">
-        Delete this rep
+        {t("deleteThisRep")}
       </h2>
       <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
-        It comes off the log, and the XP and streak it earned go back to what
-        they were. Badges you have already earned stay earned.
+        {t("deleteExplanation")}
       </p>
 
       {armed ? (
@@ -86,7 +88,7 @@ function DeleteRep({ id }: { id: string }) {
             onClick={() => setArmed(false)}
             className="text-sm text-ink-muted underline-offset-4 hover:text-ink hover:underline"
           >
-            Keep it
+            {t("keepIt")}
           </button>
         </form>
       ) : (
@@ -95,7 +97,7 @@ function DeleteRep({ id }: { id: string }) {
           onClick={() => setArmed(true)}
           className="mt-4 rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper-raised)]"
         >
-          Delete this rep
+          {t("deleteThisRep")}
         </button>
       )}
     </section>
@@ -103,6 +105,7 @@ function DeleteRep({ id }: { id: string }) {
 }
 
 function DeleteButton() {
+  const t = useTranslations("editRepPage");
   const { pending } = useFormStatus();
   return (
     <button
@@ -110,7 +113,7 @@ function DeleteButton() {
       disabled={pending}
       className="rounded bg-[var(--flag)] px-4 py-2.5 text-sm font-medium text-[var(--paper)] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
-      {pending ? "Deleting…" : "Yes, delete it"}
+      {pending ? t("deletingPending") : t("yesDeleteIt")}
     </button>
   );
 }

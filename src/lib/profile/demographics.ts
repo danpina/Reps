@@ -7,6 +7,8 @@
  * option the database will reject.
  */
 
+import type { Translate } from "@/lib/i18n";
+
 export const SEXES = ["male", "female"] as const;
 export type Sex = (typeof SEXES)[number];
 
@@ -135,5 +137,50 @@ export function describeSelf(
   if (sex && age) return `${SEX_LABELS[sex].toLowerCase()}, ${AGE_LABELS[age]}`;
   if (sex) return SEX_LABELS[sex].toLowerCase();
   if (age) return AGE_LABELS[age];
+  return null;
+}
+
+/**
+ * The reader-facing versions of the labels and sentences above.
+ *
+ * Kept apart from SEX_LABELS, AGE_LABELS, DATING_INTEREST_LABELS,
+ * describeSelf and describeOther on purpose: those feed the coach and
+ * rehearsal-partner prompts sent to Claude, and stay in English regardless of
+ * the reader's language — that is a prompt-engineering decision, not a UI one.
+ * These are for dropdown options and the field log, which do follow the
+ * reader.
+ */
+export function sexOptionLabel(t: Translate, value: Sex): string {
+  return t(`demographics.sex.${value}`);
+}
+
+export function ageOptionLabel(t: Translate, value: AgeGroup): string {
+  return t(`demographics.age.${value}`);
+}
+
+export function datingInterestOptionLabel(
+  t: Translate,
+  value: (typeof DATING_INTERESTS)[number],
+): string {
+  return t(`demographics.datingInterest.${value}`);
+}
+
+/** The reader-facing version of describeOther, for the field log. */
+export function describeOtherLocalized(
+  t: Translate,
+  sex: Sex | null,
+  age: AgeGroup | null,
+): string | null {
+  const who =
+    sex === "male"
+      ? t("demographics.aMan")
+      : sex === "female"
+        ? t("demographics.aWoman")
+        : null;
+  const ageText = age ? ageOptionLabel(t, age) : null;
+
+  if (who && ageText) return `${who}, ${ageText}`;
+  if (who) return who;
+  if (ageText) return t("demographics.someoneAged", { age: ageText });
   return null;
 }

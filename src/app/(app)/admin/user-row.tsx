@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import type { ManagedUser } from "./page";
 import type { UserProgress } from "@/lib/progress/admin-summary";
@@ -32,6 +33,7 @@ export function UserRow({
   isSelf: boolean;
   progress: UserProgress;
 }) {
+  const t = useTranslations("adminPage.userRow");
   const blocked = Boolean(user.blockedAt);
   // Matches what the server will refuse, so the UI never offers an action
   // that is going to come back as an error. The server is still the check.
@@ -41,37 +43,37 @@ export function UserRow({
     <li className="border-b border-rule">
       <details>
         <summary className="flex cursor-pointer flex-wrap items-baseline gap-x-3 gap-y-1 py-4 hover:bg-[var(--paper-raised)]">
-          <span className="text-sm text-ink">{user.email ?? "no email"}</span>
+          <span className="text-sm text-ink">{user.email ?? t("noEmail")}</span>
 
-          {user.isAdmin ? <Tag tone="accent">Admin</Tag> : null}
+          {user.isAdmin ? <Tag tone="accent">{t("admin")}</Tag> : null}
 
           {/* Every non-admin row says which side of the paywall it is on.
               Tagging only the subscribers made a free account and an account
               nobody had looked at yet render identically. */}
           {user.isAdmin ? null : user.isPro ? (
-            <Tag tone="accent">{accessLabel(user)}</Tag>
+            <Tag tone="accent">{accessLabel(user, t)}</Tag>
           ) : (
-            <Tag tone="muted">{accessLabel(user)}</Tag>
+            <Tag tone="muted">{accessLabel(user, t)}</Tag>
           )}
 
-          {isSelf ? <Tag tone="muted">You</Tag> : null}
-          {blocked ? <Tag tone="flag">Blocked</Tag> : null}
+          {isSelf ? <Tag tone="muted">{t("you")}</Tag> : null}
+          {blocked ? <Tag tone="flag">{t("blocked")}</Tag> : null}
 
           {/* The one number worth seeing without opening the row. Reps rather
               than XP, because XP counts reading and this is the column you
               scan to find out who is actually using the thing. */}
           <span className="tabular ml-auto text-xs text-ink-faint">
             {progress.repsLogged === 0
-              ? "no reps"
-              : `${progress.repsLogged} ${progress.repsLogged === 1 ? "rep" : "reps"}`}
-            {progress.lastActive ? ` · ${sinceLabel(progress.lastActive)}` : ""}
+              ? t("noReps")
+              : t("repsCount", { count: progress.repsLogged })}
+            {progress.lastActive ? ` · ${sinceLabel(progress.lastActive, t)}` : ""}
           </span>
         </summary>
 
         <div className="flex flex-col gap-6 pb-6 pl-1">
           {user.blockedReason ? (
             <p className="text-[13px] leading-relaxed text-ink-muted">
-              Reason given: {user.blockedReason}
+              {t("reasonGiven", { reason: user.blockedReason })}
             </p>
           ) : null}
 
@@ -81,8 +83,7 @@ export function UserRow({
 
           {user.isAdmin ? (
             <p className="text-[13px] leading-relaxed text-ink-muted">
-              Admins have the whole product already, so there is nothing to
-              grant here.
+              {t("adminsHaveWholeProduct")}
             </p>
           ) : (
             <SubscriptionForm user={user} />
@@ -95,9 +96,7 @@ export function UserRow({
             </>
           ) : (
             <p className="text-[13px] leading-relaxed text-ink-muted">
-              {isSelf
-                ? "You cannot block or delete your own account."
-                : "This account is an admin. Remove it from the roster in SQL before blocking or deleting it."}
+              {isSelf ? t("cannotBlockSelf") : t("accountIsAdmin")}
             </p>
           )}
         </div>
@@ -126,14 +125,16 @@ function Standing({
   progress: UserProgress;
   joined: string;
 }) {
+  const t = useTranslations("adminPage.userRow");
+
   if (progress.isUntouched) {
     return (
       <div>
         <h3 className="text-xs uppercase tracking-[0.14em] text-ink-faint">
-          Standing
+          {t("standing")}
         </h3>
         <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
-          Joined {formatDate(joined)} and has not opened a lesson yet.
+          {t("joinedNotOpened", { date: formatDate(joined) })}
         </p>
       </div>
     );
@@ -144,54 +145,58 @@ function Standing({
   return (
     <div>
       <h3 className="text-xs uppercase tracking-[0.14em] text-ink-faint">
-        Standing
+        {t("standing")}
       </h3>
 
       <dl className="mt-2 flex flex-col gap-1 text-[13px] leading-relaxed">
-        <Row label="Rank">
+        <Row label={t("rank")}>
           {rank.rank.name}{" "}
           <span className="text-ink-faint">
-            ({rank.position} of {rank.total}) · {progress.totalXp.toLocaleString()} XP
+            {t("rankPosition", {
+              position: rank.position,
+              total: rank.total,
+              xp: progress.totalXp.toLocaleString(),
+            })}
           </span>
         </Row>
-        <Row label="Reps">
+        <Row label={t("reps")}>
           {progress.repsLogged}
           {progress.skillsWorked > 0
-            ? ` across ${progress.skillsWorked} ${progress.skillsWorked === 1 ? "skill" : "skills"}`
+            ? t("acrossSkills", { count: progress.skillsWorked })
             : ""}
         </Row>
-        <Row label="Streak">
-          {progress.currentStreak} day{progress.currentStreak === 1 ? "" : "s"}
+        <Row label={t("streak")}>
+          {t("dayCount", { count: progress.currentStreak })}
           <span className="text-ink-faint">
             {" "}
-            · longest {progress.longestStreak}
+            · {t("longest", { count: progress.longestStreak })}
           </span>
         </Row>
-        <Row label="Topics">
-          {progress.topicsStarted} of {progress.topicsTotal} started
+        <Row label={t("topics")}>
+          {t("startedOfTotal", { started: progress.topicsStarted, total: progress.topicsTotal })}
         </Row>
-        <Row label="Skills">
-          {progress.skillsStarted} of {progress.skillsTotal} started
+        <Row label={t("skills")}>
+          {t("startedOfTotal", { started: progress.skillsStarted, total: progress.skillsTotal })}
           <span className="text-ink-faint">
             {" "}
-            · {progress.skillsFinished} read through
+            · {t("readThrough", { count: progress.skillsFinished })}
           </span>
         </Row>
-        <Row label="Lessons">
-          {progress.lessonsRead} of {progress.lessonsTotal} read
+        <Row label={t("lessons")}>
+          {t("readOfTotal", { read: progress.lessonsRead, total: progress.lessonsTotal })}
         </Row>
         {progress.badges > 0 ? (
-          <Row label="Badges">{progress.badges}</Row>
+          <Row label={t("badges")}>{progress.badges}</Row>
         ) : null}
         {progress.furthest ? (
-          <Row label="Last in">
+          <Row label={t("lastIn")}>
             {progress.furthest.topic} · {progress.furthest.skill} ·{" "}
             {progress.furthest.lesson}
           </Row>
         ) : null}
-        <Row label="Active">
-          {progress.lastActive ? formatDate(progress.lastActive) : "never"}
-          <span className="text-ink-faint"> · joined {formatDate(joined)}</span>
+        <Row label={t("active")}>
+          {progress.lastActive ? formatDate(progress.lastActive) : t("never")}
+          <span className="text-ink-faint"> · {t("joined", { date: formatDate(joined) })}</span>
         </Row>
       </dl>
     </div>
@@ -202,21 +207,22 @@ function Standing({
  * How long ago, in the fewest words that still distinguish this week from last
  * quarter. Anything older than a year is not worth counting precisely.
  */
-function sinceLabel(iso: string): string {
+function sinceLabel(iso: string, t: ReturnType<typeof useTranslations>): string {
   const then = new Date(`${iso}T00:00:00`);
   const now = new Date();
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const days = Math.round((today.getTime() - then.getTime()) / 86_400_000);
 
-  if (days <= 0) return "today";
-  if (days === 1) return "yesterday";
-  if (days < 7) return `${days}d ago`;
-  if (days < 60) return `${Math.floor(days / 7)}w ago`;
-  if (days < 365) return `${Math.floor(days / 30)}mo ago`;
-  return "over a year";
+  if (days <= 0) return t("today");
+  if (days === 1) return t("yesterday");
+  if (days < 7) return t("daysAgo", { count: days });
+  if (days < 60) return t("weeksAgo", { count: Math.floor(days / 7) });
+  if (days < 365) return t("monthsAgo", { count: Math.floor(days / 30) });
+  return t("overAYear");
 }
 
 function SettingsForm({ user }: { user: ManagedUser }) {
+  const t = useTranslations("adminPage.userRow");
   const [state, formAction] = useActionState<AdminState, FormData>(
     updateUserSettings,
     {},
@@ -226,12 +232,12 @@ function SettingsForm({ user }: { user: ManagedUser }) {
     <form action={formAction}>
       <input type="hidden" name="user_id" value={user.id} />
       <h3 className="text-xs uppercase tracking-[0.14em] text-ink-faint">
-        Their settings
+        {t("theirSettings")}
       </h3>
 
       <div className="mt-3 flex flex-wrap gap-3">
         <label className="flex-1">
-          <span className="block text-[13px] text-ink-muted">Display name</span>
+          <span className="block text-[13px] text-ink-muted">{t("displayName")}</span>
           <input
             name="display_name"
             defaultValue={user.displayName ?? ""}
@@ -240,21 +246,21 @@ function SettingsForm({ user }: { user: ManagedUser }) {
           />
         </label>
         <label>
-          <span className="block text-[13px] text-ink-muted">Theme</span>
+          <span className="block text-[13px] text-ink-muted">{t("theme")}</span>
           <select
             name="theme"
             defaultValue={user.theme}
             className="mt-1 rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           >
-            <option value="system">Match device</option>
-            <option value="light">Light</option>
-            <option value="dark">Dark</option>
+            <option value="system">{t("matchDevice")}</option>
+            <option value="light">{t("light")}</option>
+            <option value="dark">{t("dark")}</option>
           </select>
         </label>
       </div>
 
       <Feedback state={state} />
-      <Button idle="Save" busy="Saving…" />
+      <Button idle={t("save")} busy={t("savingPending")} />
     </form>
   );
 }
@@ -267,17 +273,17 @@ function SettingsForm({ user }: { user: ManagedUser }) {
  * ran out and one that was revoked need telling apart when someone asks why
  * they lost access.
  */
-function accessLabel(user: ManagedUser): string {
-  if (user.isPro) return "Pro";
-  if (!user.subscription) return "Free";
-  if (user.subscription.status === "canceled") return "Cancelled";
+function accessLabel(user: ManagedUser, t: ReturnType<typeof useTranslations>): string {
+  if (user.isPro) return t("pro");
+  if (!user.subscription) return t("free");
+  if (user.subscription.status === "canceled") return t("cancelled");
   if (
     user.subscription.currentPeriodEnd &&
     new Date(user.subscription.currentPeriodEnd) <= new Date()
   ) {
-    return "Expired";
+    return t("expired");
   }
-  return user.subscription.status === "past_due" ? "Past due" : "Free";
+  return user.subscription.status === "past_due" ? t("pastDue") : t("free");
 }
 
 /**
@@ -290,7 +296,8 @@ function accessLabel(user: ManagedUser): string {
  */
 function formatDate(iso: string): string {
   const value = /^\d{4}-\d{2}-\d{2}$/.test(iso) ? `${iso}T00:00:00` : iso;
-  return new Date(value).toLocaleDateString(undefined, {
+  // Deliberately locale-independent (admin-only screen, never localized).
+  return new Date(value).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -305,6 +312,7 @@ function formatDate(iso: string): string {
  * way. Each button states what it does.
  */
 function SubscriptionForm({ user }: { user: ManagedUser }) {
+  const t = useTranslations("adminPage.userRow");
   const [grantState, grantAction] = useActionState<AdminState, FormData>(
     grantPro,
     {},
@@ -317,25 +325,27 @@ function SubscriptionForm({ user }: { user: ManagedUser }) {
   return (
     <div>
       <h3 className="text-xs uppercase tracking-[0.14em] text-ink-faint">
-        Subscription
+        {t("subscription")}
       </h3>
 
       <dl className="mt-2 flex flex-col gap-1 text-[13px] leading-relaxed">
-        <Row label="Access">
-          {user.isPro
-            ? "Every lesson, unlimited rehearsals"
-            : "Two lessons per topic, one rehearsal"}
+        <Row label={t("access")}>
+          {user.isPro ? t("everyLessonUnlimited") : t("twoLessonsOneRehearsal")}
         </Row>
-        <Row label="Status">
+        <Row label={t("status")}>
           {user.subscription
-            ? `${user.subscription.status} · ${user.subscription.source === "manual" ? "granted by hand" : "Stripe"}`
-            : "no subscription record"}
+            ? t("statusLine", {
+                status: user.subscription.status,
+                source:
+                  user.subscription.source === "manual" ? t("grantedByHand") : "Stripe",
+              })
+            : t("noSubscriptionRecord")}
         </Row>
-        <Row label={user.isPro ? "Runs until" : "Ended"}>
+        <Row label={user.isPro ? t("runsUntil") : t("ended")}>
           {user.subscription?.currentPeriodEnd
             ? formatDate(user.subscription.currentPeriodEnd)
             : user.subscription
-              ? "no end date"
+              ? t("noEndDate")
               : "—"}
         </Row>
       </dl>
@@ -344,7 +354,7 @@ function SubscriptionForm({ user }: { user: ManagedUser }) {
         <form action={revokeAction} className="mt-3">
           <input type="hidden" name="user_id" value={user.id} />
           <Feedback state={revokeState} />
-          <Button idle="Revoke access" busy="Revoking…" />
+          <Button idle={t("revokeAccess")} busy={t("revokingPending")} />
         </form>
       ) : (
         <form action={grantAction} className="mt-3">
@@ -354,26 +364,26 @@ function SubscriptionForm({ user }: { user: ManagedUser }) {
               end date gets created, which makes it the only way to test what
               happens when one runs out. */}
           <label className="block">
-            <span className="block text-[13px] text-ink-muted">For how long</span>
+            <span className="block text-[13px] text-ink-muted">{t("forHowLong")}</span>
             <select
               name="duration"
               defaultValue="none"
               className="mt-1 rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
             >
-              <option value="none">No end date</option>
-              <option value="week">One week</option>
-              <option value="month">One month</option>
-              <option value="year">One year</option>
+              <option value="none">{t("noEndDateOption")}</option>
+              <option value="week">{t("oneWeek")}</option>
+              <option value="month">{t("oneMonth")}</option>
+              <option value="year">{t("oneYear")}</option>
             </select>
           </label>
 
           <input
             name="note"
-            placeholder="Why, for your own records (optional)"
+            placeholder={t("whyForRecordsPlaceholder")}
             className="mt-3 w-full rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
           />
           <Feedback state={grantState} />
-          <Button idle="Grant full access" busy="Granting…" />
+          <Button idle={t("grantFullAccess")} busy={t("grantingPending")} />
         </form>
       )}
     </div>
@@ -381,6 +391,7 @@ function SubscriptionForm({ user }: { user: ManagedUser }) {
 }
 
 function BlockForm({ user }: { user: ManagedUser }) {
+  const t = useTranslations("adminPage.userRow");
   const [state, formAction] = useActionState<AdminState, FormData>(
     blockUser,
     {},
@@ -390,24 +401,24 @@ function BlockForm({ user }: { user: ManagedUser }) {
     <form action={formAction}>
       <input type="hidden" name="user_id" value={user.id} />
       <h3 className="text-xs uppercase tracking-[0.14em] text-ink-faint">
-        Block
+        {t("block")}
       </h3>
       <p className="mt-1 text-[13px] leading-relaxed text-ink-muted">
-        They stop being able to use the app immediately. Nothing is deleted,
-        and this can be undone.
+        {t("blockExplanation")}
       </p>
       <input
         name="reason"
-        placeholder="Reason, shown to them (optional)"
+        placeholder={t("reasonPlaceholder")}
         className="mt-3 w-full rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
       />
       <Feedback state={state} />
-      <Button idle="Block this account" busy="Blocking…" />
+      <Button idle={t("blockThisAccount")} busy={t("blockingPending")} />
     </form>
   );
 }
 
 function UnblockForm({ user }: { user: ManagedUser }) {
+  const t = useTranslations("adminPage.userRow");
   const [state, formAction] = useActionState<AdminState, FormData>(
     unblockUser,
     {},
@@ -417,15 +428,16 @@ function UnblockForm({ user }: { user: ManagedUser }) {
     <form action={formAction}>
       <input type="hidden" name="user_id" value={user.id} />
       <h3 className="text-xs uppercase tracking-[0.14em] text-ink-faint">
-        Blocked
+        {t("blocked")}
       </h3>
       <Feedback state={state} />
-      <Button idle="Unblock" busy="Unblocking…" />
+      <Button idle={t("unblock")} busy={t("unblockingPending")} />
     </form>
   );
 }
 
 function DeleteForm({ user }: { user: ManagedUser }) {
+  const t = useTranslations("adminPage.userRow");
   const [state, formAction] = useActionState<AdminState, FormData>(
     deleteUser,
     {},
@@ -438,24 +450,23 @@ function DeleteForm({ user }: { user: ManagedUser }) {
     >
       <input type="hidden" name="user_id" value={user.id} />
       <h3 className="text-xs uppercase tracking-[0.14em] text-[var(--flag)]">
-        Delete permanently
+        {t("deletePermanently")}
       </h3>
       <p className="mt-1 text-[13px] leading-relaxed text-ink">
-        Removes the account and every rep, rehearsal and badge with it. This
-        cannot be undone.
+        {t("deleteExplanation")}
       </p>
       <label htmlFor={`confirm-${user.id}`} className="sr-only">
-        Type DELETE to confirm
+        {t("typeDeleteToConfirm")}
       </label>
       <input
         id={`confirm-${user.id}`}
         name="confirm"
         autoComplete="off"
-        placeholder="Type DELETE to confirm"
+        placeholder={t("typeDeleteToConfirm")}
         className="mt-3 w-full rounded border border-[var(--flag)] bg-[var(--paper)] px-3 py-2 text-sm text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--flag)]"
       />
       <Feedback state={state} />
-      <Button idle="Delete this account" busy="Deleting…" tone="flag" />
+      <Button idle={t("deleteThisAccount")} busy={t("deletingPending")} tone="flag" />
     </form>
   );
 }

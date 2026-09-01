@@ -1,13 +1,15 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import type { DatingInterest } from "@/lib/curriculum/variants";
 import {
   AGE_GROUPS,
-  AGE_LABELS,
+  ageOptionLabel,
   DATING_INTERESTS,
-  DATING_INTEREST_LABELS,
+  datingInterestOptionLabel,
   SEXES,
-  SEX_LABELS,
+  sexOptionLabel,
   type AgeGroup,
   type Sex,
 } from "@/lib/profile/demographics";
@@ -25,17 +27,14 @@ export function AboutYouFields({
   ageGroup,
   datingInterest,
   idPrefix = "",
-  sexLabel = "You are",
-  ageLabel = "Your age",
 }: {
   sex: Sex | null;
   ageGroup: AgeGroup | null;
   datingInterest: DatingInterest | null;
   /** Keeps ids unique when the fields appear twice on one page. */
   idPrefix?: string;
-  sexLabel?: string;
-  ageLabel?: string;
 }) {
+  const t = useTranslations("demographics");
   const sexId = `${idPrefix}sex`;
   const ageId = `${idPrefix}age_group`;
   const datingId = `${idPrefix}dating_interest`;
@@ -44,7 +43,7 @@ export function AboutYouFields({
     <div className="flex flex-wrap gap-4">
       <div className="flex min-w-40 flex-1 flex-col gap-1.5">
         <label htmlFor={sexId} className="text-sm font-medium text-ink">
-          {sexLabel}
+          {t("youAre")}
         </label>
         <select
           id={sexId}
@@ -52,10 +51,10 @@ export function AboutYouFields({
           defaultValue={sex ?? ""}
           className="rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         >
-          <option value="">Rather not say</option>
+          <option value="">{t("ratherNotSay")}</option>
           {SEXES.map((value) => (
             <option key={value} value={value}>
-              {SEX_LABELS[value]}
+              {sexOptionLabel(t, value)}
             </option>
           ))}
         </select>
@@ -63,7 +62,7 @@ export function AboutYouFields({
 
       <div className="flex min-w-40 flex-1 flex-col gap-1.5">
         <label htmlFor={ageId} className="text-sm font-medium text-ink">
-          {ageLabel}
+          {t("yourAge")}
         </label>
         <select
           id={ageId}
@@ -71,10 +70,10 @@ export function AboutYouFields({
           defaultValue={ageGroup ?? ""}
           className="rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         >
-          <option value="">Rather not say</option>
+          <option value="">{t("ratherNotSay")}</option>
           {AGE_GROUPS.map((value) => (
             <option key={value} value={value}>
-              {AGE_LABELS[value]}
+              {ageOptionLabel(t, value)}
             </option>
           ))}
         </select>
@@ -84,7 +83,7 @@ export function AboutYouFields({
           obvious the answer is only ever used by one topic. */}
       <div className="flex min-w-40 flex-1 flex-col gap-1.5">
         <label htmlFor={datingId} className="text-sm font-medium text-ink">
-          Dating practice with
+          {t("datingPracticeWith")}
         </label>
         <select
           id={datingId}
@@ -92,10 +91,10 @@ export function AboutYouFields({
           defaultValue={datingInterest ?? ""}
           className="rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         >
-          <option value="">Rather not say</option>
+          <option value="">{t("ratherNotSay")}</option>
           {DATING_INTERESTS.map((value) => (
             <option key={value} value={value}>
-              {DATING_INTEREST_LABELS[value]}
+              {datingInterestOptionLabel(t, value)}
             </option>
           ))}
         </select>
@@ -118,11 +117,13 @@ export function AboutThemFields({
   sex: Sex | null;
   ageGroup: AgeGroup | null;
 }) {
+  const t = useTranslations("demographics");
+
   return (
     <div className="flex flex-wrap gap-4">
       <div className="flex min-w-40 flex-1 flex-col gap-1.5">
         <label htmlFor="other_sex" className="text-sm text-ink-muted">
-          They were
+          {t("theyWere")}
         </label>
         <select
           id="other_sex"
@@ -130,10 +131,10 @@ export function AboutThemFields({
           defaultValue={sex ?? ""}
           className="rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         >
-          <option value="">Not saying</option>
+          <option value="">{t("notSaying")}</option>
           {SEXES.map((value) => (
             <option key={value} value={value}>
-              {SEX_LABELS[value]}
+              {sexOptionLabel(t, value)}
             </option>
           ))}
         </select>
@@ -141,7 +142,7 @@ export function AboutThemFields({
 
       <div className="flex min-w-40 flex-1 flex-col gap-1.5">
         <label htmlFor="other_age_group" className="text-sm text-ink-muted">
-          Roughly
+          {t("roughly")}
         </label>
         <select
           id="other_age_group"
@@ -149,10 +150,10 @@ export function AboutThemFields({
           defaultValue={ageGroup ?? ""}
           className="rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2 text-sm text-ink focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
         >
-          <option value="">Not saying</option>
+          <option value="">{t("notSaying")}</option>
           {AGE_GROUPS.map((value) => (
             <option key={value} value={value}>
-              {AGE_LABELS[value]}
+              {ageOptionLabel(t, value)}
             </option>
           ))}
         </select>

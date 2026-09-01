@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import { MAX_LINE_CHARS } from "@/lib/roleplay/limits";
 import type { Turn } from "@/lib/roleplay/partner";
@@ -28,6 +29,7 @@ export function Chat({
    */
   instruction?: string;
 }) {
+  const t = useTranslations("chat");
   const [state, formAction] = useActionState<SayState, FormData>(say, {});
   const endRef = useRef<HTMLDivElement>(null);
   const full = turnsLeft === 0;
@@ -40,7 +42,7 @@ export function Chat({
   return (
     <>
       <ol
-        aria-label="Conversation so far"
+        aria-label={t("conversationSoFar")}
         aria-live="polite"
         className="mt-6 flex flex-col gap-4"
       >
@@ -58,7 +60,7 @@ export function Chat({
               ].join(" ")}
             >
               <p className="tabular text-[11px] uppercase tracking-[0.14em] text-ink-faint">
-                {turn.role === "user" ? "You" : partnerName}
+                {turn.role === "user" ? t("you") : partnerName}
               </p>
               <p className="mt-1 text-[15px] leading-[1.55] whitespace-pre-wrap">
                 {turn.content}
@@ -78,7 +80,7 @@ export function Chat({
       <form action={formAction} className="mt-6">
         <input type="hidden" name="roleplay_id" value={roleplayId} />
         <label htmlFor="message" className="sr-only">
-          What you say next
+          {t("whatYouSayNext")}
         </label>
 
         {/* Keyed on the transcript so a landed line remounts the box, clearing
@@ -106,6 +108,7 @@ export function Chat({
  * left, and how much of this scene is.
  */
 function LineBox({ full, turnsLeft }: { full: boolean; turnsLeft: number }) {
+  const t = useTranslations("chat");
   // A hard maxLength on its own just stops accepting keystrokes, which reads
   // as a broken keyboard rather than as a limit.
   const [used, setUsed] = useState(0);
@@ -121,7 +124,7 @@ function LineBox({ full, turnsLeft }: { full: boolean; turnsLeft: number }) {
         required
         disabled={full}
         onChange={(e) => setUsed(e.target.value.length)}
-        placeholder={full ? "This scene is done." : "What do you say?"}
+        placeholder={full ? t("sceneIsDone") : t("whatDoYouSay")}
         className="w-full resize-none rounded border border-[var(--rule-strong)] bg-[var(--paper)] px-3 py-2.5 text-[15px] leading-relaxed text-ink placeholder:text-ink-faint focus:outline-none focus:ring-2 focus:ring-[var(--accent)] disabled:opacity-60"
       />
 
@@ -130,19 +133,14 @@ function LineBox({ full, turnsLeft }: { full: boolean; turnsLeft: number }) {
           which is the opposite of the thing being practised. */}
       {full ? (
         <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
-          That is as far as this scene goes. End it below and read the review —
-          that part is where the lesson is.
+          {t("thatIsAsFarAsThisSceneGoes")}
         </p>
       ) : (
         <div className="tabular mt-2 flex items-baseline justify-between gap-3 text-xs text-ink-faint">
-          <span>
-            {turnsLeft <= 4
-              ? `${turnsLeft} ${turnsLeft === 1 ? "line" : "lines"} left in this scene`
-              : ""}
-          </span>
+          <span>{turnsLeft <= 4 ? t("linesLeft", { count: turnsLeft }) : ""}</span>
           {charsLeft <= 40 ? (
             <span aria-live="polite">
-              {charsLeft} {charsLeft === 1 ? "character" : "characters"} left
+              {t("charactersLeft", { count: charsLeft })}
             </span>
           ) : null}
         </div>
@@ -152,6 +150,7 @@ function LineBox({ full, turnsLeft }: { full: boolean; turnsLeft: number }) {
 }
 
 function Send() {
+  const t = useTranslations("chat");
   const { pending } = useFormStatus();
   return (
     <button
@@ -159,7 +158,7 @@ function Send() {
       disabled={pending}
       className="mt-3 rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
-      {pending ? "Saying it…" : "Say it"}
+      {pending ? t("sayingItPending") : t("sayIt")}
     </button>
   );
 }

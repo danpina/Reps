@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { signOut } from "@/app/(auth)/actions";
 import { BackLink } from "@/components/back-link";
@@ -8,26 +9,28 @@ import { PasswordForm } from "./password-form";
 import { LanguageForm } from "./language-form";
 import { ThemeForm } from "./theme-form";
 
-export const metadata = { title: "Settings — Reps" };
+export async function generateMetadata() {
+  const t = await getTranslations("settings");
+  return { title: t("pageTitle") };
+}
 
 export default async function SettingsPage() {
   await requireUser();
   const [profile, admin] = await Promise.all([getProfile(), isAdmin()]);
+  const t = await getTranslations("settings");
+  const tNav = await getTranslations("nav");
 
   return (
     <main className="mx-auto w-full max-w-2xl px-5 py-12">
       <header className="border-b border-rule pb-5">
-        <BackLink href="/today" label="Today" />
+        <BackLink href="/today" label={tNav("today")} />
         <h1 className="mt-3 text-xl font-semibold tracking-tight text-ink">
-          Settings
+          {t("heading")}
         </h1>
       </header>
 
       <div className="flex flex-col">
-        <Section
-          title="About you"
-          description="Three optional answers. They decide which version of a lesson you are shown, how a rehearsal is reviewed, and what a read of your log is able to notice. Leave any of them blank and you get the general version, which is written to be right for everybody."
-        >
+        <Section title={t("aboutYou.title")} description={t("aboutYou.description")}>
           <AboutYouForm
             sex={profile?.sex ?? null}
             ageGroup={profile?.age_group ?? null}
@@ -35,48 +38,42 @@ export default async function SettingsPage() {
           />
         </Section>
 
-        <Section
-          title="Language"
-          description="Anything not yet translated stays in English until it is."
-        >
+        <Section title={t("language.title")} description={t("language.description")}>
           <LanguageForm current={profile?.locale ?? "en"} />
         </Section>
 
         <Section
-          title="Appearance"
-          description="Stored on your account, so it follows you to any device you sign in on."
+          title={t("appearance.title")}
+          description={t("appearance.description")}
         >
           <ThemeForm current={profile?.theme ?? "system"} />
         </Section>
 
-        <Section
-          title="Password"
-          description="You will need your current one to set a new one."
-        >
+        <Section title={t("password.title")} description={t("password.description")}>
           <PasswordForm />
         </Section>
 
         {admin ? (
           <Section
-            title="Administration"
-            description="You have admin access on this account."
+            title={t("admin.title")}
+            description={t("admin.description")}
           >
             <Link
               href="/admin"
               className="inline-flex rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper-raised)]"
             >
-              Manage users
+              {t("admin.manageUsers")}
             </Link>
           </Section>
         ) : null}
 
-        <Section title="Account">
+        <Section title={t("account.title")}>
           <form action={signOut}>
             <button
               type="submit"
               className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper-raised)]"
             >
-              Sign out
+              {t("account.signOut")}
             </button>
           </form>
         </Section>

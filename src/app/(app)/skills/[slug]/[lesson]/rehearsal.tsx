@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { RehearsalRow, rehearsalCount } from "@/components/rehearsal-list";
 import { rehearsalsLeft } from "@/lib/billing/entitlement";
@@ -7,11 +8,7 @@ import {
   isRehearsalUnlocked,
   requiredLevelForLesson,
 } from "@/lib/roleplay/limits";
-import {
-  costsMoney,
-  isRehearsalMode,
-  type RehearsalMode,
-} from "@/lib/roleplay/modes";
+import { costsMoney, isRehearsalMode } from "@/lib/roleplay/modes";
 import { getRehearsalsForLesson } from "@/lib/roleplay/queries";
 import { startRehearsal } from "@/app/(app)/rehearse/start/actions";
 import { XP_AWARD } from "@/lib/progress/rules";
@@ -24,27 +21,10 @@ import { XP_AWARD } from "@/lib/progress/rules";
  * and the mismatch matters most for the person this is written for: somebody
  * who opens a chat window expecting to have to hold up a conversation, and
  * closes it again.
+ *
+ * The message keys are the mode names themselves, under the "rehearsalBox"
+ * namespace's headings/start/carryOn objects — see the translations there.
  */
-const HEADINGS: Record<RehearsalMode, string> = {
-  line: "Drill the line",
-  beat: "Drill the sequence",
-  choice: "Read the situation",
-  scene: "Rehearse it first",
-};
-
-const START: Record<RehearsalMode, string> = {
-  line: "Try the line",
-  beat: "Start the sequence",
-  choice: "Read the first one",
-  scene: "Start a rehearsal",
-};
-
-const CARRY_ON: Record<RehearsalMode, string> = {
-  line: "Carry on the drill",
-  beat: "Carry on the sequence",
-  choice: "Carry on reading",
-  scene: "Carry on the rehearsal",
-};
 
 /**
  * The rehearsal entry point on a lesson.
@@ -71,6 +51,8 @@ export async function Rehearsal({
   const supabase = await createClient();
   const mode = isRehearsalMode(authoredMode) ? authoredMode : "scene";
   const paid = costsMoney(mode);
+  const t = await getTranslations("rehearsalBox");
+  const tRehearsal = await getTranslations("rehearsalList");
 
   const left = paid ? await rehearsalsLeft() : null;
   const [{ data: state }, past] = await Promise.all([
@@ -102,36 +84,38 @@ export async function Rehearsal({
         id="rehearse"
         className="tabular text-xs uppercase tracking-[0.18em] text-ink-faint"
       >
-        {HEADINGS[mode]}
+        {t(`headings.${mode}`)}
       </h2>
 
       {spent ? (
         <>
           <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-            You have used your free rehearsal. {partnerName} is waiting on this
-            one, and every other scene in the app, with a subscription.
+            {t("usedFreeRehearsal", { partnerName })}
           </p>
           <Link
             href="/pro"
             className="mt-4 inline-flex rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper)]"
           >
-            What a subscription unlocks
+            {t("whatSubscriptionUnlocks")}
           </Link>
         </>
       ) : unlocked ? (
         <>
           <p className="mt-3 text-sm leading-relaxed text-ink">
             {mode === "line"
-              ? "One line, as many goes as you want. You will be told what it has to do before you write it."
+              ? t("modeIntro.line")
               : mode === "choice"
                 ? // Deliberately says nothing about which way the answers go.
                   // This used to promise that the right answer was often to do
                   // nothing, which is true of the lessons about reading
                   // availability and false of the ones about going anyway.
-                  "Situations to read, and a decision on each. There is a right answer, and the reason it is right is the lesson."
+                  t("modeIntro.choice")
                 : mode === "beat"
-                  ? `A short sequence with ${partnerName}. Each turn tells you what it is for.`
-                  : `Practise this on ${partnerName} before you try it on anyone real.${openness <= 2 ? " They are hard work on purpose." : ""}`}
+                  ? t("modeIntro.beat", { partnerName })
+                  : t("modeIntro.scene", {
+                      partnerName,
+                      hardWork: openness <= 2 ? t("modeIntro.hardWork") : "",
+                    })}
           </p>
 
           {/* Only the paid modes have a number to report. Saying "unlimited"
@@ -139,7 +123,7 @@ export async function Rehearsal({
               there. */}
           {left !== null ? (
             <p className="tabular mt-2 text-xs text-ink-faint">
-              {left} free {left === 1 ? "rehearsal" : "rehearsals"} left
+              {t("freeRehearsalsLeft", { count: left })}
             </p>
           ) : null}
 
@@ -149,25 +133,23 @@ export async function Rehearsal({
               type="submit"
               className="rounded border border-[var(--rule-strong)] px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-[var(--paper)]"
             >
-              {open ? CARRY_ON[mode] : START[mode]}
+              {open ? t(`carryOn.${mode}`) : t(`start.${mode}`)}
             </button>
             {/* A drill pays once, the first time it is landed. Repetition is
                 the point of it, and paying per repetition would turn that into
                 a way of farming the number. */}
             <span className="tabular text-xs text-ink-faint">
-              +{XP_AWARD.roleplay} XP{paid ? "" : ", the first time"}
+              {paid ? t("xpAward", { xp: XP_AWARD.roleplay }) : t("xpAwardFirstTime", { xp: XP_AWARD.roleplay })}
             </span>
           </form>
         </>
       ) : (
         <>
           <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-            Locked until level {required} in this skill. You are level {level}.
+            {t("lockedUntilLevel", { required, level })}
           </p>
           <p className="mt-2 text-[13px] leading-relaxed text-ink-muted">
-            Levels come from logging real conversations, so the way to open this
-            is to go and have some. That is deliberate — rehearsal is the warm
-            up, not the work.
+            {t("levelsComeFromReps")}
           </p>
         </>
       )}
@@ -179,7 +161,7 @@ export async function Rehearsal({
       {past.length > 0 ? (
         <details className="mt-5 border-t border-rule pt-4">
           <summary className="cursor-pointer text-xs text-ink-faint underline-offset-4 hover:text-ink hover:underline">
-            {rehearsalCount(past.length)} on this lesson
+            {t("countOnThisLesson", { count: rehearsalCount(tRehearsal, past.length) })}
           </summary>
           <ol className="mt-2">
             {past.map((rehearsal) => (

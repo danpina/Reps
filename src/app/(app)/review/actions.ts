@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 
 import { requireUser } from "@/lib/auth/dal";
 import { createClient } from "@/lib/supabase/server";
@@ -22,12 +23,13 @@ export async function saveRewrite(
 ): Promise<RewriteState> {
   const user = await requireUser();
   const supabase = await createClient();
+  const t = await getTranslations("review.rewrite.errors");
 
   const logId = String(formData.get("log_id") ?? "").trim();
   const rewrite = String(formData.get("rewrite") ?? "").trim();
 
-  if (!logId) return { error: "Something went wrong. Reload and try again." };
-  if (rewrite.length < 3) return { error: "Write what you would say instead." };
+  if (!logId) return { error: t("somethingWentWrong") };
+  if (rewrite.length < 3) return { error: t("writeSomething") };
 
   // Only award once per rep, however many times it is edited.
   const { data: existing, error: readError } = await supabase
@@ -37,7 +39,7 @@ export async function saveRewrite(
     .maybeSingle();
 
   if (readError || !existing) {
-    return { error: "Could not find that rep." };
+    return { error: t("notFound") };
   }
 
   const alreadyRewritten = Boolean(existing.rewrite?.trim());
@@ -47,7 +49,8 @@ export async function saveRewrite(
     .update({ rewrite, rewrite_at: new Date().toISOString() })
     .eq("id", logId);
 
-  if (error) return { error: `That did not save: ${error.message}` };
+  // Never the SDK's own message — see the note in settings/actions.ts.
+  if (error) return { error: t("didNotSave") };
 
   if (!alreadyRewritten) {
     await awardRewriteXp(supabase, user.id, existing.skill_id);
