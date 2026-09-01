@@ -143,7 +143,8 @@
     "heading": "Settings",
     "aboutYou": {
       "title": "About you",
-      "description": "Three optional answers. They decide which version of a lesson you are shown, how a rehearsal is reviewed, and what a read of your log is able to notice. Leave any of them blank and you get the general version, which is written to be right for everybody."
+      "description": "Three optional answers. They decide which version of a lesson you are shown, how a rehearsal is reviewed, and what a read of your log is able to notice. Leave any of them blank and you get the general version, which is written to be right for everybody.",
+      "save": "Save"
     },
     "language": {
       "title": "Language",
@@ -817,6 +818,11 @@
     "heading": "Nothing here",
     "body": "That lesson or skill doesn’t exist.",
     "backToSkills": "Back to the skills"
+  },
+  "offlinePage": {
+    "heading": "No connection",
+    "body1": "Your reps are stored on the server, so your REPS account needs a connection to load. Nothing has been lost.",
+    "body2": "If you have just had a conversation you want to record, write the note somewhere for now and log it when you are back online."
   },
   "blockedPage": {
     "heading": "This account is blocked",

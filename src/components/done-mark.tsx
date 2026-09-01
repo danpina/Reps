@@ -36,7 +36,12 @@ export function DoneMark({ state }: { state: LessonState }) {
   );
 }
 
-/** The same information in words, for screen readers and for the label line. */
+/**
+ * The same information in words, for screen readers and for the label line.
+ *
+ * `t` must already be scoped to the "lessonState" namespace
+ * (`getTranslations("lessonState")`).
+ */
 export function stateLabel(t: Translate, state: LessonState): string {
-  return t(`lessonState.${state}`);
+  return t(state);
 }

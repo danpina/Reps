@@ -148,21 +148,22 @@ export function describeSelf(
  * rehearsal-partner prompts sent to Claude, and stay in English regardless of
  * the reader's language — that is a prompt-engineering decision, not a UI one.
  * These are for dropdown options and the field log, which do follow the
- * reader.
+ * reader. `t` must already be scoped to the "demographics" namespace
+ * (`getTranslations("demographics")`).
  */
 export function sexOptionLabel(t: Translate, value: Sex): string {
-  return t(`demographics.sex.${value}`);
+  return t(`sex.${value}`);
 }
 
 export function ageOptionLabel(t: Translate, value: AgeGroup): string {
-  return t(`demographics.age.${value}`);
+  return t(`age.${value}`);
 }
 
 export function datingInterestOptionLabel(
   t: Translate,
   value: (typeof DATING_INTERESTS)[number],
 ): string {
-  return t(`demographics.datingInterest.${value}`);
+  return t(`datingInterest.${value}`);
 }
 
 /** The reader-facing version of describeOther, for the field log. */
@@ -173,14 +174,14 @@ export function describeOtherLocalized(
 ): string | null {
   const who =
     sex === "male"
-      ? t("demographics.aMan")
+      ? t("aMan")
       : sex === "female"
-        ? t("demographics.aWoman")
+        ? t("aWoman")
         : null;
   const ageText = age ? ageOptionLabel(t, age) : null;
 
   if (who && ageText) return `${who}, ${ageText}`;
   if (who) return who;
-  if (ageText) return t("demographics.someoneAged", { age: ageText });
+  if (ageText) return t("someoneAged", { age: ageText });
   return null;
 }

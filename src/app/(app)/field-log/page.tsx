@@ -71,6 +71,7 @@ export default async function FieldLogPage({
   const params = await searchParams;
   const t = await getTranslations("fieldLog");
   const tWent = await getTranslations("went");
+  const tDemographics = await getTranslations("demographics");
   const locale = await getLocale();
 
   const justEarned = params.badges
@@ -319,9 +320,9 @@ export default async function FieldLogPage({
                       </span>
                     </div>
 
-                    {entry.context_note || who(entry, t) ? (
+                    {entry.context_note || who(entry, tDemographics) ? (
                       <p className="mt-1.5 text-[13px] text-ink-muted">
-                        {[entry.context_note, who(entry, t)]
+                        {[entry.context_note, who(entry, tDemographics)]
                           .filter(Boolean)
                           .join(" · ")}
                       </p>

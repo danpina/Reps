@@ -42,6 +42,8 @@ export default async function TodayPage() {
 
   const t = await getTranslations("today");
   const tRehearsal = await getTranslations("rehearsalList");
+  const tRanks = await getTranslations("ranks");
+  const tProgress = await getTranslations("progress");
   const locale = await getLocale();
   const fact = factForLocale(locale);
   const name = profile?.display_name?.trim();
@@ -138,7 +140,7 @@ export default async function TodayPage() {
               id="rank"
               className="text-base font-medium tracking-tight text-ink"
             >
-              {rankName(t, rank.rank)}
+              {rankName(tRanks, rank.rank)}
             </h3>
             <span className="tabular shrink-0 text-xs text-ink-faint">
               {t("rankXp", { xp: rank.xp, position: rank.position, total: rank.total })}
@@ -153,7 +155,7 @@ export default async function TodayPage() {
             aria-valuemax={100}
             aria-label={
               rank.next
-                ? t("progressToRank", { name: rankName(t, rank.next) })
+                ? t("progressToRank", { name: rankName(tRanks, rank.next) })
                 : t("everyRankEarnedAria")
             }
           >
@@ -172,11 +174,11 @@ export default async function TodayPage() {
                   count: repsToNextRank(rank.toNext, XP_AWARD.mission),
                 })}
               </span>{" "}
-              {t("toRank", { name: rankName(t, rank.next), note: rankNote(t, rank.next) })}
+              {t("toRank", { name: rankName(tRanks, rank.next), note: rankNote(tRanks, rank.next) })}
             </p>
           ) : (
             <p className="mt-2.5 text-[13px] leading-relaxed text-ink-muted">
-              {t("everyRankEarned", { note: rankNote(t, rank.rank) })}
+              {t("everyRankEarned", { note: rankNote(tRanks, rank.rank) })}
             </p>
           )}
         </section>
@@ -187,7 +189,7 @@ export default async function TodayPage() {
           </summary>
 
           <dl className="mt-3 flex flex-col gap-2.5">
-            {xpTable(t).map((row) => (
+            {xpTable(tProgress).map((row) => (
               <div key={row.label} className="flex items-baseline gap-3">
                 <dt className="flex-1 text-[13px] leading-snug text-ink">
                   {row.label}
@@ -323,7 +325,7 @@ export default async function TodayPage() {
                           {t("levelNumber", { level: skill.progress.level })}
                           {skill.progress.isMax
                             ? ""
-                            : ` · ${describeNextLevelLocalized(t, skill.progress)}`}
+                            : ` · ${describeNextLevelLocalized(tProgress, skill.progress)}`}
                         </span>
                       </div>
                       <Bar

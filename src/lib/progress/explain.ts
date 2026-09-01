@@ -30,16 +30,21 @@ export function describeNextLevel(progress: LevelProgress): string {
     : `${reps} more reps to level ${progress.level + 1}`;
 }
 
-/** The reader-facing version of describeNextLevel, translated. */
+/**
+ * The reader-facing version of describeNextLevel, translated.
+ *
+ * `t` must already be scoped to the "progress" namespace
+ * (`getTranslations("progress")`).
+ */
 export function describeNextLevelLocalized(
   t: Translate,
   progress: LevelProgress,
 ): string {
   if (progress.isMax) {
-    return t("progress.maxLevel", { level: MAX_LEVEL });
+    return t("maxLevel", { level: MAX_LEVEL });
   }
 
-  return t("progress.moreRepsToLevel", {
+  return t("moreRepsToLevel", {
     reps: repsToNextLevel(progress),
     level: progress.level + 1,
   });
@@ -91,28 +96,31 @@ export const REPS_TO_THEORY_RATIO = Math.round(
  *
  * XP_TABLE itself stays in English and untouched, since tests assert its
  * exact wording and its rows have to line up with XP_AWARD by value.
+ *
+ * `t` must already be scoped to the "progress" namespace
+ * (`getTranslations("progress")`).
  */
 export function xpTable(t: Translate): XpRow[] {
   return [
     {
-      label: t("progress.xpTable.mission.label"),
+      label: t("xpTable.mission.label"),
       xp: XP_AWARD.mission,
-      note: t("progress.xpTable.mission.note"),
+      note: t("xpTable.mission.note"),
     },
     {
-      label: t("progress.xpTable.roleplay.label"),
+      label: t("xpTable.roleplay.label"),
       xp: XP_AWARD.roleplay,
-      note: t("progress.xpTable.roleplay.note"),
+      note: t("xpTable.roleplay.note"),
     },
     {
-      label: t("progress.xpTable.rewrite.label"),
+      label: t("xpTable.rewrite.label"),
       xp: XP_AWARD.rewrite,
-      note: t("progress.xpTable.rewrite.note"),
+      note: t("xpTable.rewrite.note"),
     },
     {
-      label: t("progress.xpTable.theory.label"),
+      label: t("xpTable.theory.label"),
       xp: XP_AWARD.theory,
-      note: t("progress.xpTable.theory.note"),
+      note: t("xpTable.theory.note"),
     },
   ];
 }

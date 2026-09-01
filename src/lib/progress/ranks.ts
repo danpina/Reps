@@ -167,11 +167,14 @@ export function repsToNextRank(toNext: number, xpPerRep: number): number {
  * and punctuation, and rankProgress hands back a reference into that array
  * rather than a copy. These look the rank back up by position in RANKS and
  * read the translated version from the messages catalog instead.
+ *
+ * `t` must already be scoped to the "ranks" namespace (`getTranslations("ranks")`),
+ * since the messages catalog nests rank entries at the root under that key.
  */
 export function rankName(t: Translate, rank: Rank): string {
-  return t(`ranks.${RANKS.indexOf(rank)}.name`);
+  return t(`${RANKS.indexOf(rank)}.name`);
 }
 
 export function rankNote(t: Translate, rank: Rank): string {
-  return t(`ranks.${RANKS.indexOf(rank)}.note`);
+  return t(`${RANKS.indexOf(rank)}.note`);
 }

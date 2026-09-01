@@ -2,6 +2,7 @@
 
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
+import { useTranslations } from "next-intl";
 
 import { AboutYouFields } from "@/components/about-you-fields";
 import type { DatingInterest } from "@/lib/curriculum/variants";
@@ -17,6 +18,7 @@ export function AboutYouForm({
   ageGroup: AgeGroup | null;
   datingInterest: DatingInterest | null;
 }) {
+  const t = useTranslations("settings.aboutYou");
   const [state, formAction] = useActionState<SettingsState, FormData>(
     updateAboutYou,
     {},
@@ -42,12 +44,13 @@ export function AboutYouForm({
         </p>
       ) : null}
 
-      <Submit />
+      <Submit label={t("save")} />
     </form>
   );
 }
 
-function Submit() {
+function Submit({ label }: { label: string }) {
+  const t = useTranslations("common");
   const { pending } = useFormStatus();
   return (
     <button
@@ -55,7 +58,7 @@ function Submit() {
       disabled={pending}
       className="self-start rounded bg-[var(--accent)] px-4 py-2.5 text-sm font-medium text-[var(--accent-ink)] transition-opacity hover:opacity-90 disabled:opacity-60"
     >
-      {pending ? "Saving…" : "Save"}
+      {pending ? t("saving") : label}
     </button>
   );
 }

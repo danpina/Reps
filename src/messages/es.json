@@ -143,7 +143,8 @@
     "heading": "Ajustes",
     "aboutYou": {
       "title": "Sobre ti",
-      "description": "Tres respuestas opcionales. Deciden qué versión de una lección se te muestra, cómo se revisa un ensayo, y qué es capaz de notar una lectura de tu registro. Deja cualquiera en blanco y consigues la versión general, que está escrita para ser correcta para todo el mundo."
+      "description": "Tres respuestas opcionales. Deciden qué versión de una lección se te muestra, cómo se revisa un ensayo, y qué es capaz de notar una lectura de tu registro. Deja cualquiera en blanco y consigues la versión general, que está escrita para ser correcta para todo el mundo.",
+      "save": "Guardar"
     },
     "language": {
       "title": "Idioma",
@@ -259,7 +260,7 @@
     "seeYourReps": "Ver tus repeticiones",
     "repsLogged": "Repeticiones registradas",
     "currentStreak": "Racha actual",
-    "bestStreak": "mejor {count}",
+    "bestStreak": "récord {count}",
     "rankXp": "{xp} XP · rango {position} de {total}",
     "progressToRank": "Progreso hacia {name}",
     "everyRankEarnedAria": "Todos los rangos conseguidos",
@@ -817,6 +818,11 @@
     "heading": "Nada por aquí",
     "body": "Esa lección o habilidad no existe.",
     "backToSkills": "Volver a las habilidades"
+  },
+  "offlinePage": {
+    "heading": "Sin conexión",
+    "body1": "Tus repeticiones se guardan en el servidor, así que tu cuenta de REPS necesita conexión para cargar. No se ha perdido nada.",
+    "body2": "Si acabas de tener una conversación que quieres registrar, apunta la nota en otro sitio por ahora y regístrala cuando vuelvas a tener conexión."
   },
   "blockedPage": {
     "heading": "Esta cuenta está bloqueada",
