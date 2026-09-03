@@ -37,7 +37,7 @@ join (
     ('seven-day-streak', 'Siete días', 'Una semana presentándote. Los días de descanso cuentan.'),
     ('ten-labels', 'Diez etiquetas en la calle', 'Diez repeticiones registradas sobre escuchar y etiquetar.'),
     ('first-flirting-mission', 'Primera misión de flirteo', 'Practicaste la más difícil, a propósito.'),
-    ('read-the-room', 'Leer la sala', 'Una repetición registrada sobre notar que el interés no era mutuo, y despedirte con calidez.'),
+    ('read-the-room', 'Leer el ambiente', 'Una repetición registrada sobre notar que el interés no era mutuo, y despedirte con calidez.'),
     ('second-draft', 'Segundo borrador', 'Volviste a una repetición que salió mal y averiguaste qué dirías en su lugar.'),
     ('all-nine', 'Las nueve habilidades', 'Al menos una repetición registrada en las nueve categorías.'),
     ('fifty-reps', 'Cincuenta repeticiones', 'Cincuenta conversaciones reales. Vuelve atrás en el registro y lee la primera.')
