@@ -15,7 +15,11 @@ export default async function CheckEmailPage({
         {t("heading")}
       </h1>
       <p className="text-sm leading-relaxed text-ink-muted">
-        {reason === "confirm" ? t("confirmBody") : t("linkBody")}
+        {reason === "confirm"
+          ? t("confirmBody")
+          : reason === "reset"
+            ? t("resetBody")
+            : t("linkBody")}
       </p>
       <Link
         href="/sign-in"

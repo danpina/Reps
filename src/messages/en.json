@@ -22,7 +22,8 @@
       "passwordTooShort": "Use a password of at least 8 characters.",
       "signUpFailed": "That did not work. Check the details and try again.",
       "missingEmailFirst": "Enter your email first.",
-      "magicLinkFailed": "That did not work. Check the address and try again."
+      "magicLinkFailed": "That did not work. Check the address and try again.",
+      "resetRequestFailed": "That did not work. Check the address and try again."
     },
     "signIn": {
       "heading": "Sign in",
@@ -34,6 +35,7 @@
       "passwordLabel": "Password",
       "submit": "Sign in",
       "submitPending": "Signing in…",
+      "forgotPassword": "Forgot your password?",
       "magicLinkHint": "Or sign in without a password. We'll email a one-time link to the address above.",
       "magicLinkSubmit": "Email me a link",
       "magicLinkPending": "Sending…"
@@ -55,6 +57,16 @@
       "heading": "Check your email",
       "confirmBody": "We sent you a link to confirm your address. Open it and you're in.",
       "linkBody": "We sent you a one-time sign-in link. It expires shortly, so open it soon.",
+      "resetBody": "We sent you a link to set a new password. It expires shortly, so open it soon.",
+      "backToSignIn": "Back to sign in"
+    },
+    "forgotPassword": {
+      "pageTitle": "Forgot password — Reps",
+      "heading": "Reset your password",
+      "body": "Enter the email on your account and we will send you a link to set a new one.",
+      "emailLabel": "Email",
+      "submit": "Send reset link",
+      "submitPending": "Sending…",
       "backToSignIn": "Back to sign in"
     }
   },
@@ -828,6 +840,22 @@
     "heading": "This account is blocked",
     "body": "You cannot practise or log reps while the block is in place. Your history has not been deleted.",
     "signOut": "Sign out"
+  },
+  "resetPasswordPage": {
+    "pageTitle": "Set a new password — Reps",
+    "heading": "Set a new password",
+    "body": "Choose a new password for your account.",
+    "newPasswordLabel": "New password",
+    "newPasswordHint": "At least 8 characters.",
+    "confirmLabel": "New password again",
+    "submit": "Save password",
+    "submitPending": "Saving…",
+    "errors": {
+      "expired": "This link has expired or was already used. Request a new one.",
+      "passwordTooShort": "Use a password of at least 8 characters.",
+      "passwordsDoNotMatch": "The two passwords do not match.",
+      "didNotSave": "That did not save. Try again."
+    }
   },
   "proPage": {
     "pageTitle": "Subscription — Reps",

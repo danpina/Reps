@@ -22,7 +22,8 @@
       "passwordTooShort": "Usa una contraseña de al menos 8 caracteres.",
       "signUpFailed": "Eso no ha funcionado. Comprueba los datos e inténtalo de nuevo.",
       "missingEmailFirst": "Introduce primero tu correo.",
-      "magicLinkFailed": "Eso no ha funcionado. Comprueba la dirección e inténtalo de nuevo."
+      "magicLinkFailed": "Eso no ha funcionado. Comprueba la dirección e inténtalo de nuevo.",
+      "resetRequestFailed": "Eso no ha funcionado. Comprueba la dirección e inténtalo de nuevo."
     },
     "signIn": {
       "heading": "Iniciar sesión",
@@ -34,6 +35,7 @@
       "passwordLabel": "Contraseña",
       "submit": "Iniciar sesión",
       "submitPending": "Iniciando sesión…",
+      "forgotPassword": "¿Has olvidado tu contraseña?",
       "magicLinkHint": "O inicia sesión sin contraseña. Te enviaremos un enlace de un solo uso a la dirección de arriba.",
       "magicLinkSubmit": "Envíame un enlace",
       "magicLinkPending": "Enviando…"
@@ -55,6 +57,16 @@
       "heading": "Revisa tu correo",
       "confirmBody": "Te hemos enviado un enlace para confirmar tu dirección. Ábrelo y ya estás dentro.",
       "linkBody": "Te hemos enviado un enlace de inicio de sesión de un solo uso. Caduca pronto, así que ábrelo enseguida.",
+      "resetBody": "Te hemos enviado un enlace para poner una contraseña nueva. Caduca pronto, así que ábrelo enseguida.",
+      "backToSignIn": "Volver a iniciar sesión"
+    },
+    "forgotPassword": {
+      "pageTitle": "Contraseña olvidada — Reps",
+      "heading": "Recupera tu contraseña",
+      "body": "Introduce el correo de tu cuenta y te enviaremos un enlace para poner una nueva.",
+      "emailLabel": "Correo",
+      "submit": "Enviar enlace",
+      "submitPending": "Enviando…",
       "backToSignIn": "Volver a iniciar sesión"
     }
   },
@@ -828,6 +840,22 @@
     "heading": "Esta cuenta está bloqueada",
     "body": "No puedes practicar ni registrar repeticiones mientras el bloqueo esté vigente. Tu historial no se ha borrado.",
     "signOut": "Cerrar sesión"
+  },
+  "resetPasswordPage": {
+    "pageTitle": "Pon una contraseña nueva — Reps",
+    "heading": "Pon una contraseña nueva",
+    "body": "Elige una contraseña nueva para tu cuenta.",
+    "newPasswordLabel": "Contraseña nueva",
+    "newPasswordHint": "Al menos 8 caracteres.",
+    "confirmLabel": "Contraseña nueva otra vez",
+    "submit": "Guardar contraseña",
+    "submitPending": "Guardando…",
+    "errors": {
+      "expired": "Ese enlace ha caducado o ya se ha usado. Pide uno nuevo.",
+      "passwordTooShort": "Usa una contraseña de al menos 8 caracteres.",
+      "passwordsDoNotMatch": "Las dos contraseñas no coinciden.",
+      "didNotSave": "Eso no se ha guardado. Inténtalo de nuevo."
+    }
   },
   "proPage": {
     "pageTitle": "Suscripción — Reps",

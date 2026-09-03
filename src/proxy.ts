@@ -8,6 +8,7 @@ import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/env";
 const PUBLIC_ROUTES = [
   "/sign-in",
   "/sign-up",
+  "/forgot-password",
   "/check-email",
   "/auth/callback",
   "/offline",

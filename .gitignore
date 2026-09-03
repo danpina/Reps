@@ -34,11 +34,18 @@ yarn-error.log*
 .env*
 !.env.example
 
-# loose credential notes, so a stray `git add -A` cannot publish them
-*PWD*
-*password*
-*secret*
-*credentials*
+# loose credential notes, so a stray `git add -A` cannot publish them.
+# Scoped to note-like extensions rather than a bare `*password*` — that
+# blanket form also matched legitimate source (password-form.tsx,
+# reset-password/), silently keeping it out of `git status` entirely.
+*PWD*.txt
+*PWD*.md
+*password*.txt
+*password*.md
+*secret*.txt
+*secret*.md
+*credentials*.txt
+*credentials*.md
 
 # vercel
 .vercel

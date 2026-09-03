@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState, useState } from "react";
 import { useTranslations } from "next-intl";
 
@@ -53,6 +54,12 @@ export function SignInForm({
           autoComplete="current-password"
           required
         />
+        <Link
+          href="/forgot-password"
+          className="-mt-2 self-end text-sm text-ink-muted underline underline-offset-4"
+        >
+          {t("forgotPassword")}
+        </Link>
         <Button type="submit" disabled={passwordPending}>
           {passwordPending ? t("submitPending") : t("submit")}
         </Button>

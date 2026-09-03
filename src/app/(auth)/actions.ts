@@ -79,6 +79,24 @@ export async function signUp(
   redirect("/check-email?reason=confirm");
 }
 
+export async function requestPasswordReset(
+  _state: AuthState,
+  formData: FormData,
+): Promise<AuthState> {
+  const t = await getTranslations("auth.errors");
+  const email = String(formData.get("email") ?? "").trim();
+  if (!email) return { error: t("missingEmailFirst") };
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${SITE_URL}/auth/callback?next=/reset-password`,
+  });
+
+  if (error) return { error: t("resetRequestFailed") };
+
+  redirect("/check-email?reason=reset");
+}
+
 export async function sendMagicLink(
   _state: AuthState,
   formData: FormData,
