@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 
-import { getProfile, requireUser } from "@/lib/auth/dal";
+import { getLocale, getProfile, requireUser } from "@/lib/auth/dal";
 import { describeSelf } from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
 import type { Rubric, Scenario } from "@/lib/curriculum/types";
@@ -161,7 +161,8 @@ export async function say(
   let reply: string;
   try {
     const engine = getPartnerEngine();
-    reply = await engine.nextTurn(await sceneFor(roleplay), history);
+    const locale = await getLocale();
+    reply = await engine.nextTurn(await sceneFor(roleplay), history, locale);
   } catch (error) {
     // A refusal is recorded as well as reported. Without the row the limit
     // above can never trip, since nothing else remembers that it happened.
@@ -231,6 +232,7 @@ export async function endScene(
   // escape would lose the transcript to an error page.
   const engine = getPartnerEngine();
   const profile = await getProfile();
+  const locale = await getLocale();
   let result: Awaited<ReturnType<typeof engine.feedback>>;
   try {
     result = await engine.feedback(
@@ -238,6 +240,7 @@ export async function endScene(
       roleplay.lessons.rubric_json,
       roleplay.transcript_json,
       describeSelf(profile?.sex ?? null, profile?.age_group ?? null),
+      locale,
     );
   } catch (error) {
     result = {

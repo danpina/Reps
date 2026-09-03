@@ -2,6 +2,7 @@ import "server-only";
 
 import Anthropic from "@anthropic-ai/sdk";
 
+import type { Locale } from "@/lib/curriculum/locale";
 import {
   buildCoachSystemPrompt,
   buildCoachUserPrompt,
@@ -77,6 +78,7 @@ export async function readTheLog(input: {
   repsTotal: number;
   capped: boolean;
   coachee: Coachee;
+  locale: Locale;
 }): Promise<ReviewResult> {
   if (input.reps.length === 0) {
     return { ok: false, reason: "There is nothing new to read." };
@@ -92,7 +94,7 @@ export async function readTheLog(input: {
       system: [
         {
           type: "text",
-          text: buildCoachSystemPrompt(),
+          text: buildCoachSystemPrompt(input.locale),
           cache_control: { type: "ephemeral" },
         },
       ],

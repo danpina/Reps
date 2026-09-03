@@ -44,7 +44,7 @@ describe("system prompt", () => {
 
   test("carries the partner's identity and situation", () => {
     for (const scenario of scenarios) {
-      const prompt = buildSystemPrompt(scenario);
+      const prompt = buildSystemPrompt(scenario, "en");
       assert.ok(prompt.includes(scenario.partner.name), "missing name");
       assert.ok(prompt.includes(scenario.partner.role), "missing role");
       assert.ok(prompt.includes(scenario.partner.personality), "missing personality");
@@ -56,7 +56,7 @@ describe("system prompt", () => {
 
   test("states openness as both a number and a behaviour", () => {
     for (const scenario of scenarios) {
-      const prompt = buildSystemPrompt(scenario);
+      const prompt = buildSystemPrompt(scenario, "en");
       const { openness, name } = scenario.partner;
       assert.ok(
         prompt.includes(`${openness} out of 5`),
@@ -71,7 +71,7 @@ describe("system prompt", () => {
 
   test("every scenario's own constraints survive into the prompt", () => {
     for (const scenario of scenarios) {
-      const prompt = buildSystemPrompt(scenario);
+      const prompt = buildSystemPrompt(scenario, "en");
       for (const constraint of scenario.constraints) {
         assert.ok(
           prompt.includes(constraint),
@@ -84,14 +84,14 @@ describe("system prompt", () => {
   // The single most important instruction in the whole feature.
   test("always forbids coaching, whatever the lesson said", () => {
     for (const scenario of scenarios) {
-      const prompt = buildSystemPrompt(scenario).toLowerCase();
+      const prompt = buildSystemPrompt(scenario, "en").toLowerCase();
       assert.ok(prompt.includes("never coach"), `${scenario.partner.name}`);
     }
   });
 
   test("forbids narration and breaking the scene", () => {
     for (const scenario of scenarios) {
-      const prompt = buildSystemPrompt(scenario).toLowerCase();
+      const prompt = buildSystemPrompt(scenario, "en").toLowerCase();
       assert.ok(prompt.includes("no narration"));
       assert.ok(prompt.includes("fourth wall"));
     }
@@ -104,7 +104,7 @@ describe("system prompt", () => {
     assert.ok(closed.length > 0, "expected at least one openness 1 partner");
 
     for (const scenario of closed) {
-      const prompt = buildSystemPrompt(scenario).toLowerCase();
+      const prompt = buildSystemPrompt(scenario, "en").toLowerCase();
       assert.ok(prompt.includes("do not warm up"));
       assert.ok(prompt.includes("not a puzzle to be solved"));
     }
@@ -126,7 +126,7 @@ describe("feedback prompt", () => {
   };
 
   test("names every criterion by key", () => {
-    const prompt = buildFeedbackPrompt(rubric);
+    const prompt = buildFeedbackPrompt(rubric, undefined, "en");
     for (const c of rubric.criteria) {
       assert.ok(prompt.includes(c.key));
       assert.ok(prompt.includes(c.label));
@@ -134,13 +134,13 @@ describe("feedback prompt", () => {
   });
 
   test("demands JSON only, with no fences", () => {
-    const prompt = buildFeedbackPrompt(rubric).toLowerCase();
+    const prompt = buildFeedbackPrompt(rubric, undefined, "en").toLowerCase();
     assert.ok(prompt.includes("json only"));
     assert.ok(prompt.includes("no markdown code fences"));
   });
 
   test("states the brief's counting rules explicitly", () => {
-    const prompt = buildFeedbackPrompt(rubric).toLowerCase();
+    const prompt = buildFeedbackPrompt(rubric, undefined, "en").toLowerCase();
     assert.ok(prompt.includes("exactly two"), "two positives");
     assert.ok(prompt.includes("exactly one"), "one fix");
     assert.ok(prompt.includes("verbatim"), "quote must be real");
@@ -232,7 +232,7 @@ describe("the partner a reader gets instead", () => {
 
   test("each builds a prompt that carries who they are", () => {
     for (const { where, partner } of alternates) {
-      const prompt = buildSystemPrompt({ ...scene, partner });
+      const prompt = buildSystemPrompt({ ...scene, partner }, "en");
       assert.ok(prompt.includes(partner.name), `${where}: missing name`);
       assert.ok(prompt.includes(partner.role), `${where}: missing role`);
       assert.ok(prompt.includes(partner.personality), `${where}: missing personality`);

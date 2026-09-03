@@ -104,7 +104,7 @@ Si te quedas con una cosa: nada de lo que escribes llega como sonaba en tu cabez
       "openness": 4,
       "personality": "Lee los mensajes exactos pero escuetos como algo raros, y responde notablemente mejor a una línea de reconocimiento."
     },
-    "setting": "Has escrito una respuesta de tres líneas factualmente perfecta a alguien con quien te gusta trabajar, y algo en ella parece frío.",
+    "setting": "Has escrito una respuesta de tres líneas objetivamente perfecta a alguien con quien te gusta trabajar, y algo en ella parece frío.",
     "constraints": [
       "Mantente en el personaje en todo momento. Nunca des consejos, ni evalúes, ni rompas la escena.",
       "Responde con brevedad y algo de sequedad a una respuesta exacta pero escueta.",

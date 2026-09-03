@@ -1,3 +1,4 @@
+import type { Locale } from "@/lib/curriculum/locale";
 import type { Rubric, Scenario } from "@/lib/curriculum/types";
 import type { Feedback, Rewrite } from "./feedback";
 
@@ -58,7 +59,7 @@ export class PartnerError extends Error {
  */
 export interface PartnerEngine {
   readonly name: string;
-  nextTurn(scenario: Scenario, history: Turn[]): Promise<string>;
+  nextTurn(scenario: Scenario, history: Turn[], locale: Locale): Promise<string>;
   feedback(
     scenario: Scenario,
     rubric: Rubric,
@@ -67,7 +68,8 @@ export interface PartnerEngine {
      * A line describing the learner, when they have said who they are. Sets
      * the register of the advice; the scripted engine ignores it entirely.
      */
-    learner?: string | null,
+    learner: string | null | undefined,
+    locale: Locale,
   ): Promise<{ ok: true; feedback: Feedback } | { ok: false; reason: string }>;
 }
 

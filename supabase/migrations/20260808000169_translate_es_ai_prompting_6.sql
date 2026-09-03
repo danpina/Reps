@@ -358,7 +358,7 @@ select pg_temp.es_lesson('do-not-outsource-the-reps', 4,
 
 La señal es que se siente productivo. La evitación genuina — cerrar el portátil, salir a caminar, decidir hacerlo mañana — se anuncia a sí misma, y sabes qué estás haciendo mientras lo haces. Pulir no. Estás trabajando en el mensaje. Llevas una hora trabajando en él. Cada pasada hace una pequeña mejora, y el mensaje no se ha enviado, que era lo único que iba a importar de verdad.
 
-La herramienta hace que esto sea mucho más fácil de hacer, porque siempre va a producir otra versión. No hay ningún punto de parada natural, ninguna fricción, y ningún momento en el que algo diga *ya es suficiente*. Una persona editando por su cuenta eventualmente se aburre. Esto no.
+La herramienta hace que esto sea mucho más fácil de hacer, porque siempre va a producir otra versión. No hay ningún punto de parada natural, ninguna fricción, y ningún momento en el que algo diga *ya es suficiente*. Una persona editando por su cuenta con el tiempo se aburre. Esto no.
 
 Tres señales, en el orden en que suelen aparecer.
 

@@ -35,6 +35,21 @@ export const LOCALE_NAMES: Record<Locale, string> = {
   de: "Deutsch",
 };
 
+/**
+ * The name of a language in English, for AI prompts.
+ *
+ * The roleplay partner and the coach are both told to answer in this
+ * language rather than left to infer it — a system prompt written in English
+ * pulls a model toward English regardless of what language the scenario data
+ * around it happens to be in, and "respond in Spanish" written in English is
+ * followed more reliably than the same instruction written in Spanish.
+ */
+export const LOCALE_ENGLISH_NAMES: Record<Locale, string> = {
+  en: "English",
+  es: "Spanish",
+  de: "German",
+};
+
 export function isLocale(value: unknown): value is Locale {
   return typeof value === "string" && (LOCALES as readonly string[]).includes(value);
 }

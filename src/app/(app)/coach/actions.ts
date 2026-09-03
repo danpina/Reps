@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 
-import { getProfile, requireUser } from "@/lib/auth/dal";
+import { getLocale, getProfile, requireUser } from "@/lib/auth/dal";
 import { isPro } from "@/lib/billing/entitlement";
 import { readTheLog } from "@/lib/coach/engine";
 import { getCoachState, getUnreadReps } from "@/lib/coach/queries";
@@ -96,6 +96,7 @@ export async function runReview(
       sex: profile?.sex ?? null,
       ageGroup: profile?.age_group ?? null,
     },
+    locale: await getLocale(),
   });
 
   if (!result.ok) return { error: result.reason };

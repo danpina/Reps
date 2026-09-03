@@ -2,6 +2,7 @@ import "server-only";
 
 import Anthropic from "@anthropic-ai/sdk";
 
+import type { Locale } from "@/lib/curriculum/locale";
 import type { Rubric, Scenario } from "@/lib/curriculum/types";
 import { parseFeedback } from "./feedback";
 import { PartnerError, type PartnerEngine, type Turn } from "./partner";
@@ -138,7 +139,7 @@ function assertNotRefused(message: Anthropic.Message, what: "reply" | "review") 
 export class AnthropicPartner implements PartnerEngine {
   readonly name = "anthropic";
 
-  async nextTurn(scenario: Scenario, history: Turn[]): Promise<string> {
+  async nextTurn(scenario: Scenario, history: Turn[], locale: Locale): Promise<string> {
     const messages = toMessages(history);
     if (messages.length === 0) return scenario.opening_beat;
 
@@ -152,7 +153,7 @@ export class AnthropicPartner implements PartnerEngine {
         system: [
           {
             type: "text",
-            text: buildSystemPrompt(scenario),
+            text: buildSystemPrompt(scenario, locale),
             cache_control: { type: "ephemeral" },
           },
         ],
@@ -180,7 +181,8 @@ export class AnthropicPartner implements PartnerEngine {
     scenario: Scenario,
     rubric: Rubric,
     history: Turn[],
-    learner?: string | null,
+    learner: string | null | undefined,
+    locale: Locale,
   ) {
     const userTurns = history
       .filter((turn) => turn.role === "user")
@@ -195,7 +197,7 @@ export class AnthropicPartner implements PartnerEngine {
       message = await getClient().messages.create({
         model: MODEL,
         max_tokens: FEEDBACK_MAX_TOKENS,
-        system: buildFeedbackPrompt(rubric, learner),
+        system: buildFeedbackPrompt(rubric, learner, locale),
         output_config: {
           // The review is the part users judge the app by, and a shallow one
           // reads as filler. Worth the tokens.

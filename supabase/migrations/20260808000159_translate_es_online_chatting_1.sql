@@ -208,7 +208,7 @@ Si te quedas con una cosa: si se puede borrar sin cambiar el significado, estaba
       "role": "una compañera de trabajo",
       "mood": "Ocupada.",
       "openness": 4,
-      "personality": "Trata una petición encogida como poco prioritaria y le llega eventualmente; trata una llana como una petición normal y responde con una hora."
+      "personality": "Trata una petición encogida como poco prioritaria y le llega con el tiempo; trata una llana como una petición normal y responde con una hora."
     },
     "setting": "Necesitas quince minutos del tiempo de una compañera esta semana. Has redactado un mensaje y contiene tres solos.",
     "constraints": [

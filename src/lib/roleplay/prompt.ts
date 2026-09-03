@@ -1,3 +1,4 @@
+import { LOCALE_ENGLISH_NAMES, type Locale } from "../curriculum/locale.ts";
 import type { Scenario } from "@/lib/curriculum/types";
 
 /**
@@ -24,7 +25,7 @@ export function opennessBehaviour(level: number): string {
   return OPENNESS_BEHAVIOUR[level] ?? OPENNESS_BEHAVIOUR[3];
 }
 
-export function buildSystemPrompt(scenario: Scenario): string {
+export function buildSystemPrompt(scenario: Scenario, locale: Locale): string {
   const { partner } = scenario;
 
   return [
@@ -46,6 +47,7 @@ export function buildSystemPrompt(scenario: Scenario): string {
     opennessBehaviour(partner.openness),
     ``,
     `# Rules`,
+    `- Speak only in ${LOCALE_ENGLISH_NAMES[locale]}, in every turn, regardless of what language the other person writes in.`,
     ...scenario.constraints.map((c) => `- ${c}`),
     `- Reply with your character's next turn only. No narration, no stage directions, no quotation marks around your speech.`,
     `- Keep replies to the length a real person would actually use out loud. One to three sentences is normal; a paragraph is not.`,
@@ -73,7 +75,8 @@ export function buildFeedbackPrompt(
    * differently at twenty-two and at fifty-five, and one written for the wrong
    * one of those is worse than none.
    */
-  learner?: string | null,
+  learner: string | null | undefined,
+  locale: Locale,
 ): string {
   const criteria = rubric.criteria
     .map((c) => `- ${c.key}: ${c.label}. ${c.description}`)
@@ -108,9 +111,10 @@ export function buildFeedbackPrompt(
     `}`,
     ``,
     `# Rules`,
+    `- Write "worked", "fix", "rewrite.better" and "rewrite.why" only in ${LOCALE_ENGLISH_NAMES[locale]}. "original" is the exception — see below.`,
     `- Exactly two entries in "worked". Not one, not three.`,
     `- Exactly one "fix". People can only act on one thing at a time, so choose the change that would have made the most difference.`,
-    `- "original" must be copied verbatim from a LEARNER line in this transcript. Never invent a line, and never quote the PARTNER.`,
+    `- "original" must be copied verbatim from a LEARNER line in this transcript, in whatever language they actually wrote it in. Never invent a line, and never quote the PARTNER.`,
     `- Write to the learner in the second person: "you asked", not "the learner asked". Never address them by the partner's name, and never use a name for them at all — you have not been told theirs.`,
     `- Be specific and plain. No praise for its own sake.`,
   ].join("\n");
