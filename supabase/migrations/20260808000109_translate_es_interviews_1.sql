@@ -6,10 +6,16 @@
 --
 -- Decisions this topic adds:
 --
--- **El remate** for "the landing". "El cierre" is the obvious choice and it is
--- already taken by track 9, which is about closing the interview. "Remate" is
--- what finishes a play in ordinary Spanish, it takes a verb — rematar — and it
--- keeps the two ideas apart in a topic that talks about both.
+-- **El aterrizaje** for "the landing", keeping the English's own image rather
+-- than swapping it for an unrelated Spanish one. "El cierre" is the obvious
+-- choice and it is already taken by track 9, which is about closing the
+-- interview — a second, distinct problem needed a second, distinct word.
+-- "El remate" was tried first: correct dictionary Spanish for "the finishing
+-- blow", but its everyday sense is football and auctions, and it reads as
+-- borrowed sports jargon inside a room where nobody is playing a match.
+-- "Aterrizar" carries the same image the English is making — an answer that
+-- sticks the landing — and takes it naturally as a verb: "aterriza en X",
+-- "una respuesta que nunca aterrizó".
 --
 -- **Tres tiempos** for "three beats". "En tres tiempos" already means in three
 -- stages in everyday Spanish, so the structure arrives free.
@@ -143,7 +149,7 @@ Usa tres tiempos en su lugar.
 
 **Segundo tiempo — qué hiciste con ello.** El medio, y la única parte que debería ocupar más de una frase o dos. Una o dos cosas concretas que hayas hecho de verdad, elegidas porque se parecen al puesto que hay encima de la mesa.
 
-**Tercer tiempo — por qué estás aquí.** El remate. Por qué este puesto, en este sitio, ahora.
+**Tercer tiempo — por qué estás aquí.** El aterrizaje. Por qué este puesto, en este sitio, ahora.
 
 **La jugada:** responde en tres tiempos — de dónde vienes, qué hiciste con ello, por qué estás en esta sala.
 
@@ -154,7 +160,7 @@ Un aviso. El segundo tiempo es donde vive el buen material, así que quiere crec
     {
       "situation": "Alguien de desarrollo, con seis años de experiencia, en una entrevista en una empresa de pagos.",
       "line": "Llegué a esto por una carrera de física y un montón de scripts que se me fueron de las manos. Desde entonces he pasado casi todo el tiempo en sistemas donde equivocarse sale caro — los últimos cuatro años en facturación en un marketplace, que fue mucha conciliación y mucho aprender cómo se mueve el dinero de verdad. Por eso me llamó la atención este puesto: es el mismo problema, pero es toda la empresa en vez del rincón de un equipo.",
-      "why": "Tres tiempos, y cada uno hace un solo trabajo. El medio nombra el terreno en vez de enumerar empresas, y el remate dice por qué esta empresa en concreto — que es justo la parte que casi todos los candidatos dejan a la deducción."
+      "why": "Tres tiempos, y cada uno hace un solo trabajo. El medio nombra el terreno en vez de enumerar empresas, y el aterrizaje dice por qué esta empresa en concreto — que es justo la parte que casi todos los candidatos dejan a la deducción."
     },
     {
       "situation": "Alguien que cambia de profesión, de dar clase a diseñar formación.",
@@ -181,18 +187,18 @@ Un aviso. El segundo tiempo es donde vive el buen material, así que quiere crec
       "prompt": "Llevas noventa segundos y no has llegado al tercer tiempo. ¿Cuál es el arreglo?",
       "options": [
         { "text": "Acelerar para que todavía te quepa todo.", "correct": false, "note": "Correr no comprime una respuesta, solo la hace más difícil de seguir. Quien te entrevista deja de escuchar y se pone a esperar." },
-        { "text": "Dejar el resto del medio e ir directo a por qué estás aquí.", "correct": true, "note": "El remate es el tiempo que cambia algo. Una respuesta que llega ahí con dos ejemplos en vez de cuatro no ha perdido nada que importe." },
-        { "text": "Terminar el medio como es debido: el detalle es lo que lo hace creíble.", "correct": false, "note": "Ya es creíble. El segundo mejor ejemplo no ha ganado nunca una entrevista, y suele ser justo lo que se come el remate." },
-        { "text": "Preguntar si quieren que sigas.", "correct": false, "note": "Educado, y les entrega una respuesta que nunca remató. Dirán que sí y recordarán que te enrollaste." }
+        { "text": "Dejar el resto del medio e ir directo a por qué estás aquí.", "correct": true, "note": "El aterrizaje es el tiempo que cambia algo. Una respuesta que llega ahí con dos ejemplos en vez de cuatro no ha perdido nada que importe." },
+        { "text": "Terminar el medio como es debido: el detalle es lo que lo hace creíble.", "correct": false, "note": "Ya es creíble. El segundo mejor ejemplo no ha ganado nunca una entrevista, y suele ser justo lo que se come el aterrizaje." },
+        { "text": "Preguntar si quieren que sigas.", "correct": false, "note": "Educado, y les entrega una respuesta que nunca aterrizó. Dirán que sí y recordarán que te enrollaste." }
       ],
-      "explain": "Todas las respuestas largas a esta pregunta mueren igual: el medio se come el final. Cuando vas sobrado de tiempo, corta del medio, nunca del remate."
+      "explain": "Todas las respuestas largas a esta pregunta mueren igual: el medio se come el final. Cuando vas sobrado de tiempo, corta del medio, nunca del aterrizaje."
     }
   ]$j$::jsonb,
   $j${
     "scale": { "min": 1, "max": 5 },
     "criteria": [
-      { "key": "three_beats", "label": "Tenía forma", "description": "La respuesta tuvo un comienzo, un medio y un remate en vez de ser una cronología." },
-      { "key": "landed_on_them", "label": "Remató en este puesto", "description": "Terminó conectando la historia con este puesto en concreto, en vez de parar en la última empresa." },
+      { "key": "three_beats", "label": "Tenía forma", "description": "La respuesta tuvo un comienzo, un medio y un aterrizaje en vez de ser una cronología." },
+      { "key": "landed_on_them", "label": "Aterrizó en este puesto", "description": "Terminó conectando la historia con este puesto en concreto, en vez de parar en la última empresa." },
       { "key": "chosen_middle", "label": "Eligió el medio", "description": "Los ejemplos que dio se parecían al puesto que había sobre la mesa, en vez de ser lo primero que le vino a la cabeza." },
       { "key": "length", "label": "Fue breve", "description": "Unos noventa segundos. Suficiente para tener sustancia, corto como para que quisieran preguntar más." }
     ]
@@ -214,31 +220,31 @@ Un aviso. El segundo tiempo es donde vive el buen material, así que quiere crec
       "No des ánimos ni comentarios sobre cómo lo ha contado. Estás evaluando, no enseñando."
     ],
     "opening_beat": "Dan echa un vistazo a sus notas y vuelve a la cámara. «Vale — antes de entrar en ningún detalle, háblame de ti.»",
-    "success_looks_like": "La persona da una respuesta con forma: comienzo, medio y un remate que nombra este puesto, en unos noventa segundos. Dan pregunta por algo del medio, lo que significa que fue lo bastante concreto como para agarrarse a ello."
+    "success_looks_like": "La persona da una respuesta con forma: comienzo, medio y un aterrizaje que nombra este puesto, en unos noventa segundos. Dan pregunta por algo del medio, lo que significa que fue lo bastante concreto como para agarrarse a ello."
   }$j$::jsonb,
   'Di tus tres tiempos en voz alta hoy a una persona real: un amigo, tu pareja, un compañero de confianza. No le avises antes de que estás practicando. Luego hazle una sola pregunta: ¿a qué puesto sonaba que me estaba presentando? Apunta lo que te diga, aunque se equivoque. Sobre todo si se equivoca.',
   $j${
     "says": "Vale — antes de entrar en ningún detalle, háblame de ti.",
     "model": {
       "line": "Empecé en operaciones en una empresa de logística, sobre todo porque fue el primer trabajo que me quiso, y descubrí que se me daba bien desenredar cosas que nadie más quería mirar. El medio son cinco años haciendo exactamente eso con problemas cada vez más grandes, los dos últimos llevando un equipo de seis y rehaciendo cómo gestionábamos las incidencias. Ahí he llegado más o menos hasta donde puedo, y este puesto es el primero que veo que es el mismo problema diez veces más grande, y por eso estoy aquí.",
-      "why": "Tres tiempos y nada más: una frase de dónde empezó, el medio donde está el trabajo, y un remate que nombra el puesto. Menos de ciento diez palabras, que son unos noventa segundos en voz alta."
+      "why": "Tres tiempos y nada más: una frase de dónde empezó, el medio donde está el trabajo, y un aterrizaje que nombra el puesto. Menos de ciento diez palabras, que son unos noventa segundos en voz alta."
     },
     "checks": [
       { "kind": "min_words", "n": 60, "requirement": "Lo bastante largo para ser una respuesta y no un encogimiento de hombros" },
       { "kind": "max_words", "n": 170, "requirement": "Noventa segundos — ciento setenta palabras como mucho" },
-      { "kind": "contains_any", "words": ["este puesto", "este trabajo", "por eso", "esa es la razón", "me ha traído", "estoy aquí"], "requirement": "Remátalo en por qué estás en esta sala" }
+      { "kind": "contains_any", "words": ["este puesto", "este trabajo", "por eso", "esa es la razón", "me ha traído", "estoy aquí"], "requirement": "Aterrízalo en por qué estás en esta sala" }
     ],
     "maxChars": 1100
   }$j$::jsonb
 );
 
 select pg_temp.es_lesson('interview-your-story', 2,
-  'El remate es toda la respuesta',
+  'El aterrizaje es toda la respuesta',
   $md$Dos candidatos dan el mismo medio. Uno termina en lo último que hizo. El otro termina en el puesto que hay en la sala. Al segundo se le recuerda como mejor candidato, y ninguno de los dos llega a saber por qué.
 
-El remate hace algo que ninguna otra parte de la respuesta puede hacer. Todo lo anterior son pruebas, y las pruebas no se interpretan solas. Quien te entrevista está ahí sentado preguntando en silencio *¿y qué?*, y el remate es donde respondes a eso en voz alta en vez de confiar en que se entienda.
+El aterrizaje hace algo que ninguna otra parte de la respuesta puede hacer. Todo lo anterior son pruebas, y las pruebas no se interpretan solas. Quien te entrevista está ahí sentado preguntando en silencio *¿y qué?*, y el aterrizaje es donde respondes a eso en voz alta en vez de confiar en que se entienda.
 
-Un remate tiene dos mitades, y saltarse cualquiera de las dos es lo que hace que suene flojo.
+Un aterrizaje tiene dos mitades, y saltarse cualquiera de las dos es lo que hace que suene flojo.
 
 **Por qué este trabajo.** Qué estás buscando de verdad, en palabras llanas. No un cumplido a la empresa: una dirección. *Quiero hacer esto sobre una superficie más grande* es una dirección. *Sois los líderes del mercado* es halago, y el halago es gratis, así que no cuenta.
 
@@ -248,41 +254,41 @@ Un remate tiene dos mitades, y saltarse cualquiera de las dos es lo que hace que
 
 El detalle concreto es la parte que la gente se salta, y es la parte que se recuerda. Quien entrevista se pasa el día oyendo que su empresa es apasionante. Que alguien se haya fijado en lo que de verdad hicieron es raro hasta el punto de merecer una nota al margen.
 
-Una advertencia: el remate tiene que ser verdad. Un motivo inventado para querer el puesto es lo más fácil de pillar que existe, porque la pregunta que viene después siempre es *cuéntame más de eso*, y no hay más.$md$,
+Una advertencia: el aterrizaje tiene que ser verdad. Un motivo inventado para querer el puesto es lo más fácil de pillar que existe, porque la pregunta que viene después siempre es *cuéntame más de eso*, y no hay más.$md$,
   $j$[
     {
-      "situation": "Rematar la historia al presentarte a una empresa más pequeña después de años en una grande.",
+      "situation": "Aterrizar la historia al presentarte a una empresa más pequeña después de años en una grande.",
       "line": "Lo que quiero ahora es estar más cerca de las decisiones. En el sitio anterior estaba a tres capas de cualquiera que pudiera cambiar la hoja de ruta, y me cansé de escribir el informe en vez de estar en la sala. Sois cuarenta personas y el puesto reporta a quien es dueño del producto, que es justo por lo que me presenté en vez de renovar.",
       "why": "Una dirección en vez de un cumplido, y el detalle concreto es estructural: a quién reporta el puesto. Eso solo se sabe si te has leído la oferta en serio, y lo dice sin decirlo."
     },
     {
-      "situation": "Rematar una respuesta en una entrevista para un puesto que es un movimiento lateral y no un ascenso.",
+      "situation": "Aterrizar una respuesta en una entrevista para un puesto que es un movimiento lateral y no un ascenso.",
       "line": "La versión honesta es que no busco subir de nivel, busco moverme de lado. Lo que se me da bien es llevar una cosa de hecha un lío a funcionando, y a mi puesto actual se le ha acabado el lío. Vuestro artículo de ingeniería sobre rehacer el sistema de planificación decía en voz alta lo que casi nadie dice: que sigue migrado a medias. Ese es el trabajo que quiero.",
       "why": "Nombra lo incómodo antes de que puedan preguntárselo, y luego hace que el detalle concreto trabaje por partida doble: demuestra que investigó, y demuestra que la motivación es real porque señala el lío exacto que quiere."
     },
     {
-      "situation": "Alguien cuyo motivo real para irse es un mal jefe, rematando la respuesta sin decirlo.",
+      "situation": "Alguien cuyo motivo real para irse es un mal jefe, aterrizando la respuesta sin decirlo.",
       "line": "He aprendido mucho en el puesto actual y he dejado de aprender en él, que es el resumen útil. Lo que busco es un sitio donde el listón lo ponga alguien de quien pueda aprender — y la razón por la que estoy aquí es que dos personas en las que confío me han dicho, por separado, que este es el equipo donde eso pasa.",
       "why": "Verdad, completo, y no da nada. El rencor hacia un jefe es la forma más común de que esta respuesta salga mal; el arreglo no es mentir, sino responder a una altura donde el detalle feo sencillamente no viene a cuento."
     }
   ]$j$::jsonb,
   $j$[
     {
-      "prompt": "¿Qué remate está haciendo más trabajo?",
+      "prompt": "¿Qué aterrizaje está haciendo más trabajo?",
       "options": [
         { "text": "Y por eso me hace muchísima ilusión esta oportunidad: estáis haciendo cosas increíbles en este sector.", "correct": false, "note": "Se le podría decir a cualquier empresa del planeta, lo que significa que no dice nada. La palabra ilusión está cargando con todo y no puede." },
-        { "text": "Y eso nos trae hasta hoy, básicamente. Ese soy yo.", "correct": false, "note": "No es un remate en absoluto. Detiene la respuesta sin interpretarla, y deja el «¿y qué?» en manos de quien entrevista." },
+        { "text": "Y eso nos trae hasta hoy, básicamente. Ese soy yo.", "correct": false, "note": "No es un aterrizaje en absoluto. Detiene la respuesta sin interpretarla, y deja el «¿y qué?» en manos de quien entrevista." },
         { "text": "Lo que quiero es ser dueño de un producto y no de una funcionalidad, y este es uno de los tres sitios más o menos que contratan para eso donde el producto es algo que yo usaría.", "correct": true, "note": "Una dirección, y luego un motivo concreto y comprobable. Ese «de los tres sitios más o menos» señala sin ruido una búsqueda pensada y no un envío masivo." },
         { "text": "Y llevo mucho tiempo siguiendo a vuestra empresa, así que esto me parece el paso natural.", "correct": false, "note": "No se puede comprobar y vale para cualquiera. «El paso natural» es la frase a la que se agarra quien no ha averiguado cuál es el paso." }
       ],
-      "explain": "Un remate necesita una dirección y un detalle. El entusiasmo sin ninguna de las dos cosas es el final más común que hay, y es por lo que tantas buenas respuestas se olvidan."
+      "explain": "Un aterrizaje necesita una dirección y un detalle. El entusiasmo sin ninguna de las dos cosas es el final más común que hay, y es por lo que tantas buenas respuestas se olvidan."
     },
     {
-      "prompt": "Quieres el puesto sobre todo porque paga bastante más. ¿Qué pones en el remate?",
+      "prompt": "Quieres el puesto sobre todo porque paga bastante más. ¿Qué pones en el aterrizaje?",
       "options": [
         { "text": "Dilo. La honestidad desarma y ya saben que el dinero cuenta.", "correct": false, "note": "Es honesto, y también responde a una pregunta que nadie ha hecho en el momento menos útil para ti. El dinero tiene su propia conversación más tarde, en mejores condiciones." },
-        { "text": "Busca el motivo verdadero que hay debajo y remata en ese.", "correct": true, "note": "Casi siempre hay uno: más alcance, problemas más difíciles, un nivel que se te ha quedado pequeño. El sueldo suele ser el síntoma de lo que de verdad quieres, y lo que de verdad quieres es lo que hace que un remate remate." },
-        { "text": "Invéntate un motivo sobre su misión y sostenlo.", "correct": false, "note": "La pregunta que viene después siempre es «cuéntame más de eso», y no hay más. Un remate que no sobrevive a una sola pregunta es peor que uno soso." }
+        { "text": "Busca el motivo verdadero que hay debajo y aterriza en ese.", "correct": true, "note": "Casi siempre hay uno: más alcance, problemas más difíciles, un nivel que se te ha quedado pequeño. El sueldo suele ser el síntoma de lo que de verdad quieres, y lo que de verdad quieres es lo que hace que un aterrizaje aterrice." },
+        { "text": "Invéntate un motivo sobre su misión y sostenlo.", "correct": false, "note": "La pregunta que viene después siempre es «cuéntame más de eso», y no hay más. Un aterrizaje que no sobrevive a una sola pregunta es peor que uno soso." }
       ],
       "explain": "No estás obligado a dar todos tus motivos. Estás obligado a que el que des sea verdad, porque la siguiente pregunta lo va a poner a prueba."
     }
@@ -293,7 +299,7 @@ Una advertencia: el remate tiene que ser verdad. Un motivo inventado para querer
       { "key": "direction", "label": "Nombró una dirección", "description": "Dijo qué está buscando, en vez de hacerle un cumplido a la empresa." },
       { "key": "specific_detail", "label": "Un detalle solo sobre ellos", "description": "Incluyó algo que no se le podría haber dicho a un competidor." },
       { "key": "truthfulness", "label": "Sobreviviría a una repregunta", "description": "El motivo que dio era lo bastante real como para ampliarlo si se lo piden." },
-      { "key": "clean_finish", "label": "Terminó limpio", "description": "Acabó en el remate y paró, en vez de irse apagando o volver a empezar." }
+      { "key": "clean_finish", "label": "Terminó limpio", "description": "Acabó en el aterrizaje y paró, en vez de irse apagando o volver a empezar." }
     ]
   }$j$::jsonb,
   $j${
@@ -315,7 +321,7 @@ Una advertencia: el remate tiene que ser verdad. Un motivo inventado para querer
     "opening_beat": "Priya tapa el bolígrafo. «He leído tu CV y Dan me ha dado el resumen, así que no me hace falta toda la historia. Lo que quiero saber es por qué estás sentado aquí y no en otro sitio.»",
     "success_looks_like": "La persona da una dirección y un detalle que es específicamente sobre esta empresa, y aguanta cuando Priya le pide que cuente más."
   }$j$::jsonb,
-  'Coge hoy una oferta de empleo real, una a la que te presentarías de verdad. Encuentra un detalle en ella, o en la empresa, que no se le podría decir a sus competidores. Luego di tu remate en voz alta a alguien y pregúntale si sonó a que te lo habías mirado o a que estabas siendo educado. Apúntalo.',
+  'Coge hoy una oferta de empleo real, una a la que te presentarías de verdad. Encuentra un detalle en ella, o en la empresa, que no se le podría decir a sus competidores. Luego di tu aterrizaje en voz alta a alguien y pregúntale si sonó a que te lo habías mirado o a que estabas siendo educado. Apúntalo.',
   $j${
     "says": "No me hace falta toda la historia. Lo que quiero saber es por qué estás sentado aquí y no en otro sitio.",
     "model": {
@@ -323,7 +329,7 @@ Una advertencia: el remate tiene que ser verdad. Un motivo inventado para querer
       "why": "Un detalle que solo puede ser sobre ellos, qué te dijo, y qué quieres sacar de ello. Ni un solo adjetivo sobre la empresa."
     },
     "checks": [
-      { "kind": "max_sentences", "n": 3, "requirement": "Tres frases. Esto es el remate, no la historia." },
+      { "kind": "max_sentences", "n": 3, "requirement": "Tres frases. Esto es el aterrizaje, no la historia." },
       { "kind": "first_person", "requirement": "Di qué quieres tú, no lo que suena impresionante" },
       { "kind": "forbids_any", "words": ["oportunidad apasionante", "me apasiona", "líderes del mercado", "líder del mercado", "líderes del sector", "referente del sector", "vanguardia", "muy buen ambiente"], "requirement": "Nada de palabras de folleto" }
     ]
@@ -372,7 +378,7 @@ La prueba de si funcionó no es el reloj. Es si quien te entrevista pregunta alg
       "options": [
         { "text": "Quitar los adjetivos y apretar la redacción en toda la respuesta.", "correct": false, "note": "Ahorra unos diez segundos y hace la respuesta más difícil de escuchar. Densidad no es brevedad." },
         { "text": "Resumir tus tres primeros trabajos en una sola oración.", "correct": true, "note": "Compra treinta o cuarenta segundos de un solo golpe, y no cuesta nada: los puestos de los primeros años casi nunca sostienen el argumento de por qué contratarte ahora." },
-        { "text": "Cortar el remate y dejar que el CV explique por qué te presentaste.", "correct": false, "note": "El CV no puede explicar eso. Esta es la única parte de la respuesta que nada más en el proceso sustituye." },
+        { "text": "Cortar el aterrizaje y dejar que el CV explique por qué te presentaste.", "correct": false, "note": "El CV no puede explicar eso. Esta es la única parte de la respuesta que nada más en el proceso sustituye." },
         { "text": "Hablar más rápido.", "correct": false, "note": "La respuesta dura lo mismo. Solo que ahora suena nerviosa." }
       ],
       "explain": "Los recortes deben quitar elementos, no sílabas. Un trabajo entero o un ejemplo entero valen más que una página de apretar frases."
@@ -380,7 +386,7 @@ La prueba de si funcionó no es el reloj. Es si quien te entrevista pregunta alg
     {
       "prompt": "¿Cuál es la mejor señal de que tu historia tenía la longitud correcta?",
       "options": [
-        { "text": "Terminaste dentro de los noventa segundos.", "correct": false, "note": "Es un objetivo útil, pero el reloj es solo un indicador indirecto. Ochenta segundos apretados que no rematan en nada siguen siendo una mala respuesta." },
+        { "text": "Terminaste dentro de los noventa segundos.", "correct": false, "note": "Es un objetivo útil, pero el reloj es solo un indicador indirecto. Ochenta segundos apretados que no aterrizan en nada siguen siendo una mala respuesta." },
         { "text": "Fueron asintiendo todo el rato.", "correct": false, "note": "La gente asiente. Es la señal más barata de una entrevista y solo significa que no estás resultando desagradable." },
         { "text": "Te pidieron que ampliaras una cosa concreta que mencionaste.", "correct": true, "note": "Eso es la respuesta funcionando exactamente como se pretendía: dejó un anzuelo, lo cogieron, y ahora tu mejor material es una contestación en vez de un monólogo." }
       ],
@@ -413,19 +419,19 @@ La prueba de si funcionó no es el reloj. Es si quien te entrevista pregunta alg
       "No comentes en ningún momento la longitud ni cómo lo está contando."
     ],
     "opening_beat": "«Gracias por sacar el hueco. Tenemos hasta y media, así que voy rápido: cuéntame la versión resumida de tu trayectoria y qué estás buscando.»",
-    "success_looks_like": "La persona cuenta una historia que cabe holgadamente en dos minutos, se salta los primeros puestos, y aun así remata en por qué este trabajo. Marcus pregunta algo más en vez de pasar a otra cosa."
+    "success_looks_like": "La persona cuenta una historia que cabe holgadamente en dos minutos, se salta los primeros puestos, y aun así aterriza en por qué este trabajo. Marcus pregunta algo más en vez de pasar a otra cosa."
   }$j$::jsonb,
   'Grábate contando tu historia una vez, con el móvil, de una sola toma. Escúchala y apunta la única cosa que cortarías. Luego cuéntale la versión recortada a una persona real y apunta si te hizo alguna pregunta después.',
   $j${
     "beats": [
       {
-        "situation": "Tu respuesta dura tres minutos. Contiene: la carrera que estudiaste, tu primer trabajo, un contrato de dos años, tu trabajo actual, un proyecto personal que te encanta, y el remate.",
+        "situation": "Tu respuesta dura tres minutos. Contiene: la carrera que estudiaste, tu primer trabajo, un contrato de dos años, tu trabajo actual, un proyecto personal que te encanta, y el aterrizaje.",
         "prompt": "El reclutador te ha dado noventa segundos. ¿Qué se va?",
         "options": [
           { "text": "La carrera y el primer trabajo, comprimidos en una sola oración.", "correct": true, "note": "Corta cosas enteras, y las más antiguas primero. Nadie te contrata por la carrera, y el primer trabajo se gana su sitio solo como aquello que arrancó la dirección." },
           { "text": "Recortar unas cuantas palabras de cada frase en toda la respuesta.", "correct": false, "note": "Así es como una respuesta de tres minutos se convierte en una de dos cincuenta que además ahora es difícil de seguir. Las palabras no son donde está el tiempo." },
           { "text": "El proyecto personal: no es lo que han preguntado.", "correct": false, "note": "Puede que sea lo más memorable de toda la respuesta. Corta por antigüedad, no por una relevancia que no has comprobado." },
-          { "text": "El remate, que ya volverás a él más tarde.", "correct": false, "note": "El remate es la única parte que está haciendo trabajo. Cortarlo deja un resumen de tu CV, que ya tienen." }
+          { "text": "El aterrizaje, que ya volverás a él más tarde.", "correct": false, "note": "El aterrizaje es la única parte que está haciendo trabajo. Cortarlo deja un resumen de tu CV, que ya tienen." }
         ]
       },
       {
@@ -433,9 +439,9 @@ La prueba de si funcionó no es el reloj. Es si quien te entrevista pregunta alg
         "prompt": "¿Qué suele significar esa sensación?",
         "options": [
           { "text": "Nada. Es tu tercera vez contándolo y la primera de ellos.", "correct": true, "note": "Quedarse corto es lo que se siente por dentro cuando una respuesta está bien recortada, porque tú oyes todo lo que dejaste fuera. Ellos no." },
-          { "text": "Has cortado demasiado y deberías devolver un elemento.", "correct": false, "note": "Ese es el instinto que en una semana de práctica lo devuelve a los tres minutos. Si está completo y remata, está terminado." },
+          { "text": "Has cortado demasiado y deberías devolver un elemento.", "correct": false, "note": "Ese es el instinto que en una semana de práctica lo devuelve a los tres minutos. Si está completo y aterriza, está terminado." },
           { "text": "Te hace falta más detalle en el medio para demostrarlo.", "correct": false, "note": "Para el detalle del medio están las veinte preguntas siguientes. Esta respuesta solo tiene que ganárselas." },
-          { "text": "El orden está mal, y por eso suena plano.", "correct": false, "note": "Reordenar una respuesta que ya está completa es una forma de seguir trabajándola. El orden está fijado: comienzo, medio, remate." }
+          { "text": "El orden está mal, y por eso suena plano.", "correct": false, "note": "Reordenar una respuesta que ya está completa es una forma de seguir trabajándola. El orden está fijado: comienzo, medio, aterrizaje." }
         ]
       }
     ]
@@ -454,7 +460,7 @@ select pg_temp.es_lesson('interview-your-story', 4,
 
 **La jugada:** mantén los tres tiempos y cambia solo el medio según quién pregunta.
 
-Lo que no puede cambiar es el remate. Tu motivo para querer este puesto debería ser idéntico en todas las salas, y si se va moviendo entre conversaciones te van a pillar, porque comparan notas: para eso está la puesta en común.
+Lo que no puede cambiar es el aterrizaje. Tu motivo para querer este puesto debería ser idéntico en todas las salas, y si se va moviendo entre conversaciones te van a pillar, porque comparan notas: para eso está la puesta en común.
 
 Una última, barata y efectiva: usa su vocabulario. Si la oferta dice *socios* y no *clientes*, di socios. No es hacer la pelota, es la prueba de que se te puede entender dentro de su edificio.$md$,
   $j$[
@@ -489,7 +495,7 @@ Una última, barata y efectiva: usa su vocabulario. Si la oferta dice *socios* y
       "options": [
         { "text": "El primer tiempo, para que la historia empiece siempre igual.", "correct": false, "note": "Puede comprimirse o ampliarse, y a menudo debe hacerlo. Nadie compara comienzos." },
         { "text": "Los ejemplos del medio, para que tu relato de tu trabajo sea coherente.", "correct": false, "note": "Elegir ejemplos distintos para públicos distintos no es incoherencia: los hechos no cambian, solo cuáles vienen a cuento." },
-        { "text": "El remate: por qué este trabajo y por qué aquí.", "correct": true, "note": "Este es el que comparan en la puesta en común, y una motivación que se mueve de una sala a otra se lee como alguien diciéndole a cada persona lo que quiere oír." },
+        { "text": "El aterrizaje: por qué este trabajo y por qué aquí.", "correct": true, "note": "Este es el que comparan en la puesta en común, y una motivación que se mueve de una sala a otra se lee como alguien diciéndole a cada persona lo que quiere oír." },
         { "text": "La longitud, para que nadie se sienta menos atendido.", "correct": false, "note": "Una criba telefónica y una ronda final tienen presupuestos completamente distintos. Mantener la longitud fija desperdiciaría una y reventaría la otra." }
       ],
       "explain": "Adapta las pruebas, nunca el motivo. La puesta en común es justo donde se contrastan esas dos cosas."
@@ -521,7 +527,7 @@ Una última, barata y efectiva: usa su vocabulario. Si la oferta dice *socios* y
       "Nunca le digas qué registro usar. Si hay un desajuste, déjalo estar."
     ],
     "opening_beat": "«Te seré sincera, no me he leído tu CV: me metieron en esto ayer. Así que empieza por el principio y cuéntame de qué has sido responsable en realidad.»",
-    "success_looks_like": "La persona da una versión apuntada al alcance y a la responsabilidad en vez de a la técnica, mantiene el mismo remate que le daría a cualquiera, y no la ahoga en detalle."
+    "success_looks_like": "La persona da una versión apuntada al alcance y a la responsabilidad en vez de a la técnica, mantiene el mismo aterrizaje que le daría a cualquiera, y no la ahoga en detalle."
   }$j$::jsonb,
   'Cuenta tu historia hoy dos veces a dos personas distintas: una que conozca tu sector y otra que no. Cambia solo el medio. Apunta cuál de las dos versiones te costó más, porque esa es la sala para la que menos preparado estás.',
   $j${
@@ -638,7 +644,7 @@ La pregunta de verdad, debajo de todo esto, es: ¿tiene sentido la carrera de es
     "turns": [
       { "instruction": "Antes de recorrer nada, di qué suma el arco entero. Una frase." },
       { "instruction": "Ahora recórrelo, y dale a cada cambio un motivo: por qué te fuiste, no solo adónde." },
-      { "instruction": "Remátalo en el presente. Para qué fue el último cambio, y por qué esta sala." }
+      { "instruction": "Aterrízalo en el presente. Para qué fue el último cambio, y por qué esta sala." }
     ]
   }$j$::jsonb
 );
