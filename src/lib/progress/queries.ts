@@ -209,11 +209,13 @@ export type ResumePoint = {
  */
 export async function getResumePoint(): Promise<ResumePoint | null> {
   const supabase = await createClient();
+  const locale = await getLocale();
+  const translated = locale !== DEFAULT_LOCALE;
 
   const { data } = await supabase
     .from("user_skill_state")
     .select(
-      "updated_at, current_lesson_id, lessons!user_skill_state_current_lesson_id_fkey(title, sort_order, skill_id, skills(slug, name, topics(slug, name)))",
+      "updated_at, current_lesson_id, lessons!user_skill_state_current_lesson_id_fkey(title, sort_order, skill_id, skills(slug, name, topics(id, slug, name)))",
     )
     .not("current_lesson_id", "is", null)
     .order("updated_at", { ascending: false })
@@ -230,26 +232,56 @@ export async function getResumePoint(): Promise<ResumePoint | null> {
       skills: {
         slug: string;
         name: string;
-        topics: { slug: string; name: string };
+        topics: { id: string; slug: string; name: string };
       };
     } | null;
   }).lessons;
 
   if (!lesson) return null;
 
-  const { count } = await supabase
-    .from("lessons")
-    .select("id", { count: "exact", head: true })
-    .eq("skill_id", lesson.skill_id);
+  const [{ count }, lessonText, skillText, topicText] = await Promise.all([
+    supabase.from("lessons").select("id", { count: "exact", head: true }).eq("skill_id", lesson.skill_id),
+    translated
+      ? supabase
+          .from("lesson_translations")
+          .select("title")
+          .eq("lesson_id", data.current_lesson_id)
+          .eq("locale", locale)
+          .maybeSingle()
+          .then((r) => r.data)
+      : Promise.resolve(null),
+    translated
+      ? supabase
+          .from("skill_translations")
+          .select("name")
+          .eq("skill_id", lesson.skill_id)
+          .eq("locale", locale)
+          .maybeSingle()
+          .then((r) => r.data)
+      : Promise.resolve(null),
+    translated
+      ? supabase
+          .from("topic_translations")
+          .select("name")
+          .eq("topic_id", lesson.skills.topics.id)
+          .eq("locale", locale)
+          .maybeSingle()
+          .then((r) => r.data)
+      : Promise.resolve(null),
+  ]);
 
   const total = count ?? 0;
 
+  const { title: lessonTitle } = localise({ title: lesson.title }, lessonText);
+  const { name: skillName } = localise({ name: lesson.skills.name }, skillText);
+  const { name: topicName } = localise({ name: lesson.skills.topics.name }, topicText);
+
   return {
-    topicName: lesson.skills.topics.name,
+    topicName,
     topicSlug: lesson.skills.topics.slug,
     skillSlug: lesson.skills.slug,
-    skillName: lesson.skills.name,
-    lessonTitle: lesson.title,
+    skillName,
+    lessonTitle,
     lessonSortOrder: lesson.sort_order,
     nextSortOrder: lesson.sort_order < total ? lesson.sort_order + 1 : null,
   };

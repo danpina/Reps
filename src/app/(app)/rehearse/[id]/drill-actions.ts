@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 
 import { requireUser } from "@/lib/auth/dal";
+import { getLesson } from "@/lib/curriculum/queries";
 import { createClient } from "@/lib/supabase/server";
 import { XP_AWARD, levelForXp } from "@/lib/progress/rules";
 import { awardBadges } from "@/lib/progress/snapshot";
@@ -37,17 +38,51 @@ type Loaded = {
   lessons: { rehearsal_spec: unknown; skill_id: string };
 };
 
+/**
+ * Loaded with the rehearsal_spec read in the reader's own language.
+ *
+ * The line drill checks a submitted line against this spec's word lists, so
+ * an English spec is not just a display bug here the way it is on the
+ * rehearsal page — it is a Spanish reader's correct Spanish line failing
+ * checks authored in a language they never wrote in. See the matching
+ * comment on rehearse/[id]/actions.ts's loadRoleplay for why `getLesson` and
+ * not `lessons` directly.
+ */
 async function load(id: string): Promise<Loaded | null> {
   const supabase = await createClient();
   const { data } = await supabase
     .from("roleplays")
     .select(
-      "id, mode, status, transcript_json, lesson_id, lessons(rehearsal_spec, skill_id)",
+      "id, mode, status, transcript_json, lesson_id, lessons(sort_order, skill_id, skills(slug))",
     )
     .eq("id", id)
     .maybeSingle();
 
-  return (data as unknown as Loaded) ?? null;
+  if (!data) return null;
+
+  const raw = data as unknown as {
+    id: string;
+    mode: string;
+    status: string;
+    transcript_json: Turn[];
+    lesson_id: string;
+    lessons: { sort_order: number; skill_id: string; skills: { slug: string } };
+  };
+
+  const localized = await getLesson(raw.lessons.skills.slug, raw.lessons.sort_order);
+  if (!localized) return null;
+
+  return {
+    id: raw.id,
+    mode: raw.mode,
+    status: raw.status,
+    transcript_json: raw.transcript_json,
+    lesson_id: raw.lesson_id,
+    lessons: {
+      rehearsal_spec: localized.lesson.rehearsal_spec,
+      skill_id: raw.lessons.skill_id,
+    },
+  };
 }
 
 /**

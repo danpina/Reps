@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 
 import { getLocale, getProfile, requireUser } from "@/lib/auth/dal";
+import { getLesson } from "@/lib/curriculum/queries";
 import { describeSelf } from "@/lib/profile/demographics";
 import { createClient } from "@/lib/supabase/server";
 import type { Rubric, Scenario } from "@/lib/curriculum/types";
@@ -26,18 +27,61 @@ import { awardBadges } from "@/lib/progress/snapshot";
 
 export type SayState = { error?: string };
 
+/**
+ * The roleplay, with its lesson content read in the reader's own language.
+ *
+ * `roleplays` only carries a `lesson_id`, and the lesson content that matters
+ * here — the scenario the partner is played from, the rubric it is scored
+ * against, the drill spec — lives on `lessons`, which is English-only. Reading
+ * it straight off that table the way this used to is exactly how a Spanish
+ * reader ends up mid-rehearsal in English: `getLesson` is what the rest of
+ * the curriculum already goes through to read a lesson in translation, keyed
+ * by skill slug and sort order rather than lesson id, so those are fetched
+ * first and the actual content comes from there instead.
+ */
 async function loadRoleplay(id: string) {
   const supabase = await createClient();
   const { data, error } = await supabase
     .from("roleplays")
     .select(
-      "id, lesson_id, transcript_json, status, mode, lessons(scenario_json, rubric_json, rehearsal_spec, variants_json, skill_id)",
+      "id, lesson_id, transcript_json, status, mode, lessons(sort_order, variants_json, skill_id, skills(slug))",
     )
     .eq("id", id)
     .maybeSingle();
 
   if (error || !data) return null;
-  return data as unknown as {
+
+  const raw = data as unknown as {
+    id: string;
+    lesson_id: string;
+    transcript_json: Turn[];
+    status: string;
+    mode: string;
+    lessons: {
+      sort_order: number;
+      variants_json: LessonVariant[];
+      skill_id: string;
+      skills: { slug: string };
+    };
+  };
+
+  const localized = await getLesson(raw.lessons.skills.slug, raw.lessons.sort_order);
+  if (!localized) return null;
+
+  return {
+    id: raw.id,
+    lesson_id: raw.lesson_id,
+    transcript_json: raw.transcript_json,
+    status: raw.status,
+    mode: raw.mode,
+    lessons: {
+      scenario_json: localized.lesson.scenario_json,
+      rubric_json: localized.lesson.rubric_json,
+      rehearsal_spec: localized.lesson.rehearsal_spec,
+      variants_json: raw.lessons.variants_json,
+      skill_id: raw.lessons.skill_id,
+    },
+  } satisfies {
     id: string;
     lesson_id: string;
     transcript_json: Turn[];

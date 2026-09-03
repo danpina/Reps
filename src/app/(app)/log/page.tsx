@@ -1,7 +1,8 @@
 import { getTranslations } from "next-intl/server";
 
-import { requireUser } from "@/lib/auth/dal";
+import { getLocale, requireUser } from "@/lib/auth/dal";
 import { getTopics } from "@/lib/curriculum/queries";
+import { DEFAULT_LOCALE } from "@/lib/curriculum/locale";
 import { createClient } from "@/lib/supabase/server";
 import { LogForm } from "./log-form";
 
@@ -27,6 +28,7 @@ export default async function LogPage({
 
   if (lessonId) {
     const supabase = await createClient();
+    const locale = await getLocale();
     const { data } = await supabase
       .from("lessons")
       .select("id, skill_id, mission_text")
@@ -36,6 +38,16 @@ export default async function LogPage({
     if (data) {
       missionText = data.mission_text;
       knownSkillId = data.skill_id;
+
+      if (locale !== DEFAULT_LOCALE) {
+        const { data: translated } = await supabase
+          .from("lesson_translations")
+          .select("mission_text")
+          .eq("lesson_id", lessonId)
+          .eq("locale", locale)
+          .maybeSingle();
+        missionText = translated?.mission_text || missionText;
+      }
     }
   }
 

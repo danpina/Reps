@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { BackLink } from "@/components/back-link";
 import type { Translate } from "@/lib/i18n";
 import { extractTheMove } from "@/lib/curriculum/the-move";
+import { getLesson } from "@/lib/curriculum/queries";
 import { getProfile, requireUser } from "@/lib/auth/dal";
 import { createClient } from "@/lib/supabase/server";
 import type { Rubric, Scenario, WorkedExample } from "@/lib/curriculum/types";
@@ -72,14 +73,58 @@ export default async function RehearsePage({
   const { data } = await supabase
     .from("roleplays")
     .select(
-      "id, status, mode, transcript_json, feedback_json, lesson_id, lessons(title, sort_order, theory_md, rehearsal_note, rehearsal_spec, examples_json, variants_json, scenario_json, rubric_json, mission_text, skills(slug, name))",
+      "id, status, mode, transcript_json, feedback_json, lesson_id, lessons(sort_order, rehearsal_note, variants_json, skills(slug, name))",
     )
     .eq("id", id)
     .maybeSingle();
 
   if (!data) notFound();
 
-  const roleplay = data as unknown as Roleplay;
+  const raw = data as unknown as {
+    id: string;
+    status: string;
+    mode: string;
+    transcript_json: Turn[];
+    feedback_json: Feedback | DrillResult | null;
+    lesson_id: string;
+    lessons: {
+      sort_order: number;
+      rehearsal_note: string | null;
+      variants_json: LessonVariant[];
+      skills: { slug: string; name: string };
+    };
+  };
+
+  // Reads the lesson through the same translated path every other curriculum
+  // page uses, rather than off `lessons` directly — that table is
+  // English-only, and reading it here is exactly how a rehearsal ends up in
+  // English while the rest of the app is in Spanish. `rehearsal_note` and
+  // `variants_json` have no translated column to read instead, so they still
+  // come from the raw row above.
+  const localized = await getLesson(raw.lessons.skills.slug, raw.lessons.sort_order);
+  if (!localized) notFound();
+
+  const roleplay: Roleplay = {
+    id: raw.id,
+    status: raw.status,
+    mode: raw.mode,
+    transcript_json: raw.transcript_json,
+    feedback_json: raw.feedback_json,
+    lesson_id: raw.lesson_id,
+    lessons: {
+      title: localized.lesson.title,
+      sort_order: raw.lessons.sort_order,
+      theory_md: localized.lesson.theory_md,
+      rehearsal_note: raw.lessons.rehearsal_note,
+      rehearsal_spec: localized.lesson.rehearsal_spec,
+      examples_json: localized.lesson.examples_json,
+      variants_json: raw.lessons.variants_json,
+      scenario_json: localized.lesson.scenario_json,
+      rubric_json: localized.lesson.rubric_json,
+      mission_text: localized.lesson.mission_text,
+      skills: raw.lessons.skills,
+    },
+  };
   const { lessons: lesson } = roleplay;
 
   // Who the reader is practising with, where the lesson cares. Everywhere else
