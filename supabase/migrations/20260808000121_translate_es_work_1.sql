@@ -161,7 +161,7 @@ select pg_temp.es_lesson('speaking-in-meetings', 2,
 
 Casi todo el mundo espera un hueco. En una buena reunión no llegan huecos: la pausa que estás esperando es la pausa de después de la decisión. Lo que pasa de verdad es que la gente entra encima del último medio segundo de la frase de otro, y la sala lo trata como algo completamente normal, porque lo es.
 
-**La jugada:** dos palabras de pista de despegue, y luego el argumento.
+**La jugada:** dos palabras de pista, y luego el argumento.
 
 *Una cosa* — *Un apunte* — *Rápido*: cualquiera vale. No son relleno. Una pista corta le da a la sala medio segundo para girarse hacia ti, que es exactamente lo que estabas esperando que te diera un hueco, y funciona a un volumen que ya tienes.
 

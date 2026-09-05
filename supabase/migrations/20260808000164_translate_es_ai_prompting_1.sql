@@ -37,7 +37,7 @@ select pg_temp.es_lesson('an-answer-worth-having', 1,
   'Pega la cosa real',
   $md$Dos personas con la misma suscripción sacan un valor muy distinto de ella, y la mayor parte de la brecha es un hábito.
 
-El error más común, con diferencia, es describir el problema en vez de suministrarlo. *Necesito responder a un correo de mi jefe sobre un plazo* produce una respuesta a un correo imaginario — competente, genérica, y sobre una situación que no existe.
+El error más común, con diferencia, es describir el problema en vez de pegarlo. *Necesito responder a un correo de mi jefe sobre un plazo* produce una respuesta a un correo imaginario — competente, genérica, y sobre una situación que no existe.
 
 **La jugada:** pega el material, no lo describas.
 
@@ -47,7 +47,7 @@ Esto vale para todo. El documento en vez de sobre qué trata el documento. El hi
 
 Dos matices que merece la pena tener.
 
-**Incluye lo que lo rodea.** El mensaje anterior al tuyo, la respuesta que llegó, lo que se decidió la semana pasada. La mitad de lo que hace legible un mensaje es lo que vino antes, y pegar una línea de una conversación te consigue consejo sobre una línea.
+**Incluye lo que lo rodea.** El mensaje anterior al tuyo, la respuesta que llegó, lo que se decidió la semana pasada. La mitad de lo que hace legible un mensaje es lo que vino antes, y si pegas una línea de una conversación, consigues consejo sobre una línea.
 
 **Cuando no puedas pegar, reconstruye.** Muchas de las cosas más difíciles se dijeron en voz alta y no hay nada que copiar. Acércate todo lo que puedas a las palabras reales — *dijo algo como, bueno, si crees que eso es realista* — en vez de ordenarlo en *era escéptico*. La cita aproximada gana al parafraseo exacto siempre, porque la redacción es lo que estabas preguntando. Tu parafraseo ya ha decidido qué significaba.
 
@@ -85,8 +85,8 @@ Si te quedas con una cosa: pega la cosa en sí. Tu resumen de ella ya ha tirado 
     {
       "prompt": "Se dijo en voz alta, así que no hay nada que pegar. ¿Y ahora?",
       "options": [
-        { "text": "Resume el tono con exactitud.", "correct": false, "note": "Tu lectura del tono es precisamente lo que está en cuestión, así que suministrarlo como hecho elimina la pregunta." },
-        { "text": "Sáltatelo y haz una pregunta general.", "correct": false, "note": "Eso te consigue consejo general, que podrías haber tenido sin preguntar." },
+        { "text": "Resume el tono con exactitud.", "correct": false, "note": "Tu lectura del tono es precisamente lo que está en cuestión, así que presentarlo como hecho elimina la pregunta." },
+        { "text": "Sáltatelo y haz una pregunta general.", "correct": false, "note": "Así consigues consejo general, que podrías haber tenido sin preguntar." },
         { "text": "Describe a la persona en su lugar.", "correct": false, "note": "Útil para ensayar una conversación más tarde. No reemplaza las palabras que se usaron." },
         { "text": "Reconstruye sus palabras lo más fielmente que puedas.", "correct": true, "note": "La cita aproximada gana al parafraseo exacto. Era escéptico es tu conclusión; lo que dijo de verdad es la evidencia." }
       ],
@@ -96,7 +96,7 @@ Si te quedas con una cosa: pega la cosa en sí. Tu resumen de ella ya ha tirado 
   $j${
     "scale": { "min": 1, "max": 5 },
     "criteria": [
-      { "key": "pasted", "label": "Suministró el material", "description": "Dio el texto real en vez de un relato de él." },
+      { "key": "pasted", "label": "Pegó el material real", "description": "Dio el texto real en vez de un relato de él." },
       { "key": "context", "label": "Incluyó lo que lo rodea", "description": "El mensaje anterior, la respuesta posterior." },
       { "key": "verbatim", "label": "Mantuvo la redacción", "description": "No ordenó la formulación en conclusiones." },
       { "key": "trimmed", "label": "Dejó fuera lo que no debería estar", "description": "Los datos privados de otra gente eliminados." }
@@ -118,7 +118,7 @@ Si te quedas con una cosa: pega la cosa en sí. Tu resumen de ella ya ha tirado 
       "Nunca sugieras qué debería decir la petición."
     ],
     "opening_beat": "«¿Qué le has dado en realidad?»",
-    "success_looks_like": "La persona suministra el material real en vez de una descripción de él."
+    "success_looks_like": "La persona pega el material real en vez de una descripción de él."
   }$j$::jsonb,
   'Hoy, pega el material real en una petición en vez de describirlo. Apunta la diferencia en lo que volvió.',
   $j${
@@ -128,7 +128,7 @@ Si te quedas con una cosa: pega la cosa en sí. Tu resumen de ella ya ha tirado 
       "why": "Una descripción es un resumen que escribiste, y lo que editaste fuera es lo que necesitaba la respuesta. La mitad del significado está en lo que vino antes."
     },
     "checks": [
-      { "kind": "contains_any", "words": ["pegar", "copiar", "el correo en sí", "palabra por palabra", "darle el"], "requirement": "Di que vas a suministrar el material" },
+      { "kind": "contains_any", "words": ["pegar", "copiar", "el correo en sí", "palabra por palabra", "darle el"], "requirement": "Di que vas a pegar el material" },
       { "kind": "forbids_any", "words": ["le dije que", "le expliqué que", "básicamente va sobre", "dije que era", "más o menos", "la idea general"], "requirement": "No entregues tu resumen en su lugar" },
       { "kind": "max_words", "n": 35, "requirement": "Dos líneas, no un plan" }
     ]
@@ -253,7 +253,7 @@ Tratar la primera respuesta como definitiva es el mismo reflejo que aceptar la p
 
 Lo que convierte esto en la práctica más barata disponible. Nadie está mirando. No cuesta nada. Y *no, eso no — haz esto en su lugar* es una frase que se hace más fácil con la repetición, dondequiera que pasen las repeticiones.
 
-Dos notas prácticas. Corrige una cosa a la vez; una lista de seis cambios te consigue una reescritura en vez de una edición. Y cuando toda una dirección está mal, dilo con llaneza en vez de empujar suavemente — *este enfoque está completamente equivocado, pruébalo como una sola pregunta en su lugar* es más rápido que cuatro rondas de ajustes.
+Dos notas prácticas. Corrige una cosa a la vez; con una lista de seis cambios consigues una reescritura en vez de una edición. Y cuando toda una dirección está mal, dilo con llaneza en vez de empujar suavemente — *este enfoque está completamente equivocado, pruébalo como una sola pregunta en su lugar* es más rápido que cuatro rondas de ajustes.
 
 Si te quedas con una cosa: di qué está mal con lo que tienes. Empezar de cero descarta la única información nueva que tenías.$md$,
   $j$[
@@ -355,7 +355,7 @@ Estas cosas están construidas para ser complacientes. Abren con un cumplido, en
 
 El planteamiento que hace más trabajo es pedirle que sea el lector en vez del juez. *Eres la persona que recibe esto. ¿Qué crees que quiero, y cómo te sientes al respecto?* Eso produce algo utilizable, porque describe una reacción en vez de otorgar una nota.
 
-Luego descuenta lo que consigas de todas formas. Incluso preguntado bien, la mayoría de las respuestas abren con un párrafo sobre qué buena pregunta es esta y qué está funcionando bien. Ese párrafo es mobiliario. Empieza a leer en el segundo, donde está la respuesta.
+Luego descuenta lo que consigas de todas formas. Incluso preguntado bien, la mayoría de las respuestas abren con un párrafo sobre qué buena pregunta es esta y qué está funcionando bien. Ese párrafo es relleno. Empieza a leer en el segundo, donde está la respuesta.
 
 Y si dice que todo está bien, eso no es evidencia. Haz la pregunta de la frase más débil otra vez. Va a encontrar una.
 

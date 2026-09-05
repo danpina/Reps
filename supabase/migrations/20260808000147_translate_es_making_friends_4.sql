@@ -2,10 +2,11 @@
 --
 -- Conventions as prior tracks: tú for the reader, **La jugada:** for the
 -- move marker, "Si te quedas con una cosa:" for the closer. Scenario
--- partners "Sam" (lessons 1, 5) and "Alex" (lessons 2-4) carry no `sex`
--- field; masculine agreement used by default, as established elsewhere
--- in this topic. Lesson 3 is [scene] mode, so its rehearsal_spec stays
--- an empty object, matching the English source.
+-- partner "Sam" (lessons 1, 5) carries no `sex` field; masculine
+-- agreement used by default, as established elsewhere in this topic.
+-- "Alex" (lessons 2-4) is feminine throughout. Lesson 3 is [scene] mode,
+-- so its rehearsal_spec stays an empty object, matching the English
+-- source.
 
 create or replace function pg_temp.es_lesson(
   p_skill text, p_order integer,
@@ -35,7 +36,7 @@ create or replace function pg_temp.es_lesson(
 $fn$;
 
 select pg_temp.es_lesson('getting-past-pleasant', 1,
-  'Cuatro años y ningún sitio',
+  'Cuatro años, ningún avance',
   $md$Hay un tipo de relación que puede durar años sin convertirse en nada, y no es una amistad fallida — es un arreglo estable que ninguna de las dos personas ha intentado nunca cambiar.
 
 La ves con regularidad. Te cae bien, de verdad. Habláis del trabajo, del fútbol, del tiempo, de lo que sale en las noticias, del tráfico para llegar hasta aquí. Los dos describiríais al otro como alguien con quien os lleváis bien. Ninguno de los dos podría decir qué le preocupa de verdad al otro, qué le alegra, o con qué está lidiando.
@@ -213,9 +214,9 @@ Si te quedas con una cosa: ofrece, no preguntes. Ir primero es toda la jugada, y
     "partner": {
       "name": "Alex",
       "role": "alguien a quien ves cada semana y de quien no sabes casi nada",
-      "mood": "Cómodo, sin prisa.",
+      "mood": "Cómoda, sin prisa.",
       "openness": 4,
-      "personality": "Agradable y superficial por defecto, y notablemente aliviado cuando se dice algo real — normalmente devolviendo algo más grande."
+      "personality": "Agradable y superficial por defecto, y notablemente aliviada cuando se dice algo real — normalmente devolviendo algo más grande."
     },
     "setting": "La conversación semanal de siempre con alguien a quien conoces desde hace años. Ha ido sobre el tiempo y el aparcamiento durante unos seis minutos.",
     "constraints": [

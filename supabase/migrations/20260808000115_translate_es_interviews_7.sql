@@ -373,7 +373,7 @@ Y luego escucha la pausa. Esta es una pregunta que la gente responde con cuidado
     },
     {
       "situation": "Usar la respuesta de inmediato.",
-      "line": "Eso es útil, porque lo que acabas de describir es casi exactamente la situación con la que me encontré en 2022, y la parte que importaba no era el proceso: era conseguir que los dos jefes se pusieran de acuerdo en de quién era.",
+      "line": "Eso es útil, porque lo que acabas de describir es casi exactamente la situación con la que me encontré en 2022, y la parte que importaba no era el proceso: era conseguir que los dos jefes se pusieran de acuerdo en de quién era la decisión final.",
       "why": "Convierte su respuesta en un puente hacia tu mejor material. Es lo de más valor que puede pasar en el hueco de preguntas, y solo se vuelve posible si preguntaste lo bastante pronto."
     }
   ]$j$::jsonb,

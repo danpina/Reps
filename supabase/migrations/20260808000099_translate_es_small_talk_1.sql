@@ -37,7 +37,7 @@
 
 insert into public.topic_translations (topic_id, locale, name, description, promise)
 select id, 'es',
-  'Conversación ligera',
+  'Charla trivial',
   $$Los dos sabéis que alguien debería decir algo. Ninguno lo hace. Este es el tema sobre decirlo.$$,
   $$Entra en una sala donde no conoces a nadie y sal de ella habiendo tenido tres conversaciones que repetirías encantado.$$
 from public.topics where slug = 'small-talk'

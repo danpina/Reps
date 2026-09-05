@@ -41,7 +41,7 @@ select pg_temp.es_lesson('before-you-go', 1,
 
 Cada parte de eso está haciendo un trabajo. Una copa no tiene una duración natural, así que puede ser cuarenta minutos o tres horas sin que ninguna de las dos sea una declaración. El ruido te da algo a lo que reaccionar y le quita presión al silencio. Y un bar o una cafetería tienen otras cosas que mirar, que suena trivial y no lo es — dos personas sin nada en la sala que señalar tienen que generar absolutamente todo entre ellas.
 
-Cenar es el error habitual, y merece la pena ser concreto sobre por qué. Te comprometes a la duración de tres platos, sentado justo enfrente de alguien sin nada que mirar salvo a esa persona, con el horario de la cocina en vez del tuyo. Además es lo bastante caro como para sentirse como una ocasión, lo que sube lo que se supone que tiene que ser la noche. Nada de eso es fatal — la gente tiene buenas cenas en primeras citas constantemente — es sencillamente la versión más difícil de la sala, elegida por gente que creía estar siendo generosa.
+Cenar es el error habitual, y merece la pena ser concreto sobre por qué. Te comprometes a la duración de tres platos, sentado justo enfrente de alguien sin nada que mirar salvo a esa persona, con el horario de la cocina en vez del tuyo. Además es lo bastante caro como para sentirse como una ocasión, lo que sube lo que se supone que tiene que ser la noche. Nada de eso es fatal — la gente tiene buenas cenas en primeras citas constantemente — es sencillamente la opción más difícil, elegida por gente que creía estar siendo generosa.
 
 Cualquier cosa con una pantalla es peor, porque has organizado una noche en la que no podéis hablar el uno con el otro y luego tenéis veinte minutos después para averiguar si podéis.
 
@@ -121,7 +121,7 @@ Si te quedas con una cosa: elige por la facilidad de salida, no por lo impresion
         "situation": "«Entonces — ¿a dónde vamos?» Tienes el jueves por la tarde y ningún plan.",
         "prompt": "¿Qué propones?",
         "options": [
-          { "text": "El italiano que todo el mundo dice que está bien.", "correct": false, "note": "Tres platos, justo enfrente el uno del otro, con el horario de la cocina, y lo bastante caro como para convertirlo en una ocasión. La versión más difícil de la sala." },
+          { "text": "El italiano que todo el mundo dice que está bien.", "correct": false, "note": "Tres platos, justo enfrente el uno del otro, con el horario de la cocina, y lo bastante caro como para convertirlo en una ocasión. La opción más difícil." },
           { "text": "Un bar de vinos tranquilo donde podáis oíros bien.", "correct": false, "note": "Cerca, y lo tranquilo es la parte a reconsiderar. El silencio en una sala silenciosa es ruidoso, y dos horas tienen pausas dentro." },
           { "text": "Lo que te apetezca — a mí me da igual.", "correct": false, "note": "Le pasa a la otra persona la gestión, y normalmente vuelve como a mí también me da igual, que es cómo la gente acaba cenando por defecto." },
           { "text": "Un bar cerca de la estación, a partir de las seis.", "correct": true, "note": "Sin duración fija, algo de ruido de fondo, cosas que mirar, y fácil de dejar o alargar. Corriente, y donde de verdad han pasado la mayoría de las buenas primeras citas." }
@@ -359,7 +359,7 @@ Tener preguntas preparadas produce un interrogatorio. Preguntas, responden, saca
 
 No *a qué se dedica* — eso lo averiguas en treinta segundos y no lleva a ningún sitio. Algo sobre lo que de verdad te preguntes. Mencionaron que se mudaron aquí desde un sitio mucho más pequeño; quieres saber cómo fue eso. Su perfil decía que tienen opiniones sobre algo en lo que nunca has pensado; quieres oírlas. Dijeron algo en un mensaje que no acabaste de entender.
 
-Eso es un objeto completamente distinto de una lista de preguntas, y se comporta de forma distinta en la conversación. La curiosidad produce preguntas de seguimiento por sí sola, porque de verdad quieres la respuesta — y las preguntas de seguimiento son lo que hace que alguien se sienta escuchado en vez de encuestado. Una pregunta preparada produce una respuesta y luego un silencio mientras vas a por la siguiente.
+Eso es algo completamente distinto de una lista de preguntas, y se comporta de forma distinta en la conversación. La curiosidad produce preguntas de seguimiento por sí sola, porque de verdad quieres la respuesta — y las preguntas de seguimiento son lo que hace que alguien se sienta escuchado en vez de encuestado. Una pregunta preparada produce una respuesta y luego un silencio mientras vas a por la siguiente.
 
 Dos o tres es el número. Más y vuelve a ser una lista. Y son una reserva, no un plan: si la conversación va a parar a otro sitio completamente distinto, ese es el mejor resultado y deberías dejar que pase, cosa que es mucho más fácil de hacer cuando sabes que tienes algo en el bolsillo por si se estanca.
 

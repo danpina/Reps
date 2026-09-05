@@ -38,7 +38,7 @@ select pg_temp.es_title('your-manager', 5, 'Malas noticias, pronto y claras');
 
 select pg_temp.es_title('raising-a-problem', 1, 'Conducta, coste, cambio');
 select pg_temp.es_title('raising-a-problem', 2, 'Díselo a esa persona primero');
-select pg_temp.es_title('raising-a-problem', 3, 'Llevarlo hacia arriba');
+select pg_temp.es_title('raising-a-problem', 3, 'Llevarlo más arriba');
 select pg_temp.es_title('raising-a-problem', 4, 'No lo acumules');
 select pg_temp.es_title('raising-a-problem', 5, 'Cuando no cambia nada');
 
@@ -93,16 +93,16 @@ select pg_temp.es_title('flirting-moves', 2, 'Picar, con filo');
 select pg_temp.es_title('flirting-moves', 3, 'Halaga la elección, no la cara');
 select pg_temp.es_title('flirting-moves', 4, 'Un segundo más');
 select pg_temp.es_title('flirting-moves', 5, 'El contacto, y sus escalones');
-select pg_temp.es_title('flirting-moves', 6, 'Darte cuenta de vuelta');
+select pg_temp.es_title('flirting-moves', 6, 'Notar cuando va por ti');
 
 select pg_temp.es_title('flirting-calibration', 1, 'La calidez es un dial, no un interruptor');
 select pg_temp.es_title('flirting-calibration', 2, 'Señala, y luego lee');
 select pg_temp.es_title('flirting-calibration', 3, 'La atención es la señal que cuenta');
-select pg_temp.es_title('flirting-calibration', 4, 'Deja que hagan parte del trabajo');
+select pg_temp.es_title('flirting-calibration', 4, 'Deja que pongan de su parte');
 select pg_temp.es_title('flirting-calibration', 5, 'Di la cosa llana');
 
 select pg_temp.es_title('reading-disinterest', 1, 'Las tres señales');
-select pg_temp.es_title('reading-disinterest', 2, 'Baja un registro');
+select pg_temp.es_title('reading-disinterest', 2, 'Baja un escalón');
 select pg_temp.es_title('reading-disinterest', 3, 'La salida elegante');
 select pg_temp.es_title('reading-disinterest', 4, 'Nada de enfurruñarse');
 select pg_temp.es_title('reading-disinterest', 5, 'Cuando de verdad no lo sabes');
@@ -118,7 +118,7 @@ select pg_temp.es_title('asking-for-the-number', 5, 'El primer mensaje');
 -- ---------------------------------------------------------------------------
 
 select pg_temp.es_title('your-profile', 1, 'Que se te pueda escribir gana a impresionar');
-select pg_temp.es_title('your-profile', 2, 'Las fotos tienen tareas');
+select pg_temp.es_title('your-profile', 2, 'Cada foto tiene un trabajo');
 select pg_temp.es_title('your-profile', 3, 'Filtra a propósito');
 select pg_temp.es_title('your-profile', 4, 'Promete a la persona que va a aparecer');
 

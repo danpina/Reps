@@ -335,19 +335,19 @@ Las líneas rojas son la excepción. Una lista de lo que no quieres se lee como 
       "openness": 5,
       "personality": "Se niega a aceptar nada seguro. Pregunta quién exactamente estaría en desacuerdo con cada respuesta, y señala cuando la respuesta es nadie."
     },
-    "setting": "La casilla del prompt está abierta y el prompt en la pantalla dice: una colina en la que morir.",
+    "setting": "La casilla del prompt está abierta y el prompt en la pantalla dice: Una opinión que defendería hasta el final.",
     "constraints": [
       "Mantente en el personaje en todo momento. Nunca des consejos, ni evalúes, ni rompas la escena.",
       "Rechaza las respuestas seguras o en broma preguntando quién estaría de verdad en desacuerdo.",
       "Acepta y disfruta una respuesta que de verdad dividiera a la gente.",
       "Mantén las respuestas en una frase o dos."
     ],
-    "opening_beat": "«Una colina en la que morir. Y antes de que pongas piña en la pizza — ¿quién te lo iba a discutir de verdad?»",
+    "opening_beat": "«Una opinión que defendería hasta el final. Y antes de que pongas piña en la pizza — ¿quién te lo iba a discutir de verdad?»",
     "success_looks_like": "La persona escribe una opinión real que repelería a algo de gente."
   }$j$::jsonb,
   'Hoy, escribe una frase para tu perfil con la que alguna gente estaría en desacuerdo. No hace falta que la publiques. Apunta qué escribiste y a quién perderías.',
   $j${
-    "says": "Una colina en la que morir:",
+    "says": "Una opinión que defendería hasta el final:",
     "model": {
       "line": "Toda película sería mejor veinte minutos más corta, incluidas las que más te gustan.",
       "why": "Una opinión real, sostenida con alegría, con la que un buen número de gente discutiría — y discutir es una respuesta, que es más de lo que un perfil suave consigue nunca. Es una frase, no un manifiesto."

@@ -373,7 +373,7 @@ select pg_temp.es_lesson('match-to-date', 4,
 
 **Un momento** es la parte que convierte un deseo en una pregunta. Dos opciones en vez de una — *el jueves o el sábado* — porque dos es una elección y una es una citación, y *cuándo tienes libre* le pasa a él la gestión.
 
-Luego mándalo. Todo esto es un solo mensaje y no debería ir precedido de tres mensajes de carraspeo, que es lo que produce el pavor.
+Luego mándalo. Todo esto es un solo mensaje y no debería ir precedido de tres mensajes de preámbulo, que es lo que produce el pavor.
 
 Para quien lea esto con timidez, el replanteamiento que merece la pena: no le estás pidiendo a alguien que decida sobre ti. Le estás preguntando si le viene bien una hora el jueves. Se sienten como la misma pregunta y no lo son, y la segunda es la que de verdad estás mandando.$md$,
   $j$[
@@ -412,7 +412,7 @@ Para quien lea esto con timidez, el replanteamiento que merece la pena: no le es
         { "text": "Parece menos interesado.", "correct": false, "note": "Gestión de la imagen, y fuera de lugar. Estar interesado está bien." },
         { "text": "Dos es una elección; una es una citación.", "correct": true, "note": "Elegir entre el jueves y el sábado es fácil y agradable. Aceptar o rechazar una única fecha fija es un acto mucho más grande." }
       ],
-      "explain": "Concreto, pequeño, dos momentos. Luego mándalo sin tres mensajes de carraspeo."
+      "explain": "Concreto, pequeño, dos momentos. Luego mándalo sin tres mensajes de preámbulo."
     }
   ]$j$::jsonb,
   $j${
@@ -421,7 +421,7 @@ Para quien lea esto con timidez, el replanteamiento que merece la pena: no le es
       { "key": "specific", "label": "Nombró algo concreto", "description": "Propuso un lugar o una actividad real, idealmente de la conversación." },
       { "key": "small", "label": "Lo mantuvo pequeño", "description": "Una hora en vez de una tarde entera." },
       { "key": "a_time", "label": "Puso un momento fijado", "description": "Ofreció días en vez de un día de estos o cuándo tienes libre." },
-      { "key": "sent_it", "label": "Lo mandó limpio", "description": "Un mensaje, sin carraspeo delante." }
+      { "key": "sent_it", "label": "Lo mandó limpio", "description": "Un mensaje, sin preámbulo delante." }
     ]
   }$j$::jsonb,
   $j${
@@ -462,7 +462,7 @@ Para quien lea esto con timidez, el replanteamiento que merece la pena: no le es
       { "kind": "contains_any", "words": ["lunes", "martes", "miércoles", "jueves", "viernes", "sábado", "domingo", "mañana", "esta semana", "la semana que viene", "esta noche", "fin de semana"], "requirement": "Pon un momento fijado" },
       { "kind": "contains_any", "words": ["copa", "algo", "café", "hora", "paseo", "rápido", "una"], "requirement": "Mantenlo pequeño — una hora, no una tarde entera" },
       { "kind": "forbids_any", "words": ["un día de estos", "en algún momento", "cuando tengas libre", "cuándo tienes libre", "deberíamos"], "requirement": "Un plan, no un deseo" },
-      { "kind": "max_words", "n": 30, "requirement": "Un mensaje, sin carraspeo" }
+      { "kind": "max_words", "n": 30, "requirement": "Un mensaje, sin preámbulo" }
     ]
   }$j$::jsonb
 );

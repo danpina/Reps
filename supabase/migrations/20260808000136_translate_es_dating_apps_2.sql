@@ -507,7 +507,7 @@ Lo que casi nunca funciona es una broma sobre ellos, en un primer mensaje, de un
       { "key": "legible", "label": "No se podía malinterpretar", "description": "Escribió algo cuyo tono juguetón sobrevive sin tono." },
       { "key": "anchored", "label": "Anclado a su página", "description": "Pegó la broma a un detalle real en vez de hacer una general." },
       { "key": "not_at_them", "label": "No apuntó hacia ellos", "description": "Apuntó al objeto, a la situación o a sí mismo en vez de a un desconocido." },
-      { "key": "still_answerable", "label": "Siguió dejando una respuesta", "description": "Dejó algo que decir de vuelta en vez de cerrar con un remate." }
+      { "key": "still_answerable", "label": "Siguió dejando una respuesta", "description": "Dejó algo que decir de vuelta en vez de cerrar la conversación con una ocurrencia sin respuesta posible." }
     ]
   }$j$::jsonb,
   $j${

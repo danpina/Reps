@@ -133,7 +133,7 @@ select pg_temp.es_lesson('exits', 2,
 
 **La jugada:** motivo, calidez, fuera.
 
-La parte cálida es donde casi todo el mundo invierte de menos. *Encantado de conocerte* no es calidez, es mobiliario. Un detalle concreto convierte un final genérico en la cosa que recuerdan de ti.$md$,
+La parte cálida es donde casi todo el mundo invierte de menos. *Encantado de conocerte* no es calidez, es relleno. Un detalle concreto convierte un final genérico en la cosa que recuerdan de ti.$md$,
   $j$[
     {
       "situation": "Una buena conversación de diez minutos con alguien nuevo.",
@@ -156,16 +156,16 @@ La parte cálida es donde casi todo el mundo invierte de menos. *Encantado de co
       "prompt": "¿Qué parte de la salida hace mal casi todo el mundo?",
       "options": [
         { "text": "El motivo para irse.", "correct": false, "note": "Suele estar bien. Esta parte se le da fácil a la gente, y casi cualquier motivo neutro funciona." },
-        { "text": "La parte cálida.", "correct": true, "note": "Casi todo el mundo la sustituye por mobiliario tipo encantado de conocerte. Un detalle concreto de la conversación real es lo que se recuerda." },
+        { "text": "La parte cálida.", "correct": true, "note": "Casi todo el mundo la sustituye por relleno tipo encantado de conocerte. Un detalle concreto de la conversación real es lo que se recuerda." },
         { "text": "El momento.", "correct": false, "note": "También suele estar mal, y es el asunto de la lección anterior y no una parte de la forma de la salida." },
         { "text": "Mirar a los ojos al irse.", "correct": false, "note": "Merece la pena hacerlo, y es un detalle y no una parte estructural de la salida." }
       ],
-      "explain": "Motivo, calidez, fuera. La calidez necesita un detalle concreto o es solo mobiliario."
+      "explain": "Motivo, calidez, fuera. La calidez necesita un detalle concreto o es solo relleno."
     },
     {
-      "prompt": "¿Cuál es algo cálido concreto en vez de mobiliario?",
+      "prompt": "¿Cuál es algo cálido concreto en vez de relleno?",
       "options": [
-        { "text": "Ha sido un placer conocerte.", "correct": false, "note": "La definición de mobiliario. Agradable, automático, olvidado al instante." },
+        { "text": "Ha sido un placer conocerte.", "correct": false, "note": "La definición de relleno. Agradable, automático, olvidado al instante." },
         { "text": "Me voy a quedar con eso que has dicho del microbús.", "correct": true, "note": "Se refiere a algo que solo contenía esta conversación, que es lo que hace que caiga." },
         { "text": "Deberíamos hablar otro día con calma.", "correct": false, "note": "Mira hacia delante y es genérico. No dice nada de la conversación que habéis tenido." },
         { "text": "Se habla muy a gusto contigo.", "correct": false, "note": "Genuinamente agradable, y se le podría decir a cualquiera. Calidez sin concreción." }

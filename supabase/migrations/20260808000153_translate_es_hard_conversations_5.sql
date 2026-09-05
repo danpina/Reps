@@ -153,9 +153,9 @@ select pg_temp.es_lesson('hearing-it', 2,
 
 *¿Me puedes dar un ejemplo?* hace tres cosas a la vez. Convierte algo inaplicable en algo que de verdad podrías cambiar. Señala que te lo estás tomando en serio, que es lo más alentador que puedes hacer por alguien que acaba de hacer algo difícil. Y normalmente produce una versión mucho más precisa de la queja, porque la gente es mucho mejor describiendo un incidente que un patrón.
 
-Todo depende de cómo se pregunte, y la diferencia se oye. Preguntado para entender, es una invitación. Preguntado para litigar — *¿cuándo? dame un caso* — es un desafío, y la respuesta honesta a un desafío es producir pruebas, momento en el que estás en un juicio en vez de en una conversación.
+Todo depende de cómo se pregunte, y la diferencia se oye. Preguntado para entender, es una invitación. Preguntado para interrogar — *¿cuándo? dame un caso* — es un desafío, y la respuesta honesta a un desafío es producir pruebas, momento en el que estás en un juicio en vez de en una conversación.
 
-Merece la pena conocer las señales de la versión litigante porque se escapan con facilidad: pedir una fecha, preguntar quién más estaba, y pedir un segundo ejemplo después de que se haya dado el primero. Esa última es la delatora. Un ejemplo es para entender; dos es para construir un caso sobre si es representativo.
+Merece la pena conocer las señales de la versión fiscal porque se escapan con facilidad: pedir una fecha, preguntar quién más estaba, y pedir un segundo ejemplo después de que se haya dado el primero. Esa última es la delatora. Un ejemplo es para entender; dos es para construir un caso sobre si es representativo.
 
 Y si no pueden dar uno, tómatelo en serio de todas formas. No poder nombrar un caso es extremadamente común y no es prueba de que no pasara nada — significa que el sentimiento se fue acumulando. *Eso es justo, voy a estar atento* no cuesta nada y casi siempre es la respuesta correcta.
 
@@ -169,7 +169,7 @@ Si te quedas con una cosa: un ejemplo, preguntado para entender. Es la pregunta 
     {
       "situation": "Estás a punto de preguntar cuándo, exactamente.",
       "line": "(eso es un desafío, y produce un juicio)",
-      "why": "Pedir una fecha, preguntar quién más estaba, o pedir un segundo ejemplo son todo litigar en vez de entender."
+      "why": "Pedir una fecha, preguntar quién más estaba, o pedir un segundo ejemplo son todo interrogar en vez de entender."
     },
     {
       "situation": "No se le ocurre ninguno.",
@@ -189,7 +189,7 @@ Si te quedas con una cosa: un ejemplo, preguntado para entender. Es la pregunta 
       "explain": "Un ejemplo, preguntado para entender. Convierte un resumen de vuelta en algo aplicable."
     },
     {
-      "prompt": "¿Cuál es la señal de que estás litigando?",
+      "prompt": "¿Cuál es la señal de que estás interrogando?",
       "options": [
         { "text": "Pedir un segundo ejemplo.", "correct": true, "note": "Un ejemplo es para entender. Dos es para poner a prueba si es representativo, y todo el mundo oye la diferencia." },
         { "text": "Preguntar, en general.", "correct": false, "note": "Preguntar es la jugada. Es cómo preguntas lo que decide en qué conversación estás." },

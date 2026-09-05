@@ -232,12 +232,12 @@ Si te quedas con una cosa: cita, no resumas. No cuesta nada inventarlo y es de d
 );
 
 select pg_temp.es_lesson('telling-it', 3,
-  'Un detalle que haga trabajo',
+  'Un detalle que se gane su sitio',
   $md$El detalle es donde la gente cuidadosa invierte de más, y merece la pena saber exactamente cuánto puede llevar una historia.
 
 La respuesta es más o menos uno por historia. Una cosa concreta que la hace real y que no se podría haber inventado de forma plausible: el hecho de que sujetaba un sándwich todo el rato, la música de espera, el enorme perro dormido atravesado en la puerta.
 
-**La jugada:** elige el único detalle que haga trabajo, y corta el resto de la descripción.
+**La jugada:** elige el único detalle que se gane su sitio, y corta el resto de la descripción.
 
 Lo que hace un buen detalle no es decoración. Certifica la historia — un oyente que oye algo extrañamente específico concluye, sin decidirlo, que esto pasó. Ese efecto viene de un detalle y no aumenta con más; el segundo y el tercero no producen nada, y para el cuarto estás describiendo una habitación mientras la historia espera.
 
@@ -530,7 +530,7 @@ Si te quedas con una cosa: ve más despacio antes del giro, y luego para. Eso es
         "prompt": "¿Qué haces con el ritmo?",
         "options": [
           { "text": "Acelera — viene la parte buena.", "correct": false, "note": "Precipitar tu propio mejor momento es lo más común que la gente le hace, normalmente porque el giro es el punto de máxima exposición." },
-          { "text": "Anúncialo — esto os va a encantar.", "correct": false, "note": "Establece un estándar que la línea luego tiene que superar, y es un descargo con abrigo de confianza." },
+          { "text": "Anúncialo — esto os va a encantar.", "correct": false, "note": "Establece un estándar que la línea luego tiene que superar, y es una coletilla con abrigo de confianza." },
           { "text": "Ve un poco más despacio, y luego di el giro a velocidad normal.", "correct": true, "note": "Ir más despacio señala que viene algo sin anunciarlo, y el oyente se ajusta. Vale más que cualquier redacción." },
           { "text": "Nada — el ritmo se cuida solo.", "correct": false, "note": "No se cuida solo con nervios leves, que producen de forma fiable aceleración justo en este punto." }
         ]

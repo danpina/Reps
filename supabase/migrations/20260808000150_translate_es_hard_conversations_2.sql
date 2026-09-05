@@ -133,7 +133,7 @@ Si te quedas con una cosa: el tema va en la misma frase que la petición. No te 
 
 select pg_temp.es_lesson('opening-it', 2,
   'No de pasada',
-  $md$El otro fallo habitual es la emboscada, y como la convocatoria-pavor, normalmente la comete alguien que intenta hacerlo más fácil — para sí mismo, que es la parte difícil de ver en el momento.
+  $md$El otro fallo habitual es la emboscada, y al igual que las cuatro horas de pavor, normalmente la comete alguien que intenta hacerlo más fácil — para sí mismo, que es la parte difícil de ver en el momento.
 
 Sacar algo serio en la puerta, en los últimos dos minutos de una llamada, en un pasillo, o en el coche de camino a algún sitio es tremendamente tentador, porque se acaba antes de que el miedo tenga ocasión de crecer. Lo que produce es una reacción a la emboscada en vez de al contenido. Alguien sin aviso, sin espacio y sin salida se va a defender, y la conversación que consigues es sobre el hecho de que lo hicieras así.
 
@@ -249,7 +249,7 @@ Diez minutos de cháchara amable delante de un tema difícil se siente más suav
 
 **La jugada:** dilo en los primeros treinta segundos, y luego deja que dure lo que necesite.
 
-*Gracias por sacar tiempo. Lo que quería hablar es el tema de las cancelaciones.* Eso es una apertura completa, y todo lo que viene después es la conversación en vez de una pista de despegue hacia ella.
+*Gracias por sacar tiempo. Lo que quería hablar es el tema de las cancelaciones.* Eso es una apertura completa, y todo lo que viene después es la conversación en vez de un rodeo hasta llegar a ella.
 
 Merece la pena tener claro para quién es el calentamiento. No se lo está poniendo más fácil a ellos — saben que viene algo, porque pediste la hora y nombraste el tema. Eres tú, aplazando el momento, y el coste de ese aplazamiento cae entero sobre ellos: diez minutos esperando el giro es peor que treinta segundos llegando ahí.
 
@@ -257,11 +257,11 @@ Un segundo fallo vive en el mismo sitio: enterrarlo. Empezar por algo adyacente 
 
 En la práctica, la apertura tiene tres partes y tarda unos quince segundos. Dales las gracias por el tiempo. Nombra la cosa. Di qué quieres de la conversación — *quiero solucionarlo, no discutir* no es un tópico, le dice a alguien cómo escuchar los próximos veinte minutos.
 
-Si te quedas con una cosa: nada de pista de despegue. Dilo pronto, y luego tómate el tiempo que quieras.$md$,
+Si te quedas con una cosa: nada de rodeos. Dilo pronto, y luego tómate el tiempo que quieras.$md$,
   $j$[
     {
       "situation": "Os habéis sentado y estás a punto de preguntar por su semana.",
-      "line": "(eso es una pista de despegue, y saben que viene algo)",
+      "line": "(eso es un rodeo, y saben que viene algo)",
       "why": "Diez minutos esperando el giro es peor para ellos que treinta segundos llegando ahí, y después convierte la calidez en técnica."
     },
     {
@@ -284,7 +284,7 @@ Si te quedas con una cosa: nada de pista de despegue. Dilo pronto, y luego tóma
         { "text": "Para la relación — os recuerda que os caéis bien.", "correct": false, "note": "Algo real, y pertenece a después, no a antes. Dicho antes, se relee retroactivamente." },
         { "text": "Para ti, y el aplazamiento les cuesta a ellos.", "correct": true, "note": "Diez minutos esperando el giro es peor que treinta segundos llegando ahí, y después hace que la calidez parezca técnica." }
       ],
-      "explain": "Nada de pista de despegue. Treinta segundos, y luego tómate el tiempo que quieras."
+      "explain": "Nada de rodeos. Treinta segundos, y luego tómate el tiempo que quieras."
     },
     {
       "prompt": "¿Qué produce enterrarlo?",
@@ -300,7 +300,7 @@ Si te quedas con una cosa: nada de pista de despegue. Dilo pronto, y luego tóma
   $j${
     "scale": { "min": 1, "max": 5 },
     "criteria": [
-      { "key": "early", "label": "Lo dijo en los primeros treinta segundos", "description": "Nada de pista de despegue de cháchara amable." },
+      { "key": "early", "label": "Lo dijo en los primeros treinta segundos", "description": "Nada de rodeos de cháchara amable." },
       { "key": "named", "label": "Nombró el tema real", "description": "No lo abordó de refilón." },
       { "key": "purpose", "label": "Dijo qué quería de ello", "description": "Le dijo cómo escuchar los próximos veinte minutos." },
       { "key": "then_slow", "label": "Luego se tomó su tiempo", "description": "Fue rápido al grano y sin prisa después." }
@@ -329,11 +329,11 @@ Si te quedas con una cosa: nada de pista de despegue. Dilo pronto, y luego tóma
     "says": "Bueno. Dijiste que era sobre el tema de los planes.",
     "model": {
       "line": "Sí — gracias por sacar el tiempo. Es sobre las cancelaciones, y quiero solucionarlo en vez de discutir por ello.",
-      "why": "El tema en la primera frase y el propósito en la segunda. Nada de pista de despegue, y nada que tengan que adivinar."
+      "why": "El tema en la primera frase y el propósito en la segunda. Nada de rodeos, y nada que tengan que adivinar."
     },
     "checks": [
       { "kind": "contains_any", "words": ["cancela", "cancelaciones", "canceló", "planes", "el tema de"], "requirement": "Nombra el tema de inmediato" },
-      { "kind": "forbids_any", "words": ["qué tal tu", "cómo has estado", "antes de entrar en", "bueno", "no sé cómo decir", "esto es difícil", "ten paciencia conmigo"], "requirement": "Nada de pista de despegue ni de rodeos" },
+      { "kind": "forbids_any", "words": ["qué tal tu", "cómo has estado", "antes de entrar en", "bueno", "no sé cómo decir", "esto es difícil", "ten paciencia conmigo"], "requirement": "Nada de rodeos" },
       { "kind": "max_words", "n": 45, "requirement": "Treinta segundos, no tres minutos" }
     ]
   }$j$::jsonb

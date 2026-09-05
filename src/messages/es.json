@@ -573,7 +573,7 @@
   "topicsPage": {
     "pageTitle": "Temas — Reps",
     "heading": "¿Para qué estás practicando?",
-    "subheading": "Un tema es una situación. Las habilidades que contiene están escritas para esa situación y solo para ella, porque una apertura en un bar y una apertura en una entrevista no son el mismo oficio.",
+    "subheading": "Cada tema es una situación concreta. Las habilidades que contiene están escritas para esa situación y solo para ella, porque arrancar una conversación en un bar y arrancar una entrevista no son el mismo oficio.",
     "freeCount": "{count} gratis",
     "skillsAndLessons": "{skills, plural, one {# habilidad} other {# habilidades}} · {lessons} lecciones",
     "readCount": "{count} leídas",

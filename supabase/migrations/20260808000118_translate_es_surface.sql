@@ -30,7 +30,7 @@ from (values
   ('work',
    'El trabajo',
    $$La reunión en la que tenías la respuesta correcta y no dijiste nada. La subida que sigues sin pedir. La presentación que leíste de tus propias diapositivas.$$,
-   $$Decir lo que piensas en la reunión mientras todavía cuenta, pedir el dinero sin disculparte por pedirlo, y sostener una sala en la que no esperabas estar de pie.$$),
+   $$Decir lo que piensas en la reunión mientras todavía cuenta, pedir el dinero sin disculparte por pedirlo, y dominar una sala en la que no esperabas estar de pie.$$),
 
   ('meeting-someone',
    'Conocer a alguien',
@@ -39,7 +39,7 @@ from (values
 
   ('dating-apps',
    'Apps de citas',
-   $$Un match, una caja de mensaje en blanco, y una conversación que tiene que sobrevivir sin tono, sin tiempos y sin cara.$$,
+   $$Un match, un chat en blanco, y una conversación que tiene que sobrevivir sin tono, sin tiempos y sin cara.$$,
    $$Mandar el primer mensaje, mantenerlo vivo más allá de la tercera respuesta, y salir de la app para entrar en una sala.$$),
 
   ('first-date',
@@ -126,7 +126,7 @@ from (values
   ('the-corridor',
    'El pasillo',
    $$Congresos, ascensores, cocinas, y la persona sénior con la que tienes treinta segundos.$$,
-   $$La charla en el trabajo tiene un trabajo que la charla normal no tiene: que te reconozcan la próxima vez. Ese es todo el objetivo.$$),
+   $$La charla en el trabajo cumple una función que la charla normal no cumple: que te reconozcan la próxima vez. Ese es todo el objetivo.$$),
 
   -- Conocer a alguien ------------------------------------------------------
   ('walking-up',
@@ -152,7 +152,7 @@ from (values
   ('reading-disinterest',
    'Leer el desinterés y retirarse',
    $$Darte cuenta de que el interés no es mutuo, e irte con calidez.$$,
-   $$Respuestas cortas, postura cerrada, ninguna pregunta de vuelta: baja un registro, sin enfurruñarte. Ser bueno en esto es lo que hace que flirtear se pueda practicar sin riesgo.$$),
+   $$Respuestas cortas, postura cerrada, ninguna pregunta de vuelta: baja un escalón, sin enfurruñarte. Ser bueno en esto es lo que hace que flirtear se pueda practicar sin riesgo.$$),
 
   ('asking-for-the-number',
    'Pedir el número',
@@ -167,7 +167,7 @@ from (values
 
   ('first-message',
    'El primer mensaje',
-   $$Un match, una caja en blanco, y como un día antes de que deje de ser un match.$$,
+   $$Un match, un chat sin empezar, y como un día antes de que deje de ser un match.$$,
    $$Una cosa concreta de su perfil, una pregunta, menos de treinta palabras. «Hola» no es un mensaje, y tres preguntas son una pregunta.$$),
 
   ('match-to-date',
@@ -176,7 +176,7 @@ from (values
    $$Responde y pregunta, sal pronto del intercambio de datos, y propón algo concreto en unos pocos días. La app no es el objetivo.$$),
 
   ('running-the-app',
-   'Llevarla tú a ella',
+   'La llevas tú',
    $$Cuarenta deslizamientos, dos matches, una respuesta, ninguna respuesta. Lo que eso le hace a alguien en seis meses, y cómo pararlo.$$,
    $$El volumen es aritmética, no una nota. Dale una forma a la app — cuándo la abres, cuánto rato, cuándo paras — y toma el silencio como ruido.$$),
 
@@ -250,7 +250,7 @@ from (values
 
   ('staying-in-the-room',
    'Quedarte en la sala',
-   $$Se ponen a la defensiva, se disgustan, o te lo dan la vuelta, y tienes treinta segundos para decidir qué clase de persona vas a ser.$$,
+   $$Se ponen a la defensiva, se disgustan, o te dan la vuelta a la tortilla, y tienes treinta segundos para decidir qué clase de persona vas a ser.$$,
    $$Su reacción no es un veredicto sobre si tenías razón. No rellenes el silencio, no retires lo que dijiste, y no subas el tono para igualarles.$$),
 
   ('hearing-it',
@@ -271,7 +271,7 @@ from (values
 
   ('telling-it',
    'Contarla',
-   $$Presente, palabras textuales, un detalle que trabaje, y saber tu última frase antes de empezar.$$,
+   $$Presente, palabras textuales, un detalle que funcione, y saber tu última frase antes de empezar.$$,
    $$Mete a la gente en el momento en vez de informar de él después. Y decide dónde termina antes de empezar.$$),
 
   ('holding-the-floor',
@@ -303,7 +303,7 @@ from (values
   ('group-chats',
    'Grupos',
    $$Seis personas, ningún turno de palabra, y un mensaje que has escrito y borrado tres veces mientras la conversación seguía.$$,
-   $$Mándalo igual. Nadie audita un grupo, la tasa de reacción es baja para todo el mundo, y estar callado suena más fuerte que cualquier cosa que hubieras dicho.$$),
+   $$Mándalo igual. Nadie lleva la cuenta de un grupo, la tasa de reacción es baja para todo el mundo, y estar callado suena más fuerte que cualquier cosa que hubieras dicho.$$),
 
   ('not-everything-is-a-message',
    'No todo es un mensaje',

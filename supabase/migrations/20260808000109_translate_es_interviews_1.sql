@@ -38,7 +38,7 @@
 insert into public.topic_translations (topic_id, locale, name, description, promise)
 select id, 'es',
   'Entrevistas',
-  $$Ya has hecho el trabajo. Ahora tienes cuarenta minutos para demostrárselo a un desconocido con un cuaderno, y casi todo se decide en seis preguntas.$$,
+  $$Ya has hecho el trabajo duro. Ahora tienes cuarenta minutos para demostrárselo a un desconocido con una libreta, y casi todo se decide en seis preguntas.$$,
   $$Responder al puñado de preguntas que deciden la mayoría de las entrevistas sin bloquearte, sin irte por las ramas y sin vender por debajo de su precio un trabajo que sí hiciste — y saber qué decir en los últimos cinco minutos, cuando casi todo el mundo no dice nada.$$
 from public.topics where slug = 'interviews'
 on conflict (topic_id, locale) do update set

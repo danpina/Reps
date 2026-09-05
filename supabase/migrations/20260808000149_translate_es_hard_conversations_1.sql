@@ -368,7 +368,7 @@ La prueba de cuál de las dos has hecho es sencilla y algo incómoda. Si volvier
 
 Hay una segunda prueba que merece la pena aplicar un mes después: ¿sigues pensando en ello? Algunas cosas no se pueden dejar ir con solo decidirlo, y averiguar eso es útil — significa que la respuesta a la primera pregunta de este bloque era de verdad sí, y prefieres saberlo a un mes que a un año.
 
-Y sé honesto sobre la escala. Las cosas pequeñas que se repiten suelen ser mejores sacándolas que dejándolas caer, precisamente porque son pequeñas: una conversación de dos minutos sobre un problema de dos minutos es fácil, y la misma conversación después de un año es sobre el año y no sobre el problema.
+Y sé honesto sobre el tamaño del asunto. Las cosas pequeñas que se repiten suelen ser mejores sacándolas que dejándolas caer, precisamente porque son pequeñas: una conversación de dos minutos sobre un problema de dos minutos es fácil, y la misma conversación después de un año es sobre el año y no sobre el problema.
 
 Si te quedas con una cosa: abandonado significa que estarías a cero la próxima vez. Si estarías a tres, no lo dejaste ir — lo archivaste.$md$,
   $j$[

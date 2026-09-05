@@ -42,7 +42,7 @@ select pg_temp.es_lesson('holding-the-floor', 1,
 
 Una historia de noventa segundos bien contada es un regalo, y está cerca de lo que la gente ha salido a buscar. Nadie se ha ido nunca a casa molesto por alguien que contó una buena. Lo que sí molesta a la gente — y merece la pena ser exacto, porque el miedo no es infundado — es una de seis minutos mal contada, y la diferencia entre las dos no es la confianza ni el derecho a hablar. Son los dos bloques que acabas de leer.
 
-Hay una segunda cosa que merece la pena ver, que es cómo es de verdad una sala en la que nadie está dispuesto a contar una. No está relajada. Está plana, y todo el mundo en ella puede sentir la planitud sin poder nombrarla — y la gente con más probabilidades de tener esta creencia a menudo es la que más mejoraría la velada con sus historias.
+Hay una segunda cosa que merece la pena ver, que es cómo es de verdad una sala en la que nadie está dispuesto a contar una. No está relajada. Está plana, y todo el mundo en ella puede notar que se ha quedado así sin poder explicarlo — y la gente con más probabilidades de tener esta creencia a menudo es la que más mejoraría la velada con sus historias.
 
 El miedo tiene una forma concreta que hace que merezca la pena responderlo en vez de descartarlo. Dice: todo el mundo está siendo educado, nadie quiere esto, y les estoy haciendo esperar. Así es como se siente desde dentro de una historia de la que no estás seguro. Desde fuera, una mesa escuchando una historia parece una mesa disfrutando, y el esfuerzo que estás detectando casi siempre es el tuyo propio.
 
@@ -309,7 +309,7 @@ Si te quedas con una cosa: salta a la última línea y para. Nadie sabe qué se 
         { "text": "Que era larga.", "correct": false, "note": "La duración la empeora en el momento y se olvida tan rápido como el resto." },
         { "text": "Que nadie se rió.", "correct": false, "note": "Le pasa constantemente a todo el mundo y se olvida en unos noventa segundos." },
         { "text": "La disculpa posterior.", "correct": true, "note": "Perdona, esto fue más gracioso en el momento es la parte que la gente recuerda, y convierte un momento ordinario en una incomodidad que la mesa tiene que gestionar." },
-        { "text": "Contársela a la gente equivocada.", "correct": false, "note": "Una causa de la planitud, no lo que hace que se quede." }
+        { "text": "Contársela a la gente equivocada.", "correct": false, "note": "Una causa de que la historia se quede plana, no lo que hace que perdure." }
       ],
       "explain": "La mejor recuperación es ninguna recuperación. Termina, y dile algo a otra persona."
     }

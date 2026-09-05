@@ -45,7 +45,7 @@ Tres es una regla general y es más o menos acertada. Una vez es una pregunta. D
 
 *Más fácil explicarlo — ¿tienes cinco minutos?* es toda la escalada. A nadie le ha importado nunca que se lo pregunten, y se recibe como alguien resolviendo un problema en vez de como alguien montando un lío.
 
-Dos cosas que predicen una llamada de antemano, para que puedas saltarte los tres mensajes. Cualquier cosa que implique una decisión con más de dos opciones, porque la comparación es en lo peor que es el texto. Y cualquier cosa en la que sientas que estás redactando con cuidado — redactar con cuidado es una señal de que el contenido es más delicado de lo que soporta el canal.
+Dos cosas que predicen una llamada de antemano, para que puedas saltarte los tres mensajes. Cualquier cosa que implique una decisión con más de dos opciones, porque comparar es lo que peor se le da al texto. Y cualquier cosa en la que sientas que estás redactando con cuidado — redactar con cuidado es una señal de que el contenido es más delicado de lo que soporta el canal.
 
 El contraargumento que merece la pena tomarse en serio es que una llamada interrumpe y un mensaje no, que es cierto y es por lo que los mensajes son el estándar. Pero tres mensajes a lo largo de una tarde interrumpen tres veces, cuestan más atención en total, y producen menos. La llamada normalmente es la imposición menor.
 
@@ -58,7 +58,7 @@ Si te quedas con una cosa: tres intentos y toca llamar. Reescribir el cuarto es 
     },
     {
       "situation": "La decisión tiene cuatro opciones.",
-      "line": "(llama — la comparación es en lo peor que es el texto)",
+      "line": "(llama — comparar es lo que peor se le da al texto)",
       "why": "Te puedes saltar los tres mensajes por completo si puedes ver la forma de antemano."
     },
     {
@@ -84,7 +84,7 @@ Si te quedas con una cosa: tres intentos y toca llamar. Reescribir el cuarto es 
         { "text": "Lo importante que es el tema.", "correct": false, "note": "Muchas cosas importantes son una línea. La importancia no es con lo que le cuesta al texto." },
         { "text": "Lo bien que conoces a la persona.", "correct": false, "note": "Afecta al tono, no a si el contenido encaja en el canal." },
         { "text": "Lo larga que es la mensaje.", "correct": false, "note": "Largo es un síntoma, y un mensaje largo puede ser perfectamente claro." },
-        { "text": "Más de dos opciones, o redactar con cuidado.", "correct": true, "note": "La comparación es en lo peor que es el texto, y redactar con cuidado es una señal de que el contenido es más delicado de lo que soporta el canal." }
+        { "text": "Más de dos opciones, o redactar con cuidado.", "correct": true, "note": "Comparar es lo que peor se le da al texto, y redactar con cuidado es una señal de que el contenido es más delicado de lo que soporta el canal." }
       ],
       "explain": "Una llamada interrumpe una vez. Tres mensajes a lo largo de una tarde interrumpen tres veces y producen menos."
     }

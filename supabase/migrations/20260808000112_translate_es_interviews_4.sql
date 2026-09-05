@@ -59,7 +59,7 @@ Hay una forma que funciona, y tiene cuatro movimientos.
 
 **La jugada:** nómbralo, di qué costó, di qué cambió, y luego deja de hablar.
 
-Dos formas de fallar que hay que evitar. El éxito disfrazado — *fui demasiado ambicioso con los plazos* — que todo el mundo reconoce y nadie premia. Y la catástrofe: la historia tan mala que quien entrevista empieza a pensar en responsabilidades legales. El punto dulce es un fracaso real con un coste acotado, contado sin drama.
+Dos formas de fallar que hay que evitar. El éxito disfrazado — *fui demasiado ambicioso con los plazos* — que todo el mundo reconoce y nadie premia. Y la catástrofe: la historia tan mala que quien entrevista empieza a pensar en responsabilidades legales. El término medio es un fracaso real con un coste acotado, contado sin drama.
 
 Elige algo sobre lo que de verdad hayas terminado de pensar. Un fracaso sobre el que sigas a la defensiva se va a notar, y lo que se puntúa es lo defensivo, no el fracaso.$md$,
   $j$[

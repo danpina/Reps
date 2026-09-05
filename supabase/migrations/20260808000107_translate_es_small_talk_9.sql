@@ -130,7 +130,7 @@ select pg_temp.es_lesson('groups', 2,
   'Entra en una risa o en un cambio de tema',
   $md$Hay momentos buenos y malos para decir tu primera cosa en un grupo, y la diferencia es grande.
 
-El malo es a mitad de hilo, cuando alguien está construyendo hacia un remate. Hablar ahí te convierte en quien lo descarriló, digas lo que digas.
+El malo es a mitad de hilo, cuando alguien está construyendo hacia un aterrizaje. Hablar ahí te convierte en quien lo descarriló, digas lo que digas.
 
 Los buenos son dos. **Después de una risa**, cuando el grupo acaba de soltar y nadie está a mitad de pensamiento: este es el punto de entrada más fiable que existe en una conversación de grupo. Y **en un cambio de tema**, cuando un asunto acaba de cerrarse y el grupo busca brevemente qué viene ahora.
 
@@ -180,7 +180,7 @@ La risa hace el trabajo. La atención está sin asignar, todo el mundo está rel
     "scale": { "min": 1, "max": 5 },
     "criteria": [
       { "key": "waited_for_the_gap", "label": "Esperaste un hueco real", "description": "Entraste después de una risa o en un cambio de tema en vez de a mitad de hilo." },
-      { "key": "did_not_derail", "label": "No descarrilaste un hilo", "description": "Evitaste hablar mientras alguien construía hacia un remate." },
+      { "key": "did_not_derail", "label": "No descarrilaste un hilo", "description": "Evitaste hablar mientras alguien construía hacia un aterrizaje." },
       { "key": "extended_the_topic", "label": "Construiste sobre lo que había", "description": "Aportaste al tema existente en vez de sustituirlo." },
       { "key": "right_size", "label": "Hiciste pequeña la primera aportación", "description": "Hiciste una primera aportación proporcionada en vez de una larga." }
     ]

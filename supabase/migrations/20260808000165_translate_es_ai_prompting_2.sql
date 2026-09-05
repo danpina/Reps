@@ -144,7 +144,7 @@ Así que la mayoría de la gente se queda con la primera explicación, que fue l
 
 Aquí esa frase no cuesta nada, y es la mayor ventaja individual que tiene esto sobre preguntarle a un compañero. No la velocidad y no la disponibilidad — la capacidad de fallar en entender repetidamente, delante de nada.
 
-Di con precisión qué parte te perdió, porque eso es lo que hace que el próximo intento sea distinto en vez de más alto. *Lo seguí hasta la parte de las dos cuentas.* *Usaste la palabra liquidación y no sé a qué se refiere.* La insatisfacción vaga te consigue una reformulación; un fallo localizado te consigue una explicación distinta.
+Di con precisión qué parte te perdió, porque eso es lo que hace que el próximo intento sea distinto en vez de más alto. *Lo seguí hasta la parte de las dos cuentas.* *Usaste la palabra liquidación y no sé a qué se refiere.* Con una insatisfacción vaga solo consigues una reformulación; con un fallo localizado, consigues una explicación distinta.
 
 Dos peticiones que merece la pena conocer, porque cambian la forma en vez de la redacción. *Dame una analogía* lo mueve a terreno que ya tienes. *Dame un ejemplo concreto con números reales* quita la abstracción, y la abstracción es en lo que fallan la mayoría de las primeras explicaciones.
 
@@ -155,7 +155,7 @@ Si te quedas con una cosa: la tercera explicación normalmente es la que funcion
     {
       "situation": "La explicación no caló.",
       "line": "Todavía no lo entiendo. Lo seguí hasta la parte de las dos cuentas.",
-      "why": "Un fallo localizado consigue una explicación distinta. La insatisfacción vaga consigue la misma reformulada."
+      "why": "Con un fallo localizado consigues una explicación distinta. Con una insatisfacción vaga, consigues la misma reformulada."
     },
     {
       "situation": "Se queda abstracto.",
@@ -222,7 +222,7 @@ Si te quedas con una cosa: la tercera explicación normalmente es la que funcion
     "says": "Venga, entonces — repítemelo.",
     "model": {
       "line": "No puedo. Seguí la primera parte y la perdí por lo de las dos cuentas, así que voy a preguntar otra vez.",
-      "why": "Un fallo localizado consigue una explicación distinta en vez de una más alta. El tercer intento es el que normalmente funciona, y solo existe donde no cuesta nada."
+      "why": "Con un fallo localizado consigues una explicación distinta en vez de una más alta. El tercer intento es el que normalmente funciona, y solo existe donde no cuesta nada."
     },
     "checks": [
       { "kind": "forbids_any", "words": ["lo tengo", "tiene sentido", "creo que entiendo", "sí, claro", "no, lo sigo", "todo bien"], "requirement": "No afirmes haberlo entendido" },
@@ -348,7 +348,7 @@ select pg_temp.es_lesson('the-free-question', 4,
   'Dilo en la sala',
   $md$Entender algo en privado es la mitad del valor, y es la mitad que no cambia nada que nadie pueda ver.
 
-Este es el modo de fallo de todo este bloque. Cierras los huecos, sigues la reunión como es debido por primera vez en meses, y dices exactamente lo mismo que antes. Desde fuera, no ha pasado nada.
+Este es el error típico de todo este bloque. Cierras los huecos, sigues la reunión como es debido por primera vez en meses, y dices exactamente lo mismo que antes. Desde fuera, no ha pasado nada.
 
 **La jugada:** convierte lo que buscaste en algo que dices en voz alta.
 
@@ -366,7 +366,7 @@ Si te quedas con una cosa: una respuesta que nadie te oye usar no ha cambiado na
   $j$[
     {
       "situation": "Acabas de cerrar un hueco que tenías desde hace un año.",
-      "line": "He estado leyendo sobre esto — ¿es correcto que solo aplica por encima de cierta cantidad?",
+      "line": "He estado leyendo sobre esto — ¿es correcto que solo entra en vigor por encima de cierta cantidad?",
       "why": "Muestra preparación, no necesita confianza porque es una pregunta, y la mitad de las veces la respuesta es no exactamente."
     },
     {

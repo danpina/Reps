@@ -432,7 +432,7 @@ Si te quedas con una cosa: di qué podría salir mal, pronto. Sin eso tienes una
         "situation": "Una historia sobre recoger un paquete. Bien enmarcada, empieza tarde, y aun así no funciona.",
         "prompt": "¿Qué falta?",
         "options": [
-          { "text": "Un remate.", "correct": false, "note": "Un final necesita algo que terminar. Sin incertidumbre en el medio no hay nada que un remate pueda resolver." },
+          { "text": "Un aterrizaje.", "correct": false, "note": "Un final necesita algo que terminar. Sin incertidumbre en el medio no hay nada que un aterrizaje pueda resolver." },
           { "text": "Algo en riesgo.", "correct": true, "note": "Lo que hay en juego es lo que hace que alguien siga escuchando en vez de esperar con educación — y puede ser minúsculo. Si vas a conseguir el paquete es suficiente." },
           { "text": "Mejor detalle.", "correct": false, "note": "El detalle hace vívida una historia y no puede hacerla trepidante. Vívido sin nada en juego es una secuencia bien descrita." },
           { "text": "Sencillamente no es una historia.", "correct": false, "note": "Puede llegar a serlo. La mayoría de las historias planas tienen algo en juego en los hechos que nunca se dijo en voz alta." }
@@ -458,11 +458,11 @@ select pg_temp.es_lesson('why-stories-die', 5,
 
 Cada una se dice para rebajar las expectativas, y cada una está cerca de ser fatal — por un motivo más mecánico de lo que parece.
 
-**La jugada:** corta el descargo por completo y empieza la historia.
+**La jugada:** corta la coletilla por completo y empieza la historia.
 
-Lo que hace un descargo es decirle a la gente cómo escuchar. Dado *esto no es muy interesante*, la mesa se ajusta: la atención baja, la historia se escucha como una menor, y el final se recibe exactamente como se anunció. Has suministrado el veredicto de antemano, y la gente rara vez revoca un veredicto que el narrador ya ha dictado.
+Lo que hace una coletilla es decirle a la gente cómo escuchar. Dado *esto no es muy interesante*, la mesa se ajusta: la atención baja, la historia se escucha como una menor, y el final se recibe exactamente como se anunció. Has suministrado el veredicto de antemano, y la gente rara vez revoca un veredicto que el narrador ya ha dictado.
 
-También produce el resultado concreto que intentaba evitar. El descargo existe para protegerte del final plano — si nadie se ríe, dijiste que no era muy gracioso. Pero es lo que causa el final plano, así que el seguro se paga a sí mismo organizando el accidente.
+También produce el resultado concreto que intentaba evitar. La coletilla existe para protegerte del final plano — si nadie se ríe, dijiste que no era muy gracioso. Pero es lo que causa el final plano, así que el seguro se paga a sí mismo organizando el accidente.
 
 *Tenías que haber estado allí* es la peor de todas, porque dice que la historia no funciona antes de que hayas intentado hacer que funcione, y te da una excusa que te impide aprender qué salió mal.
 
@@ -480,7 +480,7 @@ Si te quedas con una cosa: a nadie hay que avisarlo. Empiézala, cuéntala, y de
     {
       "situation": "Quieres un seguro por si nadie se ríe.",
       "line": "(el seguro organiza el accidente)",
-      "why": "El descargo existe para protegerte del final plano y es lo que lo causa."
+      "why": "La coletilla existe para protegerte del final plano y es lo que lo causa."
     },
     {
       "situation": "Te tienta decir que tenías que haber estado allí.",
@@ -490,7 +490,7 @@ Si te quedas con una cosa: a nadie hay que avisarlo. Empiézala, cuéntala, y de
   ]$j$::jsonb,
   $j$[
     {
-      "prompt": "¿Qué hace de verdad un descargo?",
+      "prompt": "¿Qué hace de verdad una coletilla?",
       "options": [
         { "text": "Te hace parecer modesto.", "correct": false, "note": "Se lee como modestia, y lo que hace es más mecánico que una impresión." },
         { "text": "Le dice a la gente cómo escuchar.", "correct": true, "note": "La atención baja, la historia se escucha como una menor, y el final se recibe exactamente como se anunció. Suministraste el veredicto de antemano." },
@@ -500,7 +500,7 @@ Si te quedas con una cosa: a nadie hay que avisarlo. Empiézala, cuéntala, y de
       "explain": "La gente rara vez revoca un veredicto que el narrador ya ha dictado."
     },
     {
-      "prompt": "¿Qué son las tres cosas por debajo del descargo?",
+      "prompt": "¿Qué son las tres cosas por debajo de la coletilla?",
       "options": [
         { "text": "Baja autoestima.", "correct": false, "note": "Una etiqueta grande que no te dice qué hacer distinto en los próximos cuatro segundos." },
         { "text": "Un hábito adquirido por que le interrumpieran a uno.", "correct": false, "note": "Plausible como historia de origen y no lo que está haciendo la frase en el momento." },
@@ -513,7 +513,7 @@ Si te quedas con una cosa: a nadie hay que avisarlo. Empiézala, cuéntala, y de
   $j${
     "scale": { "min": 1, "max": 5 },
     "criteria": [
-      { "key": "no_disclaimer", "label": "Sin descargo", "description": "Empezó sin avisar a nadie." },
+      { "key": "no_disclaimer", "label": "Sin coletilla", "description": "Empezó sin avisar a nadie." },
       { "key": "no_permission", "label": "No pidió permiso", "description": "Cogió los noventa segundos en vez de pedirlos." },
       { "key": "no_excuse", "label": "Sin tenías que haber estado allí", "description": "No declaró de antemano que no funcionaba." },
       { "key": "started", "label": "Empezó con la historia", "description": "La primera línea fue la historia en vez de sobre ella." }
@@ -531,21 +531,21 @@ Si te quedas con una cosa: a nadie hay que avisarlo. Empiézala, cuéntala, y de
     "constraints": [
       "Mantente en el personaje en todo momento. Nunca des consejos, ni evalúes, ni rompas la escena.",
       "Escucha de verdad y reacciona a una historia que sencillamente empieza.",
-      "Escucha a medias y responde con suavidad a cualquier cosa precedida por un descargo.",
+      "Escucha a medias y responde con suavidad a cualquier cosa precedida por una coletilla.",
       "Nunca animes a la persona a contar una historia."
     ],
     "opening_beat": "(un silencio — nadie está hablando)",
-    "success_looks_like": "La persona empieza la historia sin ningún descargo."
+    "success_looks_like": "La persona empieza la historia sin ninguna coletilla."
   }$j$::jsonb,
-  'Hoy, cuenta una historia sin ningún descargo delante. Apunta el descargo que no dijiste.',
+  'Hoy, cuenta una historia sin ninguna coletilla delante. Apunta la coletilla que no dijiste.',
   $j${
     "says": "(un silencio en la mesa — nadie está hablando, y tienes una historia de la que no estás seguro)",
     "model": {
       "line": "He descubierto algo extraordinario sobre mi vecino de arriba esta semana.",
-      "why": "La primera línea es la historia en vez de una línea sobre la historia. Sin descargo, sin permiso pedido, y a la mesa se le ha dicho cómo escuchar por el contenido en vez de por un aviso."
+      "why": "La primera línea es la historia en vez de una línea sobre la historia. Sin coletilla, sin permiso pedido, y a la mesa se le ha dicho cómo escuchar por el contenido en vez de por un aviso."
     },
     "checks": [
-      { "kind": "forbids_any", "words": ["no es muy interesante", "tenías que haber estado allí", "perdona", "esto puede llevar un rato", "aburrido", "no sé si", "te importa", "una rapidita", "sin venir a cuento pero", "probablemente no tenga gracia"], "requirement": "Nada de descargo, de disculpa, de permiso" },
+      { "kind": "forbids_any", "words": ["no es muy interesante", "tenías que haber estado allí", "perdona", "esto puede llevar un rato", "aburrido", "no sé si", "te importa", "una rapidita", "sin venir a cuento pero", "probablemente no tenga gracia"], "requirement": "Nada de coletilla, de disculpa, de permiso" },
       { "kind": "min_words", "n": 6, "requirement": "Empiézala de verdad" },
       { "kind": "max_words", "n": 25, "requirement": "Una línea, y luego los hechos" }
     ]

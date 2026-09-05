@@ -76,7 +76,7 @@ select pg_temp.es_title('saying-the-thing', 5, 'Dilo una vez');
 select pg_temp.es_title('staying-in-the-room', 1, 'Su reacción no es un veredicto');
 select pg_temp.es_title('staying-in-the-room', 2, 'No rellenes el silencio');
 select pg_temp.es_title('staying-in-the-room', 3, 'Cuando se disgustan');
-select pg_temp.es_title('staying-in-the-room', 4, 'Cuando te lo dan la vuelta');
+select pg_temp.es_title('staying-in-the-room', 4, 'Cuando te dan la vuelta a la tortilla');
 select pg_temp.es_title('staying-in-the-room', 5, 'Terminar sin acuerdo');
 
 select pg_temp.es_title('hearing-it', 1, 'Tres segundos');

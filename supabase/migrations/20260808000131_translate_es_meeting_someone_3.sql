@@ -590,7 +590,7 @@ Si nunca subes el primer escalón, eso también tiene un coste real. La calidez 
 );
 
 select pg_temp.es_lesson('flirting-moves', 6,
-  'Darte cuenta de vuelta',
+  'Notar cuando va por ti',
   $md$La habilidad más útil de este tema no es iniciar. Es darte cuenta de que alguien ya te lo está haciendo a ti.
 
 La gente tímida lee esto por debajo casi de forma universal, y la frase que hace el daño es *probablemente solo estaba siendo simpático*. A veces es verdad. Pero se dice con total seguridad sobre situaciones que contienen tres o cuatro señales claras, y quien la dice nunca lo averigua, porque decidir que no era nada significa no hacer nada.

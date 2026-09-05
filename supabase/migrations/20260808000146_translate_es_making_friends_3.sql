@@ -144,10 +144,10 @@ Si te quedas con una cosa: a quién le toca no es información. Es una regla que
 );
 
 select pg_temp.es_lesson('the-second-time', 2,
-  'El demasiado interesado no existe',
+  'El pesado no existe',
   $md$Lo que impide la segunda invitación merece que se le mire directamente, porque es inusualmente fácil de desmentir.
 
-El miedo es ser *el demasiado interesado* — la persona que está un poco demasiado disponible, que siempre sugiere cosas, que lo quiere más. Es un personaje social concreto y vívido, y casi todo el mundo puede imaginárselo.
+El miedo es quedar como *un pesado* — la persona que está un poco demasiado disponible, que siempre sugiere cosas, que lo quiere más. Es un personaje social concreto y vívido, y casi todo el mundo puede imaginárselo.
 
 **La jugada:** intenta nombrar uno real.
 
@@ -162,7 +162,7 @@ Y la asimetría merece la pena tenerla delante. Invitar de más tiene un peor ca
 Si te quedas con una cosa: el entusiasmo no es lo que le molesta a la gente. La presión sí, y es fácil no aplicarla.$md$,
   $j$[
     {
-      "situation": "Te preocupa ser el demasiado interesado.",
+      "situation": "Te preocupa quedar como un pesado.",
       "line": "(nombra uno real)",
       "why": "La mayoría de la gente no puede dar ni un solo nombre. Lo que tienen es un pavor general, que nunca se ha pegado a una persona real."
     },
@@ -194,7 +194,7 @@ Si te quedas con una cosa: el entusiasmo no es lo que le molesta a la gente. La 
         { "text": "Menos amigos de los que te gustaría.", "correct": false, "note": "Cierto y dicho de forma tan general que no hace mella. Di qué pasa de verdad." },
         { "text": "Pareces distante.", "correct": false, "note": "Un coste para tu reputación, y la mitad menor. El coste real no va sobre cómo quedas." },
         { "text": "No mucho — conservas tu dignidad.", "correct": false, "note": "La dignidad nunca estuvo en juego. Ese planteamiento es el miedo defendiéndose." },
-        { "text": "Amistades que nunca empezaron, sin que nadie supiera que estaban disponibles.", "correct": true, "note": "Silencioso, acumulativo, y el estado en el que ya está la mayoría de quienes leen esto — lo que lo convierte en el peor de los dos peores casos." }
+        { "text": "Amistades que nunca empezaron, sin que nadie supiera que estaban disponibles.", "correct": true, "note": "Silencioso, acumulativo, y el estado en el que ya está la mayoría de quienes leen esto — lo que lo convierte en el peor de los dos." }
       ],
       "explain": "Invitar de más arriesga estar un poco demasiado disponible para alguien a quien no le importaba."
     }

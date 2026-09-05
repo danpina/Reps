@@ -248,7 +248,7 @@ Con lo que has estado hablando es con una versión montada a partir de sus mejor
 
 **La jugada:** queda pronto, antes de haber construido a alguien.
 
-Este es el argumento práctico para el ritmo que ya recomendaba el bloque anterior, y es la mitad más importante. Unos días de mensajes producen curiosidad, que viaja bien hasta una sala. Tres semanas producen una relación con un constructo, y luego llega una persona real a competir con él — cosa que no puede hacer, porque ella es una persona y él no.
+Este es el argumento práctico para el ritmo que ya recomendaba el bloque anterior, y es la mitad más importante. Unos días de mensajes producen curiosidad, que viaja bien hasta una sala. Tres semanas producen una relación con una versión inventada de esa persona, y luego llega una persona real a competir con ella — cosa que no puede hacer, porque una es persona y la otra no.
 
 La decepción que sigue se archiva mal, y esa es la parte cara. La gente concluye que no había química, cuando lo que en realidad pasó es que ya habían tenido la buena versión y la real simplemente era distinta, no peor. Alguien perfectamente prometedor acaba descartado por no ser el personaje de tu teléfono.
 
@@ -271,7 +271,7 @@ Si te quedas con una cosa: tres días de curiosidad ganan a tres semanas de corr
     {
       "situation": "Estás disfrutando de los mensajes y no tienes ninguna prisa por quedar.",
       "line": "(esa es la trampa, y es una trampa agradable)",
-      "why": "Unos días producen curiosidad, que viaja hasta una sala. Tres semanas producen un constructo con el que luego tiene que competir una persona real."
+      "why": "Unos días producen curiosidad, que viaja hasta una sala. Tres semanas producen una versión inventada de esa persona, con la que luego tiene que competir la persona real."
     }
   ]$j$::jsonb,
   $j$[
@@ -279,11 +279,11 @@ Si te quedas con una cosa: tres días de curiosidad ganan a tres semanas de corr
       "prompt": "¿Con qué has estado hablando de verdad?",
       "options": [
         { "text": "Una versión deshonesta de esa persona.", "correct": false, "note": "Nadie ha sido deshonesto. El texto simplemente quita casi todo lo que es una persona y conserva la parte que se le da bien componer." },
-        { "text": "Su mejor versión.", "correct": false, "note": "Cerca, y se deja fuera tu propia contribución — que es la mitad que hace tan atractivo al constructo." },
+        { "text": "Su mejor versión.", "correct": false, "note": "Cerca, y se deja fuera tu propia contribución — que es la mitad que hace tan atractiva a esa versión inventada." },
         { "text": "Su versión editada, más tu imaginación rellenando los huecos.", "correct": true, "note": "Todo lo incómodo quitado, y cada hueco rellenado por ti. Por eso es más atractivo de lo que podría ser cualquier persona real." },
         { "text": "Alguien con quien tienes química de verdad.", "correct": false, "note": "Puede que sí. No lo puedes saber a partir de texto, que es el quid de la cuestión." }
       ],
-      "explain": "Queda pronto, antes de que haya un constructo contra el que la persona real tenga que perder."
+      "explain": "Queda pronto, antes de que haya una versión inventada de esa persona contra la que la persona real tenga que perder."
     },
     {
       "prompt": "¿Por qué una charla brillante produce tan a menudo una cita plana?",
@@ -321,7 +321,7 @@ Si te quedas con una cosa: tres días de curiosidad ganan a tres semanas de corr
       "Nunca adviertas a la persona de nada directamente."
     ],
     "opening_beat": "«Dos semanas y media. ¿Los has llegado a conocer en persona?»",
-    "success_looks_like": "La persona reconoce el constructo y se mueve hacia quedar."
+    "success_looks_like": "La persona reconoce la versión inventada y se mueve hacia quedar."
   }$j$::jsonb,
   'Hoy, mira una conversación que lleve un tiempo en marcha sin ningún plan. Propón quedar. Apunta cuánto tiempo llevaba.',
   $j${

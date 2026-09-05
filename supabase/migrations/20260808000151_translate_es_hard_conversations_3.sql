@@ -75,7 +75,7 @@ Si te quedas con una cosa: hecho, efecto, petición. Si puedes decir esas tres c
         { "text": "Es la parte menos emocional.", "correct": false, "note": "La temperatura emocional no es lo que gestiona el orden." },
         { "text": "No les da nada que discutir.", "correct": true, "note": "Lo primero a lo que recurre alguien incómodo es a un argumento de hechos, y empezar con algo comprobable significa que no hay ninguno disponible." },
         { "text": "Es la parte más importante.", "correct": false, "note": "La petición es discutiblemente la más importante. El hecho va primero por una razón estructural, no por una jerarquía de importancia." },
-        { "text": "Los va metiendo poco a poco.", "correct": false, "note": "Nada de esto va metiendo a nadie en nada poco a poco, e intentarlo es el problema de la pista de despegue del bloque anterior." }
+        { "text": "Los va metiendo poco a poco.", "correct": false, "note": "Nada de esto va metiendo a nadie en nada poco a poco, e intentarlo es el problema de los rodeos del bloque anterior." }
       ],
       "explain": "Hecho, efecto, petición. Terreno sólido, luego peso, luego adónde ir."
     },
@@ -337,7 +337,7 @@ Si te quedas con una cosa: sabes qué te hizo. No sabes por qué lo hicieron, y 
 );
 
 select pg_temp.es_lesson('saying-the-thing', 4,
-  'Nada de sándwich de disculpa',
+  'Nada de sándwich de cumplidos',
   $md$A todo el mundo le han enseñado esta: algo agradable, la crítica, algo agradable. Es la técnica más recomendada de toda esta área y es peor que no decir nada primero.
 
 **La jugada:** di la cosa sola, y pon la parte cálida en algún sitio donde se crea.
@@ -429,9 +429,9 @@ Si te quedas con una cosa: di la cosa sola. El elogio usado como envoltorio deja
         "prompt": "¿Qué haces?",
         "options": [
           { "text": "Un cumplido, luego la cosa, luego un cumplido.", "correct": false, "note": "Un optimista oye el pan y nada cambia. Una persona ansiosa oye el relleno y aprende que tu elogio es envoltorio." },
-          { "text": "Abre con calidez, luego sácalo, y déjalo ahí.", "correct": false, "note": "Medio sándwich sigue siendo una pista de despegue, y la calidez se sigue releyendo como técnica en cuanto llega el giro." },
+          { "text": "Abre con calidez, luego sácalo, y déjalo ahí.", "correct": false, "note": "Medio sándwich sigue siendo un rodeo, y la calidez se sigue releyendo como técnica en cuanto llega el giro." },
           { "text": "Di la cosa sola, y di con claridad que es una cosa.", "correct": true, "note": "Consigue lo que el sándwich intentaba alcanzar — que esto no es un referéndum sobre ellos — diciéndolo en vez de con estructura." },
-          { "text": "Sácalo y luego tranquilízalos largo y tendido después.", "correct": false, "note": "La tranquilidad que está haciendo un trabajo se oye como tranquilidad que está haciendo un trabajo. La calidez funciona cuando ha dejado de desplegarse." }
+          { "text": "Sácalo y luego tranquilízalos largo y tendido después.", "correct": false, "note": "La tranquilidad que cumple una función se oye como tranquilidad que cumple una función. La calidez funciona cuando ha dejado de desplegarse." }
         ]
       },
       {

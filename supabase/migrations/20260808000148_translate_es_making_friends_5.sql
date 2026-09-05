@@ -229,7 +229,7 @@ Si te quedas con una cosa: sin disculpas, sin explicaciones, solo la cosa corrie
 );
 
 select pg_temp.es_lesson('keeping-it-alive', 3,
-  'Ritmos distintos no son fracasar',
+  'Ritmos distintos no son fracaso',
   $md$La gente aplica un solo estándar a todas las amistades que tiene, y normalmente es el estándar de la amistad que sea más frecuente. Todo lo demás entonces parece que va mal.
 
 **La jugada:** averigua el ritmo real de cada amistad, y deja de medirla contra una distinta.

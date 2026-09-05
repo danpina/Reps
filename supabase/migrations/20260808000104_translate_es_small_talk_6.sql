@@ -133,14 +133,14 @@ Si alguien menciona que ha tenido un fin de semana ajetreado, contestar con el e
 
 **La jugada:** fíjate en la profundidad de lo que te han puesto delante, y pon algo al lado, más o menos al mismo nivel.
 
-La profundidad se lee más fácil de lo que parece. Los datos sobre su semana son superficiales. Las opiniones son un paso más adentro. Lo que hicieron mal, lo que les preocupa o lo que aún no han decidido está más adentro todavía. Buscas aterrizar en el mismo estante, no ganar.
+La profundidad se lee más fácil de lo que parece. Los datos sobre su semana son superficiales. Las opiniones son un paso más adentro. Lo que hicieron mal, lo que les preocupa o lo que aún no han decidido está más adentro todavía. Buscas quedarte a su misma altura, no ganar.
 
 Pasarse hacia arriba es el error más común, y es el que hace que la gente dé un pequeño paso atrás.$md$,
   $j$[
     {
       "situation": "Mencionan que el trayecto al trabajo ha sido penoso esta semana.",
       "line": "El mío también. He empezado a salir veinte minutos antes solo para sentarme, que ya me parece una derrota.",
-      "why": "Mismo estante. Una queja pequeña respondida con una queja pequeña, más un detalle concreto para que no sea solo darles la razón."
+      "why": "Misma altura. Una queja pequeña respondida con una queja pequeña, más un detalle concreto para que no sea solo darles la razón."
     },
     {
       "situation": "Dicen que en febrero estuvieron a punto de dejar el trabajo y no lo hicieron.",
@@ -158,11 +158,11 @@ Pasarse hacia arriba es el error más común, y es el que hace que la gente dé 
       "prompt": "Alguien dice: sinceramente, este año se me ha hecho bastante solitario desde la mudanza. ¿Qué respuesta iguala la profundidad?",
       "options": [
         { "text": "Mudarse es estresante. ¿Al final encontrasteis un buen sitio?", "correct": false, "note": "Coge una confidencia genuina y contesta a la logística. Han ofrecido algo real y han recibido una pregunta práctica." },
-        { "text": "Yo me sentí exactamente igual como un año después de mudarme. Tardó mucho más de lo que esperaba.", "correct": true, "note": "Mismo estante, y lo bastante concreto como para ser una confidencia de verdad y no un ruido educado. Ahora saben que no son raros." },
+        { "text": "Yo me sentí exactamente igual como un año después de mudarme. Tardó mucho más de lo que esperaba.", "correct": true, "note": "Misma altura, y lo bastante concreto como para ser una confidencia de verdad y no un ruido educado. Ahora saben que no son raros." },
         { "text": "Eso tiene que ser durísimo.", "correct": false, "note": "Comprensivo pero con las manos vacías. Reconoce sin ofrecer, lo que les deja solos en la confidencia que acaban de hacer." },
         { "text": "Mi familia entera se mudó cuando yo tenía nueve años y nunca me he sentido del todo asentado en ningún sitio.", "correct": false, "note": "Se pasa. Su confesión iba de este año; esto contesta con una tesis vital y mueve calladamente el tema hacia ti." }
       ],
-      "explain": "Aterriza en el mismo estante. Contestar profundidad con logística rechaza la oferta, y contestarla con más profundidad se apropia de la conversación."
+      "explain": "Quédate a su misma altura. Contestar profundidad con logística rechaza la oferta, y contestarla con más profundidad se apropia de la conversación."
     },
     {
       "prompt": "Alguien te cuenta que su perro murió el mes pasado. ¿Qué aspecto tiene igualar la profundidad?",
@@ -179,7 +179,7 @@ Pasarse hacia arriba es el error más común, y es el que hace que la gente dé 
     "scale": { "min": 1, "max": 5 },
     "criteria": [
       { "key": "read_the_depth", "label": "Leíste el nivel ofrecido", "description": "Juzgaste cuánto había puesto de verdad la otra persona sobre la mesa." },
-      { "key": "matched_it", "label": "Aterrizaste en el mismo estante", "description": "Ofreciste algo de peso comparable en vez de mucho más ligero o mucho más pesado." },
+      { "key": "matched_it", "label": "Te quedaste a su altura", "description": "Ofreciste algo de peso comparable en vez de mucho más ligero o mucho más pesado." },
       { "key": "was_specific", "label": "Fuiste concreto", "description": "Diste un detalle real en vez de un acuerdo genérico." },
       { "key": "did_not_take_over", "label": "No te apropiaste del tema", "description": "Igualaste la confidencia y devolviste la conversación." }
     ]
@@ -216,7 +216,7 @@ select pg_temp.es_lesson('reciprocity', 3,
   'Y luego da un paso más',
   $md$Igualar mantiene una conversación nivelada. Dar un paso más allá de lo que te han dado es lo que la hace bajar.
 
-Después de responder a su confidencia, añade un poco más de lo que te dieron. No un salto: un paso. Mencionan un trabajo que no disfrutaban; tú mencionas un trabajo que no disfrutabas y por qué te quedaste demasiado tiempo de todas formas. Esa cláusula de más es la técnica entera.
+Después de responder a su confidencia, añade un poco más de lo que te dieron. No un salto: un paso. Mencionan un trabajo que no disfrutaban; tú mencionas un trabajo que no disfrutabas y por qué te quedaste demasiado tiempo de todas formas. Esa frase de más es la técnica entera.
 
 **La jugada:** ponte a su altura, y luego añade una cosa que no tenías que decir.
 
@@ -227,7 +227,7 @@ El riesgo es dar dos pasos en vez de uno, lo que convierte una conversación en 
     {
       "situation": "Han mencionado que les cuesta leer a su equipo nuevo.",
       "line": "Igual cuando empecé. Me pasé unos tres meses dando por hecho que le caía mal a todo el mundo, y resultó ser completamente inventado.",
-      "why": "Iguala la confidencia y añade una admisión que no hacía falta. La cláusula de más es el paso."
+      "why": "Iguala la confidencia y añade una admisión que no hacía falta. La frase de más es el paso."
     },
     {
       "situation": "Han dicho que casi no salen esta noche.",
@@ -249,7 +249,7 @@ El riesgo es dar dos pasos en vez de uno, lo que convierte una conversación en 
         { "text": "Yo estuve seis meses entre trabajos y le dije a todo el mundo que era a propósito. No lo era.", "correct": true, "note": "Iguala la confidencia y añade la admisión que hay debajo. La segunda frase es el paso de más." },
         { "text": "El tiempo libre está infravalorado. La gente no se coge suficiente.", "correct": false, "note": "Una opinión general en vez de una confidencia personal. Suena conforme sin dar nada de ti." }
       ],
-      "explain": "Responde a lo que te han dado, y luego añade una cláusula que no tenías que decir. Esa cláusula de más es lo que deja que la conversación baje."
+      "explain": "Responde a lo que te han dado, y luego añade una frase que no tenías que decir. Esa frase de más es lo que deja que la conversación baje."
     },
     {
       "prompt": "¿Qué añadido convierte una igualada en un paso más?",
@@ -289,11 +289,11 @@ El riesgo es dar dos pasos en vez de uno, lo que convierte una conversación en 
       "Si saltan varios pasos de golpe, ponte algo formal y retrocede un nivel."
     ]
   }$j$::jsonb,
-  $md$Hoy, iguala una confidencia y luego añade una cláusula que no tenías que decir. Anota qué te dieron, qué igualaste y qué añadiste.$md$,
+  $md$Hoy, iguala una confidencia y luego añade una frase que no tenías que decir. Anota qué te dieron, qué igualaste y qué añadiste.$md$,
   $j${
   "turns": [
     { "instruction": "Responde a lo que acaban de ofrecerte, al mismo nivel." },
-    { "instruction": "Ahora añade una cláusula que no tenías que decir, y devuélvesela." }
+    { "instruction": "Ahora añade una frase que no tenías que decir, y devuélvesela." }
   ]
 }$j$::jsonb);
 

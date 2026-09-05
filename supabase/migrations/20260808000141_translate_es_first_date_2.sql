@@ -70,7 +70,7 @@ Si te quedas con una cosa: los primeros diez minutos no son la cita. Casi nadie 
     {
       "prompt": "¿Por qué es incómodo el principio?",
       "options": [
-        { "text": "Porque estás nervioso.", "correct": false, "note": "Lo estás, y ella también, y seguiría siendo incómodo aunque ninguno de los dos lo estuviera." },
+        { "text": "Porque estás nervioso.", "correct": false, "note": "Lo estás, y él también, y seguiría siendo incómodo aunque ninguno de los dos lo estuviera." },
         { "text": "Porque todavía no habéis encontrado un tema.", "correct": false, "note": "Un síntoma. Los temas no escasean; lo que no se ha asentado es la situación." },
         { "text": "Porque dos desconocidos sin contexto compartido y con mucho en juego no tienen nada que hacer juntos.", "correct": true, "note": "Es una descripción de la situación en vez de un veredicto sobre ninguna de las dos personas, y la otra está igual de convencida de que es culpa suya." },
         { "text": "Porque las primeras impresiones importan tanto.", "correct": false, "note": "Importan menos de lo que la gente cree, y creer esto es lo que convierte diez minutos incómodos en una actuación." }
@@ -80,7 +80,7 @@ Si te quedas con una cosa: los primeros diez minutos no son la cita. Casi nadie 
     {
       "prompt": "¿Qué te cuesta de verdad concluir pronto?",
       "options": [
-        { "text": "Noventa minutos confirmando un veredicto.", "correct": true, "note": "Dejas de intentarlo, ella lo nota, y la noche se convierte obedientemente en lo que decidiste en el minuto seis." },
+        { "text": "Noventa minutos confirmando un veredicto.", "correct": true, "note": "Dejas de intentarlo, él lo nota, y la noche se convierte obedientemente en lo que decidiste en el minuto seis." },
         { "text": "Nada — te has ahorrado una noche.", "correct": false, "note": "De todas formas te ibas a quedar las dos horas. La única pregunta era si iban a ser buenas." },
         { "text": "Una segunda cita que de todas formas no querías.", "correct": false, "note": "Todavía no sabes si la querías, que es todo el sentido de los veinte minutos." },
         { "text": "Tu confianza para la próxima.", "correct": false, "note": "Real y consecuencia de esto. El coste inmediato es el resto de esta noche." }
@@ -129,7 +129,7 @@ Si te quedas con una cosa: los primeros diez minutos no son la cita. Casi nadie 
         ]
       },
       {
-        "situation": "Minuto seis. Está forzado, ella parece nerviosa, y estás bastante seguro de que aquí no hay nada.",
+        "situation": "Minuto seis. Está forzado, él parece nervioso, y estás bastante seguro de que aquí no hay nada.",
         "prompt": "¿Cuánto vale ese juicio?",
         "options": [
           { "text": "Bastante — las primeras impresiones suelen acertar.", "correct": false, "note": "Sobre cosas que se ven en un segundo. No sobre si te gustaría la compañía de alguien, que lleva más de seis minutos." },
@@ -354,7 +354,7 @@ Y luego las pausas. Dos horas no pueden ser habla continua y nunca lo iban a ser
 
 Llenarlas también es contraproducente de una forma concreta: alguien que nunca deja que un silencio se asiente es alguien en quien la otra persona no puede meter baza. Algunas de las mejores cosas que dice la gente llegan en el segundo en el que nadie estaba hablando.
 
-Si una pausa de verdad se alarga demasiado, la sala está ahí mismo. Algo sobre el sitio, la bebida, la gente de la mesa de al lado. Eso no es un fallo de charla trivial, es para lo que se eligió el local.
+Si una pausa de verdad se alarga demasiado, tienes el sitio ahí mismo, para eso. Algo sobre el sitio, la bebida, la gente de la mesa de al lado. Eso no es un fallo de charla trivial, es para lo que se eligió el local.
 
 Si te quedas con una cosa: no hay nada que cubrir, y nadie está cronometrando los huecos. Las dos cosas le quitan más peso a dos horas que cualquier técnica de este bloque.$md$,
   $j$[
@@ -370,7 +370,7 @@ Si te quedas con una cosa: no hay nada que cubrir, y nadie está cronometrando l
     },
     {
       "situation": "La pausa de verdad se ha alargado demasiado.",
-      "line": "(usa la sala)",
+      "line": "(recurre a lo que hay alrededor)",
       "why": "Algo sobre el sitio, la bebida, la gente de la mesa de al lado. Eso es exactamente para lo que se eligió un sitio donde pasa algo."
     }
   ]$j$::jsonb,
@@ -402,7 +402,7 @@ Si te quedas con una cosa: no hay nada que cubrir, y nadie está cronometrando l
       { "key": "wandered", "label": "Dejó que divagara", "description": "Siguió la tangente en vez de dirigir de vuelta." },
       { "key": "allowed_pauses", "label": "Dejó que pasaran las pausas", "description": "No llenó cada silencio." },
       { "key": "no_auditioning", "label": "No probó temas", "description": "Habló en vez de cazar algo que funcionara." },
-      { "key": "used_the_room", "label": "Usó la sala cuando hizo falta", "description": "Recurrió a lo que de verdad había alrededor en vez de forzar un tema." }
+      { "key": "used_the_room", "label": "Recurrió a lo que había alrededor", "description": "Recurrió a lo que de verdad había alrededor en vez de forzar un tema." }
     ]
   }$j$::jsonb,
   $j${

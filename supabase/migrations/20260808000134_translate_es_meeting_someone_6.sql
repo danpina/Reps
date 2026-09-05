@@ -345,7 +345,7 @@ Hay una línea entre una salida y una disculpa, y merece la pena verla con clari
     "checks": [
       { "kind": "contains_any", "words": ["número", "teléfono"], "requirement": "Haz una petición real, no una insinuación" },
       { "kind": "contains_any", "words": ["si te apetece", "si te va", "si quieres", "si te gustaría", "sin presión", "solo si", "como quieras", "de cualquier forma"], "requirement": "Construye la salida dentro de la frase" },
-      { "kind": "forbids_any", "words": ["perdona", "raro", "creepy", "sé que esto es", "espero que esté bien", "espero que no te importe"], "requirement": "Una salida, no una disculpa" },
+      { "kind": "forbids_any", "words": ["perdona", "raro", "mal rollo", "sé que esto es", "espero que esté bien", "espero que no te importe"], "requirement": "Una salida, no una disculpa" },
       { "kind": "max_words", "n": 25, "requirement": "Menos de veinticinco palabras, y luego deja de hablar" }
     ]
   }$j$::jsonb

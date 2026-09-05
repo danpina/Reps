@@ -196,7 +196,7 @@ Si te quedas con una cosa: si se puede borrar sin cambiar el significado, estaba
   $j${
     "scale": { "min": 1, "max": 5 },
     "criteria": [
-      { "key": "no_just", "label": "Sin solo de encogimiento", "description": "Quitó los que no hacían trabajo literal." },
+      { "key": "no_just", "label": "Sin solo de encogimiento", "description": "Quitó los que de verdad no servían para nada." },
       { "key": "no_family", "label": "Pilló a la familia", "description": "Nada de rápido, nada de no pasa nada si no, nada de perdona como puntuación." },
       { "key": "same_ask", "label": "La petición sobrevivió", "description": "Quitarlos no cambió qué se estaba pidiendo." },
       { "key": "kept_warmth", "label": "Mantuvo la calidez genuina", "description": "Dejó el gracias." }
@@ -359,7 +359,7 @@ El encogimiento es cualquier cosa que afirma que tu petición es una carga: *per
 
 Las dos parecen educación desde dentro y se comportan de forma completamente distinta. Una hace que un mensaje sea agradable de recibir. La otra hace que sea trabajo de recibir.
 
-La colocación importa tanto como el contenido, que es la parte que a la gente se le pasa. La calidez al final se lee como calidez. Las mismas palabras al principio se leen como carraspeo, porque cualquier cosa antes de la petición se experimenta como retraso. *Gracias — esto me ahorra una hora* después de la pregunta es un regalo. La misma frase antes es una pista de despegue.
+La colocación importa tanto como el contenido, que es la parte que a la gente se le pasa. La calidez al final se lee como calidez. Las mismas palabras al principio se leen como carraspeo, porque cualquier cosa antes de la petición se experimenta como retraso. *Gracias — esto me ahorra una hora* después de la pregunta es un regalo. La misma frase antes es un rodeo antes de llegar al grano.
 
 Y una cosa que vale más que cualquier cortesía: responder a lo que de verdad dijeron. Una respuesta que se implica con el punto concreto de alguien se lee como cálida sea cual sea su longitud, y un mensaje largo y amistoso que lo ignora no.
 
@@ -454,7 +454,7 @@ select pg_temp.es_lesson('stop-apologising', 5,
 
 **La jugada:** envía la misma petición otra vez, sin ninguna referencia al hueco.
 
-*Recupero este — ¿todavía necesitas que se incluyan las cifras de marzo?* Ese es todo el mensaje. Nada de *perdona por presionar*, nada de *sé que estás liado*, nada de *disculpas por el segundo mensaje*, ninguno de los cuales hace que el seguimiento sea más bienvenido y todos hacen que sea más largo.
+*Vuelvo a esto — ¿todavía necesitas que se incluyan las cifras de marzo?* Ese es todo el mensaje. Nada de *perdona por presionar*, nada de *sé que estás liado*, nada de *disculpas por el segundo mensaje*, ninguno de los cuales hace que el seguimiento sea más bienvenido y todos hacen que sea más largo.
 
 Lo que merece la pena interiorizar es qué es casi siempre una no respuesta. Alguien lo leyó en el móvil, tenía intención de gestionarlo como es debido, y subió por la pantalla. Esa es la inmensa mayoría de los mensajes sin responder — no una decisión, no una señal, y desde luego no molestia por que le hayan preguntado. Hacer seguimiento es hacerles un pequeño favor, porque lo que tenían intención de hacer ahora está de vuelta donde lo pueden ver.
 
@@ -468,7 +468,7 @@ Si te quedas con una cosa: recupéralo con llaneza. El hueco no necesita explica
   $j$[
     {
       "situation": "Cuatro días, sin respuesta, y todavía lo necesitas.",
-      "line": "Recupero este — ¿todavía necesitas que se incluyan las cifras de marzo?",
+      "line": "Vuelvo a esto — ¿todavía necesitas que se incluyan las cifras de marzo?",
       "why": "La misma petición, repetida, sin ninguna referencia al hueco. Nada de disculparse por ello lo hace más bienvenido."
     },
     {
@@ -535,7 +535,7 @@ Si te quedas con una cosa: recupéralo con llaneza. El hueco no necesita explica
   $j${
     "says": "(hace cuatro días preguntaste si el informe necesita las cifras de marzo. Sin respuesta, y necesitas terminarlo hoy.)",
     "model": {
-      "line": "Recupero este — ¿el informe necesita las cifras de marzo?",
+      "line": "Vuelvo a esto — ¿el informe necesita las cifras de marzo?",
       "why": "La misma petición repetida, en el mismo hilo, sin ninguna referencia al hueco. Casi con toda seguridad tenían intención de responder y se les pasó, así que esto es un pequeño favor en vez de presión."
     },
     "checks": [

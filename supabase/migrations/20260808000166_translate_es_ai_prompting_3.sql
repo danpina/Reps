@@ -145,7 +145,7 @@ Otras peticiones de la misma familia, todas ellas de resta.
 
 *Elimina cualquier cosa que no sea la petición o su contexto.* Esto es más una prueba que una edición, y es la misma que Storytelling aplica a una historia.
 
-*Quita cada muletilla.* Solo, bastante, quizá, posiblemente, creo, un poco. Luego léelo y vuelve a poner las dos que hacían trabajo real, porque un pequeño número de ellas son genuinas.
+*Quita cada muletilla.* Solo, bastante, quizá, posiblemente, creo, un poco. Luego léelo y vuelve a poner las dos que de verdad servían para algo, porque un pequeño número de ellas son genuinas.
 
 *¿Qué frase se podría eliminar sin que nadie se diera cuenta?* Normalmente hay una, y normalmente es la segunda.
 
@@ -160,7 +160,7 @@ Si te quedas con una cosa: mejorar añade y recortar quita. Casi todos los mensa
     },
     {
       "situation": "Está lleno de muletillas.",
-      "line": "Quita cada muletilla, y luego vuelvo a poner las que hacen trabajo.",
+      "line": "Quita cada muletilla, y luego vuelvo a poner las que de verdad sirven para algo.",
       "why": "La mayoría son el encogimiento del que trata Mensajería, y un pequeño número son genuinas."
     },
     {
@@ -367,7 +367,7 @@ Las señales, más o menos en orden de cuán fiablemente delatan.
 
 El segundo motivo para conocer esto no trata de la detección. Es que leer un mensaje y preguntarse si lo escribió una persona es en sí mismo corrosivo para el mensaje, sea cual sea la respuesta. Esa duda es el riesgo real de apoyarse en ello — no que te pillen, sino escribir cosas que invitan a la pregunta.
 
-Lo cual apunta hacia el arreglo, y no es estilístico. Pon dentro una cosa concreta que solo tú podrías saber. Derrota cada señal de la lista de golpe, y es lo mismo que pide Storytelling: un detalle que hace trabajo.
+Lo cual apunta hacia el arreglo, y no es estilístico. Pon dentro una cosa concreta que solo tú podrías saber. Derrota cada señal de la lista de golpe, y es lo mismo que pide Storytelling: un detalle que cumple una función.
 
 Si te quedas con una cosa: lo que delata es que nada dentro es específico. Un detalle real arregla más que cualquier cantidad de edición.$md$,
   $j$[

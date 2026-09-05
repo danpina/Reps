@@ -39,18 +39,18 @@ Una historia no es una secuencia de hechos. Es un cambio: se esperaba algo y pas
 
 **La jugada:** encuentra el giro, y construye el relato alrededor de él.
 
-La mayoría de las historias planas tienen uno y no lo han localizado. Pregúntate cuál fue la parte sorprendente — el momento del que le contarías a alguien si solo tuvieras una frase — y ese es el giro. Luego comprueba que todo lo que piensas decir o lo está preparando o lo está pagando, y corta lo que no haga ninguna de las dos cosas. Esa única prueba elimina la mayor parte de lo que hace largas las historias.
+La mayoría de las historias planas tienen uno y no lo han localizado. Pregúntate cuál fue la parte sorprendente — el momento del que le contarías a alguien si solo tuvieras una frase — y ese es el giro. Luego comprueba que todo lo que piensas decir o lo está preparando o lo está cobrando, y corta lo que no haga ninguna de las dos cosas. Esa única prueba elimina la mayor parte de lo que hace largas las historias.
 
 El giro también te dice cómo ritmarlo. Ve más despacio ligeramente al acercarte — un compás antes vale más que cualquier redacción — y no te precipites en la frase en sí, que es lo más común que la gente le hace a su mejor momento.
 
 Dos formas de fallo que merece la pena reconocer. Una historia sin ningún giro, que es la descripción de una tarde, y se cuenta mejor en una frase: *todo fue un caos de principio a fin.* Y una historia con el giro en el sitio equivocado, normalmente demasiado pronto, así que los dos minutos que quedan son anticlímax — si lo sorprendente pasa en la segunda frase, la historia terminó ahí y tú sigues hablando.
 
-Si te quedas con una cosa: nombra el giro antes de empezar, y comprueba que cada frase o lo está preparando o lo está pagando.$md$,
+Si te quedas con una cosa: nombra el giro antes de empezar, y comprueba que cada frase o lo está preparando o lo está cobrando.$md$,
   $j$[
     {
       "situation": "Estás a punto de contar una historia larga y no sabes por qué se hace pesada.",
       "line": "(¿cuál es el momento que da la vuelta?)",
-      "why": "Ese es el giro. Luego corta cualquier cosa que no lo esté preparando ni pagando, que elimina la mayor parte de lo que hace largas las historias."
+      "why": "Ese es el giro. Luego corta cualquier cosa que no lo esté preparando ni cobrando, que elimina la mayor parte de lo que hace largas las historias."
     },
     {
       "situation": "La parte sorprendente pasa en tu segunda frase.",
@@ -354,7 +354,7 @@ Dos reglas cubren casi todo.
 
 Cuando te des cuenta de que te has ramificado, no des marcha atrás con una disculpa. *Bueno* es una reparación completa — dilo, y vuelve al hilo principal. A nadie le importa una digresión que termina; lo que le importa a la gente es una digresión que en silencio se convierte en la historia mientras la primera se queda abierta.
 
-Y la versión que merece la pena atrapar antes de empezar: si necesita tres personajes y un poco de historia para funcionar, es una buena historia para gente que ya los conoce y no para esta mesa. Elegir no contarla ahí no es un fracaso, es casting.
+Y la versión que merece la pena atrapar antes de empezar: si necesita tres personajes y un poco de historia para funcionar, es una buena historia para gente que ya los conoce y no para esta mesa. Elegir no contarla ahí no es un fracaso, es elegir bien a quién se la cuentas.
 
 Si te quedas con una cosa: termina la historia que empezaste. Una segunda que llega en pleno vuelo es donde se pierden las dos.$md$,
   $j$[
@@ -460,7 +460,7 @@ select pg_temp.es_lesson('the-shape', 5,
 
 **Dónde empezar.** El momento en que las cosas empiezan a salir mal, no el principio del día.
 
-**El giro.** La cosa que da la vuelta — y la comprobación de que cada frase o lo prepara o lo paga.
+**El giro.** La cosa que da la vuelta — y la comprobación de que cada frase o lo prepara o lo cobra.
 
 **La última línea.** Conócela antes de empezar, para poder dirigirte hacia ella y parar ahí.
 
@@ -542,10 +542,10 @@ Si te quedas con una cosa: marco, inicio, giro, final. Diez segundos de decidir,
     "says": "Cuéntales la del taller.",
     "model": {
       "line": "Vale — me ha pasado la cosa más ridícula en el taller. Bueno, sale el mecánico, mira el coche cuatro segundos, y dice: ¿de quién es esto?",
-      "why": "Marco, y luego directo al momento en que pasa algo. Dos de las cuatro decisiones visibles en un aliento, y nada de planteamiento, de descargo o de día de la semana."
+      "why": "Marco, y luego directo al momento en que pasa algo. Dos de las cuatro decisiones visibles en un aliento, y nada de planteamiento, de coletilla o de día de la semana."
     },
     "checks": [
-      { "kind": "forbids_any", "words": ["no es muy interesante", "tenías que haber estado allí", "perdona", "bueno, básicamente", "era martes", "había ido a", "déjame pensar", "por dónde empiezo"], "requirement": "Nada de descargo, planteamiento, u orientación" },
+      { "kind": "forbids_any", "words": ["no es muy interesante", "tenías que haber estado allí", "perdona", "bueno, básicamente", "era martes", "había ido a", "déjame pensar", "por dónde empiezo"], "requirement": "Nada de coletilla, planteamiento, u orientación" },
       { "kind": "min_words", "n": 15, "requirement": "Enmárcala y empiézala" },
       { "kind": "max_words", "n": 45, "requirement": "A dos frases de empezar ya ha pasado algo" }
     ]

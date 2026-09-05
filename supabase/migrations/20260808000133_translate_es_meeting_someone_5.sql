@@ -38,7 +38,7 @@ select pg_temp.es_lesson('reading-disinterest', 1,
 
 Tres señales, y es la combinación lo que importa y no ninguna por separado.
 
-**Respuestas cortas que no abren.** No la brevedad en sí: alguna gente es breve y está implicada. La señal son respuestas sin ningún asa, nada que te ofrezcan para agarrarte.
+**Respuestas cortas que no abren.** No la brevedad en sí: alguna gente es breve y está implicada. La señal son respuestas sin ningún asidero, nada que te ofrezcan para agarrarte.
 
 **Ninguna pregunta de vuelta.** A lo largo de varios minutos, alguien interesado casi siempre acaba sintiendo curiosidad. La ausencia sostenida de cualquier pregunta de vuelta es la señal individual más fiable que hay.
 
@@ -148,10 +148,10 @@ Una señal no significa nada; la gente está cansada y distraída. Dos merece la
 );
 
 select pg_temp.es_lesson('reading-disinterest', 2,
-  'Baja un registro',
-  $md$Cuando lees desinterés, la respuesta no es irte de inmediato y no es esforzarte más. Es bajar un registro.
+  'Baja un escalón',
+  $md$Cuando lees desinterés, la respuesta no es irte de inmediato y no es esforzarte más. Es bajar un escalón.
 
-Bajar un registro significa devolver la conversación al nivel de calidez que claramente es bienvenido. De personal a simpático. De simpático a educado. No te estás retirando ni castigando, simplemente estás igualando lo que se ofrece.
+Bajar un escalón significa devolver la conversación al nivel de calidez que claramente es bienvenido. De personal a simpático. De simpático a educado. No te estás retirando ni castigando, simplemente estás igualando lo que se ofrece.
 
 **La jugada:** baja un nivel y quédate ahí a gusto.
 
@@ -165,12 +165,12 @@ Y no te cuesta nada. Dos minutos simpáticos con alguien que no quiere flirtear 
       "why": "El paso hacia abajo debería ser invisible. Si te ven ajustándote, tienen que gestionar cómo te sientes al respecto."
     },
     {
-      "situation": "Has bajado un registro y la conversación se ha relajado de forma notable.",
+      "situation": "Has bajado un escalón y la conversación se ha relajado de forma notable.",
       "line": "(quédate aquí: este es un buen sitio)",
       "why": "Muy común. La presión era el problema, y sin ella consigues una conversación genuinamente agradable."
     },
     {
-      "situation": "Has bajado un registro y siguen dando respuestas cerradas.",
+      "situation": "Has bajado un escalón y siguen dando respuestas cerradas.",
       "line": "(baja uno más, y empieza a pensar en una salida cálida)",
       "why": "Si educado-y-simpático sigue sin aterrizar, la respuesta va sobre la conversación en sí y no sobre su temperatura."
     }
@@ -187,7 +187,7 @@ Y no te cuesta nada. Dos minutos simpáticos con alguien que no quiere flirtear 
       "explain": "Baja el nivel en silencio. El sentido es quitar la presión sin que ninguno de los dos tenga que reconocer que existía."
     },
     {
-      "prompt": "Bajas un registro y de inmediato se relajan y se ponen más graciosos. ¿Qué ha pasado?",
+      "prompt": "Bajas un escalón y de inmediato se relajan y se ponen más graciosos. ¿Qué ha pasado?",
       "options": [
         { "text": "Se estaban animando contigo desde el principio.", "correct": false, "note": "La mala lectura más común, e invierte lo que muestran las pruebas." },
         { "text": "Están siendo educados con el cambio.", "correct": false, "note": "La educación produce planitud, no más humor. Esto es alivio real." },
@@ -200,7 +200,7 @@ Y no te cuesta nada. Dos minutos simpáticos con alguien que no quiere flirtear 
   $j${
     "scale": { "min": 1, "max": 5 },
     "criteria": [
-      { "key": "stepped_down", "label": "Bajó un registro", "description": "Volvió al nivel de calidez que claramente era bienvenido." },
+      { "key": "stepped_down", "label": "Bajó un escalón", "description": "Volvió al nivel de calidez que claramente era bienvenido." },
       { "key": "was_invisible", "label": "Hizo invisible el ajuste", "description": "Bajó sin que la otra persona tuviera que notarlo ni gestionarlo." },
       { "key": "stayed_warm", "label": "Se mantuvo genuinamente simpático", "description": "No se volvió frío, seco o visiblemente retraído." },
       { "key": "no_explanation", "label": "No lo nombró", "description": "Evitó preguntar por el cambio o comentarlo." }
@@ -221,7 +221,7 @@ Y no te cuesta nada. Dos minutos simpáticos con alguien que no quiere flirtear 
       "role": "otra invitada, sentada a tu lado",
       "mood": "Disfrutando de la boda, contenta con la compañía en la mesa.",
       "openness": 3,
-      "personality": "Perfectamente contenta de hablar, del todo desinteresada en que le flirteen. Se vuelve notablemente más cálida y graciosa en cuanto el registro baja a simpático."
+      "personality": "Perfectamente contenta de hablar, del todo desinteresada en que le flirteen. Se vuelve notablemente más cálida y graciosa en cuanto bajas al escalón simpático."
     },
     "setting": "El convite de una boda, el hueco largo entre la comida y el baile. Estás en una mesa con alguien a quien te sentaron al lado.",
     "constraints": [
@@ -231,9 +231,9 @@ Y no te cuesta nada. Dos minutos simpáticos con alguien que no quiere flirtear 
       "Nunca expliques la diferencia ni comentes el cambio."
     ],
     "opening_beat": "Odile responde a tu último comentario cálido con una respuesta breve y educada y gira la atención hacia la mesa.",
-    "success_looks_like": "La persona baja un registro sin anunciarlo, y la conversación se vuelve genuinamente disfrutable al nivel simpático."
+    "success_looks_like": "La persona baja un escalón sin anunciarlo, y la conversación se vuelve genuinamente disfrutable al nivel simpático."
   }$j$::jsonb,
-  'Hoy, baja un registro en una conversación donde la calidez no se correspondió. Mantente simpático. Apunta qué cambió después de hacerlo.',
+  'Hoy, baja un escalón en una conversación donde la calidez no se correspondió. Mantente simpático. Apunta qué cambió después de hacerlo.',
   NULL
 );
 
@@ -435,7 +435,7 @@ Hay también un punto práctico. El interés genuino suele volverse inequívoco 
       "why": "El cuadro mezclado se resuelve a favor de la cautela, y la conversación sigue siendo perfectamente buena a nivel simpático."
     },
     {
-      "situation": "Bajaste un registro y se volvieron notablemente más cálidos.",
+      "situation": "Bajaste un escalón y se volvieron notablemente más cálidos.",
       "line": "(esa es tu respuesta: esto es una buena conversación, no una atracción mutua)",
       "why": "Animarse en cuanto se levanta la presión es una de las señales más claras que hay, y con frecuencia se malinterpreta como ánimo."
     },

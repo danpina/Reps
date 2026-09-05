@@ -142,7 +142,7 @@ Si te quedas con una cosa: termínala a propósito. Tanto la versión buena como
 
 select pg_temp.es_lesson('what-happens-next', 2,
   'Di lo evidente',
-  $md$Los bloques de flirteo enseñaron la negabilidad. Un peldaño, ofrecido y soltado. Nada declarado, todo recibible como simple amabilidad. Eso estaba bien, y estaba bien por un motivo concreto: estabas tratando con desconocidos cuyo interés era desconocido, y la negabilidad es lo que hace que un movimiento sea seguro de ofrecer y fácil de rechazar.
+  $md$Los bloques de flirteo enseñaron a dejarlo todo negable. Un peldaño, ofrecido y soltado. Nada declarado, todo recibible como simple amabilidad. Eso estaba bien, y estaba bien por un motivo concreto: estabas tratando con desconocidos cuyo interés era desconocido, y poder negarlo es lo que hace que un movimiento sea seguro de ofrecer.
 
 Al final de una primera cita, eso ya se ha ganado. Alguien accedió a quedar contigo, se presentó, y pasó dos horas contigo. Seguir siendo negable ahora no se lee como tacto — se lee como indiferencia, y la forma más común en que una buena primera cita no produce nada es que las dos personas la dejen ambigua por educación.
 
@@ -166,7 +166,7 @@ Si te quedas con una cosa: dilo como una afirmación sobre ti. Es lo más verdad
     {
       "situation": "Estás a punto de decir deberíamos repetir esto un día de estos.",
       "line": "(eso es un sentimiento, y muere ahí)",
-      "why": "La respuesta correcta es sí, claro que sí, que también es un sentimiento, y luego no pasa nada. La negabilidad era para desconocidos."
+      "why": "La respuesta correcta es sí, claro que sí, que también es un sentimiento, y luego no pasa nada. Ser negable era para desconocidos."
     },
     {
       "situation": "Lo has dicho y hay una pausa.",
@@ -176,12 +176,12 @@ Si te quedas con una cosa: dilo como una afirmación sobre ti. Es lo más verdad
   ]$j$::jsonb,
   $j$[
     {
-      "prompt": "¿Por qué dejar la negabilidad ahora?",
+      "prompt": "¿Por qué dejar de ser negable ahora?",
       "options": [
-        { "text": "Porque la conoces mejor.", "correct": false, "note": "Dos horas no es conocer a alguien. Lo que ha cambiado es lo que se ha demostrado, no lo que sabes." },
-        { "text": "Porque ya se ha ganado — accedió, se presentó, y se quedó dos horas.", "correct": true, "note": "La negabilidad es lo que hace que un movimiento sea seguro de ofrecer a un desconocido cuyo interés es desconocido. Aquí se lee como indiferencia en vez de tacto." },
+        { "text": "Porque lo conoces mejor.", "correct": false, "note": "Dos horas no es conocer a alguien. Lo que ha cambiado es lo que se ha demostrado, no lo que sabes." },
+        { "text": "Porque ya se ha ganado — accedió, se presentó, y se quedó dos horas.", "correct": true, "note": "Que algo sea negable es lo que hace que un movimiento sea seguro de ofrecer a un desconocido cuyo interés es desconocido. Aquí se lee como indiferencia en vez de tacto." },
         { "text": "Porque ser directo es más atractivo.", "correct": false, "note": "A veces, y es una afirmación sobre el estilo, no el motivo por el que cambia la regla." },
-        { "text": "Porque ella lo hará si tú no lo haces.", "correct": false, "note": "A menudo ninguno de los dos lo hace, que es exactamente el problema." }
+        { "text": "Porque él lo hará si tú no lo haces.", "correct": false, "note": "A menudo ninguno de los dos lo hace, que es exactamente el problema." }
       ],
       "explain": "La forma más común en que una buena primera cita no produce nada es que las dos personas sean educadas al respecto."
     },
@@ -228,7 +228,7 @@ Si te quedas con una cosa: dilo como una afirmación sobre ti. Es lo más verdad
     "says": "Bueno — esto ha sido mucho mejor de lo que esperaba. En el buen sentido.",
     "model": {
       "line": "Lo ha sido, sí. Me gustaría repetir esto.",
-      "why": "Una afirmación sobre ti en vez de una pregunta sobre la otra persona, sin nada apilado después. La negabilidad era para desconocidos cuyo interés era desconocido, y ya se ha ganado desde entonces."
+      "why": "Una afirmación sobre ti en vez de una pregunta sobre la otra persona, sin nada apilado después. Ser negable era para desconocidos cuyo interés era desconocido, y ya se ha ganado desde entonces."
     },
     "checks": [
       { "kind": "first_person", "requirement": "Dilo sobre ti mismo" },
@@ -312,7 +312,7 @@ Si te quedas con una cosa: convierte *otra vez algún día* en un día concreto.
       "openness": 4,
       "personality": "Dice que sí de inmediato a cualquier cosa con un día fijado, y responde a una sugerencia vaga con un acuerdo igual de vago."
     },
-    "setting": "Fuera. Has dicho que te gustaría repetirlo y ella ha dicho que a ella también. Antes mencionó un sitio cerca de su piso que nunca ha llegado a probar.",
+    "setting": "Fuera. Has dicho que te gustaría repetirlo y él ha dicho que a él también. Antes mencionó un sitio cerca de su piso que nunca ha llegado a probar.",
     "constraints": [
       "Mantente en el personaje en todo momento. Nunca des consejos, ni evalúes, ni rompas la escena.",
       "Di que sí de forma concreta y cálida a cualquier cosa con un día fijado.",
@@ -346,7 +346,7 @@ select pg_temp.es_lesson('what-happens-next', 4,
 
 **Un momento es un sí.** *El jueves no puedo pero la semana siguiente sí* es un sí con una agenda pegada, y merece la pena fijarse en que esta es la forma más habitual que toma un sí de verdad. La gente está ocupada, y estar ocupado no es un rechazo.
 
-**Un motivo sin alternativa es un no.** *Ando muy liado ahora mismo.* *Déjame mirar mi semana y te digo.* Los dos son cálidos, los dos son amables, y ninguno contiene un día. Tómatelos por lo que significan, di algo cálido, y vete — y sobre todo no ofrezcas tú la alternativa que ella decidió no ofrecer.
+**Un motivo sin alternativa es un no.** *Ando muy liado ahora mismo.* *Déjame mirar mi semana y te digo.* Los dos son cálidos, los dos son amables, y ninguno contiene un día. Tómatelos por lo que significan, di algo cálido, y vete — y sobre todo no ofrezcas tú la alternativa que él decidió no ofrecer.
 
 **Y la duda genuina es genuina.** De vez en cuando a alguien sencillamente le pilla desprevenida, o no lo sabe, y lo dice. *¿Puedo pensármelo?* no es el no suave — el no suave llega con fluidez, porque ya se ha dicho antes. La duda que suena torpe suele ser solo torpeza.
 
@@ -364,7 +364,7 @@ Si te quedas con una cosa: que vuelva un momento es un sí, que vuelva un motivo
     {
       "situation": "«Déjame mirar mi semana y te digo.»",
       "line": "(un motivo sin ningún día dentro)",
-      "why": "Cálido, amable, y sin nada sobre lo que actuar. Tómatelo por lo que significa y no ofrezcas tú la alternativa que ella decidió no ofrecer."
+      "why": "Cálido, amable, y sin nada sobre lo que actuar. Tómatelo por lo que significa y no ofrezcas tú la alternativa que él decidió no ofrecer."
     },
     {
       "situation": "Ya tienes la respuesta y era un no.",
@@ -409,26 +409,26 @@ Si te quedas con una cosa: que vuelva un momento es un sí, que vuelva un motivo
       "role": "la persona con la que acabas de tener una cita",
       "mood": "Amable, sin interés en una segunda cita.",
       "openness": 3,
-      "personality": "Cálida y evita el conflicto. Rechaza con un motivo en vez de con una negativa, y se incomoda si le ofrecen una semana alternativa."
+      "personality": "Cálido y evita el conflicto. Rechaza con un motivo en vez de con una negativa, y se incomoda si le ofrecen una semana alternativa."
     },
-    "setting": "La acera. Propusiste el jueves o el sábado y ella está respondiendo.",
+    "setting": "La acera. Propusiste el jueves o el sábado y él está respondiendo.",
     "constraints": [
       "Mantente en el personaje en todo momento. Nunca des consejos, ni evalúes, ni rompas la escena.",
       "Nunca ofrezcas un día, por mucho que la persona lo replantee.",
       "Incomódate visiblemente si te ofrecen una semana alternativa o te preguntan otra vez.",
       "Anímate y despídete en buenos términos si la persona lo acepta con elegancia."
     ],
-    "opening_beat": "«Ah — ando bastante liada ahora mismo, la verdad.»",
+    "opening_beat": "«Ah — ando bastante liado ahora mismo, la verdad.»",
     "success_looks_like": "La persona lo lee como un no y se mantiene cálida sin presionar."
   }$j$::jsonb,
   'Hoy, tómate un no suave tal cual la primera vez. Apunta qué se dijo y qué hiciste con ello.',
   $j${
     "beats": [
       {
-        "situation": "Propusiste el jueves o el sábado. «Ah — ando bastante liada ahora mismo, la verdad.»",
+        "situation": "Propusiste el jueves o el sábado. «Ah — ando bastante liado ahora mismo, la verdad.»",
         "prompt": "¿Qué es eso?",
         "options": [
-          { "text": "Un problema de horarios — ofrece la semana siguiente.", "correct": false, "note": "Ofrecer tú la alternativa que ella decidió no ofrecer, lo que le pide rechazar una segunda vez y más directamente." },
+          { "text": "Un problema de horarios — ofrece la semana siguiente.", "correct": false, "note": "Ofrecer tú la alternativa que él decidió no ofrecer, lo que le pide rechazar una segunda vez y más directamente." },
           { "text": "Un no, dicho con calidez.", "correct": true, "note": "Volvió un motivo en vez de un día. La calidez es lo que usa la gente para ponértelo fácil, y no es la señal." },
           { "text": "Ambiguo — pregunta qué quiere decir.", "correct": false, "note": "Es uno de los mensajes más legibles que vas a recibir. Preguntar le obliga a decirlo claramente, que no ayuda a nadie." },
           { "text": "Nervios — puede que le haya pillado desprevenida.", "correct": false, "note": "Esa versión suena torpe. Esta llegó con fluidez, que es cómo suena una frase que ya se ha dicho antes." }
@@ -441,7 +441,7 @@ Si te quedas con una cosa: que vuelva un momento es un sí, que vuelva un motivo
           { "text": "Ciérralo rápido — no tiene sentido alargarlo.", "correct": false, "note": "Una salida rápida y fría le dice qué fueron las dos horas anteriores, que es justo lo que no querías decir." },
           { "text": "Di que está completamente bien, dándole vueltas.", "correct": false, "note": "Actuar que está bien le pide que gestione tus sentimientos sobre su respuesta, que es justo lo que la frase suave intentaba ahorraros a los dos." },
           { "text": "Exactamente tan cálido como hace una hora.", "correct": true, "note": "No has perdido nada que tuvieras a las seis y lo has averiguado en una noche en vez de en tres semanas. Comportarte igual en cualquiera de los dos casos es todo el asunto." },
-          { "text": "Pregunta si leíste algo mal antes.", "correct": false, "note": "Convierte treinta segundos en una autopsia, y le pide que dé explicaciones de una noche que ella también estaba simplemente viviendo." }
+          { "text": "Pregunta si leíste algo mal antes.", "correct": false, "note": "Convierte treinta segundos en una autopsia, y le pide que dé explicaciones de una noche que él también estaba simplemente viviendo." }
         ]
       }
     ]
@@ -460,7 +460,7 @@ Refiérete a la cosa real. *Un placer conocerte* es una plantilla y se lee como 
 
 Corto. Dos líneas. Este no es el sitio para resumir cómo fue o para decir nada que no dijeras a la cara.
 
-Y si tu respuesta es no, dilo — esta es la parte que la gente se salta y es la parte que más le importa a la otra persona. Un mensaje honesto lleva noventa segundos. *Me ha encantado conocerte y no creo que sea algo romántico para mí — pero de verdad un placer conocerte* es completo. No vas a disfrutar mandándolo, y la alternativa es que alguien revise su móvil durante cuatro días y acabe concluyendo algo peor sobre sí misma que la verdad.
+Y si tu respuesta es no, dilo — esta es la parte que la gente se salta y es la parte que más le importa a la otra persona. Un mensaje honesto lleva noventa segundos. *Me ha encantado conocerte y no creo que sea algo romántico para mí — pero de verdad un placer conocerte* es completo. No vas a disfrutar mandándolo, y la alternativa es que alguien revise su móvil durante cuatro días y acabe concluyendo algo peor sobre sí mismo que la verdad.
 
 El silencio no es neutro y no es amable. Es la opción que a ti no te cuesta nada y a la otra persona le cuesta una semana, y todo el que ha estado en el lado receptor sabe exactamente cuál habría preferido.
 
@@ -496,7 +496,7 @@ Si te quedas con una cosa: manda algo el mismo día, sea cual sea la respuesta. 
     {
       "prompt": "Es un no. ¿Qué mandas?",
       "options": [
-        { "text": "Nada — ya lo averiguará.", "correct": false, "note": "Lo va a averiguar, después de una semana revisando su móvil, y va a concluir algo peor sobre sí misma que la verdad." },
+        { "text": "Nada — ya lo averiguará.", "correct": false, "note": "Lo va a averiguar, después de una semana revisando su móvil, y va a concluir algo peor sobre sí mismo que la verdad." },
         { "text": "Un mensaje cálido que evita decirlo.", "correct": false, "note": "Lo peor de las dos cosas: reinicia la esperanza y de todas formas hay que resolverlo más tarde." },
         { "text": "Una frase honesta, el mismo día.", "correct": true, "note": "Noventa segundos, y es la diferencia entre una noche limpia y una semana de alguien preguntándose qué hizo mal." },
         { "text": "Una explicación de por qué no.", "correct": false, "note": "No hace falta y rara vez se quiere. El motivo es tuyo; la respuesta es lo que necesita la otra persona." }
@@ -521,7 +521,7 @@ Si te quedas con una cosa: manda algo el mismo día, sea cual sea la respuesta. 
       "openness": 4,
       "personality": "Responde con calidez y rapidez a cualquier cosa concreta, y con una sola palabra a cualquier cosa genérica."
     },
-    "setting": "Las diez de la noche, en casa. Os pasasteis veinte minutos discrepando alegremente sobre aeropuertos, y ella mencionó un sitio cerca de su piso que nunca ha probado.",
+    "setting": "Las diez de la noche, en casa. Os pasasteis veinte minutos discrepando alegremente sobre aeropuertos, y él mencionó un sitio cerca de su piso que nunca ha probado.",
     "constraints": [
       "Mantente en el personaje en todo momento. Nunca des consejos, ni evalúes, ni rompas la escena.",
       "Responde con calidez y concreción a cualquier cosa concreta de la noche.",
@@ -533,7 +533,7 @@ Si te quedas con una cosa: manda algo el mismo día, sea cual sea la respuesta. 
   }$j$::jsonb,
   'Hoy, manda un mensaje el mismo día de lo que trata, con un detalle real dentro. Apunta qué mandaste.',
   $j${
-    "says": "Las diez de la noche, en casa. Os pasasteis veinte minutos discrepando alegremente sobre aeropuertos, y ella mencionó un sitio cerca de su piso que nunca ha probado.",
+    "says": "Las diez de la noche, en casa. Os pasasteis veinte minutos discrepando alegremente sobre aeropuertos, y él mencionó un sitio cerca de su piso que nunca ha probado.",
     "model": {
       "line": "Sigo pensando en tu postura sobre los aeropuertos y sigo sin estar de acuerdo. ¿El jueves para ese sitio, entonces?",
       "why": "El mismo día, un detalle que demuestra que fue esa noche con esa persona, y algo fácil que responder. Noventa segundos, y casi nadie lo manda."

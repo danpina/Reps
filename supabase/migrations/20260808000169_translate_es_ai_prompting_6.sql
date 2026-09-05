@@ -468,7 +468,7 @@ Pero cada una de esas es una forma de llegar mejor preparado a un momento que to
 
 Esa es toda la disciplina. La preparación que no se convierte en una conversación no es preparación, es un pasatiempo. Una apertura ensayada que nunca se dice es un párrafo. Un hueco de conocimiento cerrado que nunca se menciona es trivia. La herramienta produce potencial, que no vale absolutamente nada hasta que se gasta.
 
-Hay un modo de fallo que esta app debería nombrar porque es el que más probablemente atrape a sus propios lectores: volverse muy bueno en la preparación. Leer las lecciones, hacer los ejercicios, hacer los ensayos, y descubrir que la semana no contenía conversaciones. Se siente como progreso. Se reporta como progreso. Es la misma evitación de la cuarta lección, a la escala de una vida en vez de una tarde.
+Hay un error típico que esta app debería nombrar porque es el que más probablemente atrape a sus propios lectores: volverse muy bueno en la preparación. Leer las lecciones, hacer los ejercicios, hacer los ensayos, y descubrir que la semana no contenía conversaciones. Se siente como progreso. Se reporta como progreso. Es la misma evitación de la cuarta lección, a la escala de una vida en vez de una tarde.
 
 La medida nunca fue lo bien que puedes prepararte. Era si dijiste la cosa.
 
@@ -492,7 +492,7 @@ Si te quedas con una cosa: puede ayudarte a prepararte. No puede ir en tu lugar,
   ]$j$::jsonb,
   $j$[
     {
-      "prompt": "¿Cuál es el modo de fallo que nombra esta lección?",
+      "prompt": "¿Cuál es la trampa habitual que nombra esta lección?",
       "options": [
         { "text": "Depender de ello para que escriba por ti.", "correct": false, "note": "El problema del tercer bloque, y trata del mensaje más que de ti." },
         { "text": "Volverse muy bueno en prepararse.", "correct": true, "note": "Se siente como progreso y se reporta como progreso. Es la evitación de la cuarta lección a la escala de una vida." },
