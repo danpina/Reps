@@ -17,7 +17,15 @@ export async function GET(request: NextRequest) {
   const code = searchParams.get("code");
   const tokenHash = searchParams.get("token_hash");
   const type = searchParams.get("type") as EmailOtpType | null;
-  const isRecovery = type === "recovery";
+  // A reset link comes back in one of two shapes. The token-hash shape carries
+  // `type=recovery`; the PKCE shape this app's emails actually use arrives as a
+  // bare `?code=` with no type at all, so the only thing that says "this was a
+  // password reset" is where the link was told to go. That is safe to trust:
+  // the cookie below is only set after the exchange succeeds, and an exchange
+  // only succeeds for someone who has just opened a link sent to the account's
+  // inbox — the same proof a recovery link gives. A forged `next` with no valid
+  // code gets nothing.
+  const isRecovery = type === "recovery" || next === "/reset-password";
 
   let verified = false;
   if (code) {
