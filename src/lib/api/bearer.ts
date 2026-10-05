@@ -23,7 +23,7 @@ import { SUPABASE_PUBLISHABLE_KEY, SUPABASE_URL } from "@/lib/env";
  */
 export async function authenticateBearer(
   request: Request,
-): Promise<{ supabase: SupabaseClient; user: User } | null> {
+): Promise<{ supabase: SupabaseClient; user: User; token: string } | null> {
   const token = /^Bearer\s+(\S+)$/i.exec(request.headers.get("authorization") ?? "")?.[1];
   if (!token) return null;
 
@@ -35,5 +35,5 @@ export async function authenticateBearer(
   const { data, error } = await supabase.auth.getUser(token);
   if (error || !data.user) return null;
 
-  return { supabase, user: data.user };
+  return { supabase, user: data.user, token };
 }

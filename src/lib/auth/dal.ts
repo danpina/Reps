@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { cache } from "react";
 
+import { bearerToken } from "@/lib/api/context";
 import { asLocale, LOCALE_COOKIE, type Locale } from "@/lib/curriculum/locale";
 import type { DatingInterest } from "@/lib/curriculum/variants";
 import type { AgeGroup, Sex } from "@/lib/profile/demographics";
@@ -16,7 +17,10 @@ export type SessionUser = {
 
 export const getSessionUser = cache(async (): Promise<SessionUser | null> => {
   const supabase = await createClient();
-  const { data, error } = await supabase.auth.getClaims();
+  // A request from the iOS app has no session to read, only a token to check, so
+  // the token is handed to getClaims directly. Undefined for a cookie request,
+  // which reads the session as before.
+  const { data, error } = await supabase.auth.getClaims(bearerToken());
 
   if (error || !data?.claims?.sub) return null;
 
