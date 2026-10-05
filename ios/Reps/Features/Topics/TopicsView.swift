@@ -1,35 +1,8 @@
 import SwiftUI
 
-@MainActor
-final class TopicsViewModel: ObservableObject {
-    enum State: Equatable {
-        case loading
-        case loaded([TopicItem])
-        case failed(String)
-    }
-
-    @Published private(set) var state: State = .loading
-
-    func load(store: SessionStore) async {
-        if case .loaded = state {} else { state = .loading }
-        do {
-            let token = try await store.validAccessToken()
-            let topics = try await CurriculumAPI().topics(locale: store.locale, accessToken: token)
-            state = .loaded(topics)
-        } catch is CancellationError {
-            // The view went away mid-request; nothing to show.
-        } catch let error as URLError where error.code == .cancelled {
-            // `.task(id:)` cancels the request in flight when the language changes, and URLSession
-            // reports that as a URLError rather than a CancellationError. The next load replaces it.
-        } catch {
-            state = .failed(error.localizedDescription)
-        }
-    }
-}
-
 struct TopicsView: View {
     @EnvironmentObject private var store: SessionStore
-    @StateObject private var model = TopicsViewModel()
+    @StateObject private var library = LibraryStore()
 
     var body: some View {
         NavigationStack {
@@ -41,13 +14,16 @@ struct TopicsView: View {
                     }
                 }
         }
+        // Shared with every screen pushed from here, so a lesson read in one place unlocks the next
+        // everywhere without another round trip.
+        .environmentObject(library)
         // Re-runs when the account's language arrives after sign-in, so the list never stays in
         // English for a Spanish reader.
-        .task(id: store.locale) { await model.load(store: store) }
+        .task(id: store.locale) { await library.load(session: store) }
     }
 
     @ViewBuilder private var content: some View {
-        switch model.state {
+        switch library.state {
         case .loading:
             ProgressView(store.strings.loading)
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
@@ -56,12 +32,12 @@ struct TopicsView: View {
                 Text(message)
                     .multilineTextAlignment(.center)
                     .foregroundColor(.secondary)
-                Button(store.strings.retry) { Task { await model.load(store: store) } }
+                Button(store.strings.retry) { Task { await library.load(session: store) } }
             }
             .padding(24)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
-        case .loaded(let topics):
-            List(Array(topics.enumerated()), id: \.element.id) { index, topic in
+        case .loaded:
+            List(Array(library.topics.enumerated()), id: \.element.id) { index, topic in
                 NavigationLink {
                     TopicDetailView(topic: topic)
                 } label: {
@@ -69,7 +45,7 @@ struct TopicsView: View {
                 }
             }
             .listStyle(.plain)
-            .refreshable { await model.load(store: store) }
+            .refreshable { await library.load(session: store) }
         }
     }
 }
@@ -105,6 +81,8 @@ private struct TopicRow: View {
 struct TopicDetailView: View {
     let topic: TopicItem
 
+    @EnvironmentObject private var library: LibraryStore
+
     var body: some View {
         List {
             if !topic.description.isEmpty {
@@ -112,18 +90,12 @@ struct TopicDetailView: View {
             }
             ForEach(topic.skills) { skill in
                 Section {
-                    ForEach(skill.lessons) { lesson in
-                        HStack(spacing: 12) {
-                            Text(String(format: "%02d", lesson.order))
-                                .font(.system(.footnote, design: .monospaced))
-                                .foregroundColor(.secondary)
-                            Text(lesson.title)
-                            Spacer()
-                            if !lesson.isPreview {
-                                Image(systemName: "lock.fill")
-                                    .font(.caption)
-                                    .foregroundColor(.secondary)
-                            }
+                    ForEach(Array(skill.lessons.enumerated()), id: \.element.id) { index, lesson in
+                        NavigationLink {
+                            LessonView(skill: skill, topicName: topic.name, index: index)
+                        } label: {
+                            LessonRowView(lesson: lesson, access: library.access(to: skill, at: index),
+                                          isRead: library.readIDs.contains(lesson.id))
                         }
                     }
                 } header: {
@@ -139,5 +111,31 @@ struct TopicDetailView: View {
         }
         .navigationTitle(topic.name)
         .navigationBarTitleDisplayMode(.inline)
+    }
+}
+
+private struct LessonRowView: View {
+    let lesson: LessonItem
+    let access: LessonAccess
+    let isRead: Bool
+
+    var body: some View {
+        HStack(spacing: 12) {
+            Text(String(format: "%02d", lesson.order))
+                .font(.system(.footnote, design: .monospaced))
+                .foregroundColor(.secondary)
+            Text(lesson.title)
+                .foregroundColor(access == .open ? .primary : .secondary)
+            Spacer()
+            if isRead {
+                Image(systemName: "checkmark")
+                    .font(.caption.weight(.semibold))
+                    .foregroundColor(.accentColor)
+            } else if access == .subscription {
+                Image(systemName: "lock.fill")
+                    .font(.caption)
+                    .foregroundColor(.secondary)
+            }
+        }
     }
 }

@@ -5,6 +5,8 @@ import Foundation
 final class SessionStore: ObservableObject {
     @Published private(set) var session: AuthSession?
     @Published private(set) var locale: AppLocale = .deviceDefault
+    /// What the reader has told the app about themselves, which tailors a few lessons.
+    @Published private(set) var audience = Audience()
 
     private let client = SupabaseClient.shared
 
@@ -15,19 +17,20 @@ final class SessionStore: ObservableObject {
         if let data = Keychain.load(), let saved = try? JSONDecoder().decode(AuthSession.self, from: data) {
             session = saved
         }
-        Task { await loadProfileLocale() }
+        Task { await loadProfile() }
     }
 
     func signIn(email: String, password: String) async throws {
         let fresh = try await client.signIn(email: email.trimmingCharacters(in: .whitespaces), password: password)
         store(fresh)
-        await loadProfileLocale()
+        await loadProfile()
     }
 
     func signOut() {
         session = nil
         Keychain.delete()
         locale = .deviceDefault
+        audience = Audience()
         Strings.current = Strings(locale: locale)
     }
 
@@ -54,14 +57,23 @@ final class SessionStore: ObservableObject {
         }
     }
 
-    /// The account's language lives on `profiles.locale`, the same column the website reads.
-    private func loadProfileLocale() async {
+    /// The account's language and demographics live on `profiles`, the same row the website reads.
+    private func loadProfile() async {
         guard let userID = session?.userID else { return }
-        struct Profile: Decodable { let locale: String? }
+        struct Profile: Decodable {
+            let locale: String?
+            let sex: String?
+            let ageGroup: String?
+            let datingInterest: String?
+        }
         do {
             let token = try await validAccessToken()
-            let rows: [Profile] = try await client.rows("profiles", query: "select=locale&id=eq.\(userID)", accessToken: token)
-            locale = AppLocale(stored: rows.first?.locale)
+            let rows: [Profile] = try await client.rows(
+                "profiles", query: "select=locale,sex,age_group,dating_interest&id=eq.\(userID)", accessToken: token)
+            if let profile = rows.first {
+                locale = AppLocale(stored: profile.locale)
+                audience = Audience(sex: profile.sex, ageGroup: profile.ageGroup, datingInterest: profile.datingInterest)
+            }
         } catch {
             // Staying on the phone's language is a fine fallback; it is not worth an error screen.
         }

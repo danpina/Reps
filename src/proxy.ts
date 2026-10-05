@@ -43,6 +43,13 @@ export async function proxy(request: NextRequest) {
   const isSignedIn = Boolean(data?.claims?.sub);
 
   const { pathname } = request.nextUrl;
+
+  // The iOS app's API authenticates with a bearer token, not the cookie this
+  // proxy looks for. Bouncing it to the sign-in page would answer a JSON
+  // request with HTML, so it is left alone here: every route under /api checks
+  // the token itself and replies 401 when it is missing or bad.
+  if (pathname.startsWith("/api/")) return response;
+
   const isPublic = PUBLIC_ROUTES.some(
     (route) => pathname === route || pathname.startsWith(`${route}/`),
   );

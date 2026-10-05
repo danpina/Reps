@@ -1,6 +1,6 @@
 name: iOS Build
 
-# Compile-checks the SwiftUI app in ios/ on a macOS runner (there's no local Mac).
+# Compiles the SwiftUI app in ios/ and runs its unit tests on a macOS runner (there's no local Mac).
 # Only runs when something under ios/ changes, so web-only pushes don't spend macOS minutes.
 on:
   push:
@@ -35,22 +35,26 @@ jobs:
           fi
           xcodebuild -version
 
-      - name: Build for iOS Simulator
+      # Building and testing in one step: `test` compiles the app first, so a compile error still
+      # fails here, and the unit tests (the logic ported from the website) run on a simulator.
+      - name: Build and test on the iOS Simulator
         run: |
           set -o pipefail
-          xcodebuild build \
+          DEVICE=$(xcrun simctl list devices available | grep -E '^ +iPhone' | head -n1 | sed -E 's/^ +//; s/ \([0-9A-Fa-f-]{36}\).*$//')
+          echo "Testing on: $DEVICE"
+          xcodebuild test \
             -project Reps.xcodeproj \
             -scheme Reps \
-            -destination "generic/platform=iOS Simulator" \
+            -destination "platform=iOS Simulator,name=$DEVICE" \
             CODE_SIGNING_ALLOWED=NO 2>&1 | tee "$RUNNER_TEMP/build.log"
 
       # The raw log needs a GitHub login to download; annotations are visible on the run page
-      # (and via the public API), so surface the compiler errors there.
-      - name: Surface compiler errors as annotations
+      # (and via the public API), so surface compiler errors and failed assertions there.
+      - name: Surface errors as annotations
         if: failure()
         run: |
           [ -f "$RUNNER_TEMP/build.log" ] || exit 0
-          grep -E '(^|[: ])error: ' "$RUNNER_TEMP/build.log" | sort -u | head -40 | while IFS= read -r line; do
+          grep -E '(^|[: ])error: |Test Case .* failed|Executed [0-9]+ tests' "$RUNNER_TEMP/build.log" | sort -u | head -60 | while IFS= read -r line; do
             escaped=$(printf '%s' "$line" | sed 's/%/%25/g')
             echo "::error::${escaped}"
           done

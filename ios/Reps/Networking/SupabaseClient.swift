@@ -106,6 +106,20 @@ final class SupabaseClient {
         return try decoder.decode([T].self, from: data)
     }
 
+    /// Calls a database function that takes no arguments, such as `is_pro`.
+    func rpc<T: Decodable>(_ name: String, accessToken: String) async throws -> T {
+        var request = URLRequest(url: BackendConfig.supabaseURL.appendingPathComponent("rest/v1/rpc/\(name)"))
+        request.httpMethod = "POST"
+        request.httpBody = Data("{}".utf8)
+        request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+        request.setValue(BackendConfig.publishableKey, forHTTPHeaderField: "apikey")
+        request.setValue("Bearer \(accessToken)", forHTTPHeaderField: "Authorization")
+
+        let (data, response) = try await send(request)
+        guard (200..<300).contains(response.statusCode) else { throw Self.error(from: data) }
+        return try decoder.decode(T.self, from: data)
+    }
+
     // MARK: Plumbing
 
     private func send(_ request: URLRequest) async throws -> (Data, HTTPURLResponse) {

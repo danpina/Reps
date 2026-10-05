@@ -4,7 +4,8 @@ import Foundation
 ///
 /// The language is the account's `profiles.locale`, not the phone's, so a person who chose
 /// Spanish on the website reads Spanish here whatever their handset is set to. Curriculum
-/// text is not in this file — it comes from the database, already translated.
+/// text is not in this file — it comes from the database, already translated. The Spanish
+/// below is the website's own wording (`src/messages/es.json`), so the two read as one product.
 struct Strings {
     let locale: AppLocale
 
@@ -35,6 +36,32 @@ struct Strings {
         }
         return "\(skills) \(skills == 1 ? "skill" : "skills") · \(lessons) lessons"
     }
+
+    // Lessons
+    func lessonOf(_ n: Int, _ total: Int) -> String { pick("Lesson \(n) of \(total)", "Lección \(n) de \(total)") }
+    var inPractice: String { pick("In practice", "En la práctica") }
+    func checkOf(_ n: Int, _ total: Int) -> String { pick("Check \(n) of \(total)", "Pregunta \(n) de \(total)") }
+    var oneCheck: String { pick("One check", "Una pregunta") }
+    var todaysMission: String { pick("Today’s field mission", "La misión de hoy") }
+    var goAndDoIt: String { pick("Go and do it, then log what happened. It counts either way.", "Ve y hazlo, y luego registra qué pasó. Cuenta de cualquier forma.") }
+    var previous: String { pick("Previous", "Anterior") }
+    var nextLesson: String { pick("Next lesson", "Siguiente lección") }
+    var backToTrack: String { pick("Back to the track", "Volver al recorrido") }
+    var thereIsOneBefore: String { pick("There is one before this", "Hay una antes que esta") }
+    func trackBuilds(_ n: Int, upTo next: Int) -> String {
+        pick("This track builds, and lesson \(n) assumes the ones under it. You are up to lesson \(next).",
+             "Este recorrido se construye, y la lección \(n) da por hecho las de debajo. Vas por la lección \(next).")
+    }
+    func goToLesson(_ n: Int, _ title: String) -> String { pick("Lesson \(n) · \(title)", "Lección \(n) · \(title)") }
+    var partOfSubscription: String { pick("This one is part of the subscription", "Esta es parte de la suscripción") }
+    func freePreview(count: Int, topic: String) -> String {
+        pick("The first \(count) lessons of every topic are open, so you can read enough of \(topic) to judge whether the writing is worth paying for. This is not one of them.",
+             "Las primeras \(count) lecciones de cada tema están abiertas, para que puedas leer suficiente de \(topic) y juzgar si merece la pena pagar por la escritura. Esta no es una de ellas.")
+    }
+    var correctYourAnswer: String { pick("Correct, and this was your answer.", "Correcto, y esta fue tu respuesta.") }
+    var correctAnswer: String { pick("This was the correct answer.", "Esta era la respuesta correcta.") }
+    var yourAnswerWrong: String { pick("Your answer, which was not correct.", "Tu respuesta, que no era correcta.") }
+    var lessonUnavailable: String { pick("This lesson could not be opened.", "No se ha podido abrir esta lección.") }
 
     // Errors
     var genericError: String { pick("Something went wrong. Please try again.", "Algo ha salido mal. Inténtalo de nuevo.") }

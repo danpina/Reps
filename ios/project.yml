@@ -32,3 +32,24 @@ targets:
         CURRENT_PROJECT_VERSION: "1"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
+  RepsTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - RepsTests
+    dependencies:
+      - target: Reps
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.danipina.reps.tests
+        GENERATE_INFOPLIST_FILE: YES
+        SWIFT_VERSION: "5.0"
+        DEVELOPMENT_TEAM: RW46NLF44W
+schemes:
+  Reps:
+    build:
+      targets:
+        Reps: all
+    test:
+      targets:
+        - RepsTests

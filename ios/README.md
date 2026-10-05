@@ -19,22 +19,40 @@ The `.xcodeproj` is **not** checked in. It is generated from `project.yml` by
 
 ## Where it is
 
-**Milestone 1 — the pipeline and a first vertical slice (this commit).** Sign in, then browse
-topics → skills → lesson titles, in the account's own language (`profiles.locale`, same as the
-website; English and Spanish — German is not offered yet). Lessons you haven't unlocked show a lock.
-This proves signing, upload and the Supabase connection end to end before the larger screens are built.
+**Milestone 1 — pipeline and first slice (done).** Sign in, then browse topics → skills → lesson titles,
+in the account's own language (`profiles.locale`, same as the website; English and Spanish — German is
+not offered yet).
 
-**Next, in roughly this order:** reading a lesson (theory, examples, the check questions) → the line
-and choice drills (no AI, so no API needed) → logging a rep, progress, XP and ranks → the AI
-rehearsal and the coach (needs the JSON API) → settings, language and **account deletion** (App Store
-rule 5.1.1(v) as soon as there is sign-up in the app) → in-app sign-up and Sign in with Apple.
+**Milestone 2 — lessons (this commit).** Open a lesson and read it: theory, worked examples, the
+comprehension questions (answer once, see why), and today's mission. Everything the website decides
+about a lesson is decided the same way here:
+
+- **Locks.** A track unlocks forwards (lesson two needs lesson one read), and past the free sample a
+  lesson needs a subscription. Both rules are ports of `progression.ts` and the `is_pro` database
+  function, with unit tests mirroring the website's.
+- **Tailoring.** The few lessons written differently by who is reading use the same variant matcher as
+  the web, including its rule that an unanswered question is a miss and never a guess.
+- **Reading counts.** Opening a lesson records it and awards its XP through `POST /api/lessons/{id}/read`
+  — the website's own function behind a bearer token, so the XP rules live in one place.
+
+**Not in yet:** the rehearsal drills and "log this rep" (nothing is shown for them until they work), the
+end-of-track recap, progress and ranks.
+
+**Next, in roughly this order:** the line and choice drills (no AI, so no new API) → logging a rep,
+progress, XP and ranks → the AI rehearsal and the coach (more of the JSON API) → settings, language and
+**account deletion** (App Store rule 5.1.1(v), needed as soon as there is sign-up in the app) → in-app
+sign-up and Sign in with Apple.
 
 Until in-app sign-up exists, accounts are created on the website and the login screen says so.
+
+The API routes live in the Next app (`src/app/api`) and deploy with the website, so a new app build that
+calls one needs that route to be live first.
 
 ## No Mac? CI is the compiler
 
 - **`.github/workflows/ios-build.yml`** — runs on every push that touches `ios/`. Generates the
-  project, builds for the iOS Simulator, and re-emits compiler errors as annotations on the run page.
+  project, builds for the iOS Simulator, runs the unit tests (`RepsTests`), and re-emits compiler errors and
+  failed assertions as annotations on the run page.
 - **`.github/workflows/ios-testflight.yml`** — manual. Archives, signs and uploads to TestFlight.
 
 With a Mac: `brew install xcodegen && cd ios && xcodegen generate`, open `Reps.xcodeproj`, pick a

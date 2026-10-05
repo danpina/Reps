@@ -128,6 +128,21 @@ struct CurriculumAPI {
         }
     }
 
+    /// Whether the account has a subscription. Asks the same database function the row level security
+    /// policies ask, rather than reimplementing the rule: two copies of an access rule are two chances
+    /// to disagree, and the app's copy would be the wrong one to trust.
+    func isPro(accessToken token: String) async throws -> Bool {
+        try await client.rpc("is_pro", accessToken: token)
+    }
+
+    /// Lessons this reader has read — the sessions of kind `theory`, the same set the website uses to
+    /// decide how far into a track someone may go.
+    func readLessonIDs(accessToken token: String) async throws -> Set<String> {
+        struct Row: Decodable { let lessonId: String? }
+        let rows: [Row] = try await client.rows("sessions", query: "select=lesson_id&kind=eq.theory", accessToken: token)
+        return Set(rows.compactMap(\.lessonId))
+    }
+
     /// The reader's language is fetched whole, in one query per table, and merged in memory — one
     /// round trip however much of the curriculum has been translated. English needs none.
     private func translations<T: Decodable>(
