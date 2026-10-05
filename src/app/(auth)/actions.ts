@@ -79,6 +79,29 @@ export async function signUp(
   redirect("/check-email?reason=confirm");
 }
 
+/**
+ * What to tell someone when an auth email could not be sent.
+ *
+ * Supabase caps how many emails a project may send (low on its built-in mailer),
+ * and a person who hits the cap cannot fix it by checking the address, which is
+ * what the generic message tells them to do. So that case gets its own sentence,
+ * and every failure is logged with Supabase's own reason, because the generic
+ * message alone leaves nobody — user or developer — able to see what went wrong.
+ */
+function emailFailure(
+  action: string,
+  error: { message: string; status?: number; code?: string },
+  t: (key: "emailRateLimited" | "resetRequestFailed" | "magicLinkFailed") => string,
+  fallback: "resetRequestFailed" | "magicLinkFailed",
+): string {
+  console.error(`[auth] ${action} failed:`, error.status, error.code, error.message);
+  const rateLimited =
+    error.status === 429 ||
+    error.code === "over_email_send_rate_limit" ||
+    error.code === "over_request_rate_limit";
+  return t(rateLimited ? "emailRateLimited" : fallback);
+}
+
 export async function requestPasswordReset(
   _state: AuthState,
   formData: FormData,
@@ -92,7 +115,7 @@ export async function requestPasswordReset(
     redirectTo: `${SITE_URL}/auth/callback?next=/reset-password`,
   });
 
-  if (error) return { error: t("resetRequestFailed") };
+  if (error) return { error: emailFailure("requestPasswordReset", error, t, "resetRequestFailed") };
 
   redirect("/check-email?reason=reset");
 }
@@ -111,7 +134,7 @@ export async function sendMagicLink(
     options: { emailRedirectTo: `${SITE_URL}/auth/callback` },
   });
 
-  if (error) return { error: t("magicLinkFailed") };
+  if (error) return { error: emailFailure("sendMagicLink", error, t, "magicLinkFailed") };
 
   redirect("/check-email?reason=link");
 }

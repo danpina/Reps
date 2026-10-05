@@ -23,7 +23,8 @@
       "signUpFailed": "That did not work. Check the details and try again.",
       "missingEmailFirst": "Enter your email first.",
       "magicLinkFailed": "That did not work. Check the address and try again.",
-      "resetRequestFailed": "That did not work. Check the address and try again."
+      "resetRequestFailed": "That did not work. Check the address and try again.",
+      "emailRateLimited": "Too many emails have been requested just now. Wait a few minutes and try again."
     },
     "signIn": {
       "heading": "Sign in",

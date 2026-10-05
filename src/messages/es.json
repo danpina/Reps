@@ -23,7 +23,8 @@
       "signUpFailed": "Eso no ha funcionado. Comprueba los datos e inténtalo de nuevo.",
       "missingEmailFirst": "Introduce primero tu correo.",
       "magicLinkFailed": "Eso no ha funcionado. Comprueba la dirección e inténtalo de nuevo.",
-      "resetRequestFailed": "Eso no ha funcionado. Comprueba la dirección e inténtalo de nuevo."
+      "resetRequestFailed": "Eso no ha funcionado. Comprueba la dirección e inténtalo de nuevo.",
+      "emailRateLimited": "Se han pedido demasiados correos en poco tiempo. Espera unos minutos e inténtalo de nuevo."
     },
     "signIn": {
       "heading": "Iniciar sesión",
