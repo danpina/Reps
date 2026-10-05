@@ -91,7 +91,8 @@ describe("the curriculum states its moves", () => {
       assert.notEqual(move, "FALLBACK", `${file}: fell back`);
       assert.ok(move.length > 15, `${file}: move too thin: "${move}"`);
       // Unicode-aware: a Spanish move can open on Á and a German one on Ü.
-      assert.match(move, /^\p{Lu}/u, `${file}: not capitalised: "${move}"`);
+      // Skipping any opening ¿ ¡ or quote: Spanish questions open on ¿.
+      assert.match(move, /^[¿¡"«“]*\p{Lu}/u, `${file}: not capitalised: "${move}"`);
     }
   });
 });

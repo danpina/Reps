@@ -26,12 +26,12 @@ describe("which languages exist", () => {
     }
     // The point of naming them this way: a Spanish reader scans for Español.
     assert.equal(LOCALE_NAMES.es, "Español");
-    assert.equal(LOCALE_NAMES.de, "Deutsch");
   });
 
   test("only the supported ones are locales", () => {
     assert.ok(isLocale("es"));
     assert.ok(!isLocale("fr"));
+    assert.ok(!isLocale("de"), "German is not offered yet");
     assert.ok(!isLocale(""));
     assert.ok(!isLocale(null));
   });
@@ -39,7 +39,7 @@ describe("which languages exist", () => {
   // Anything unrecognised has to read as English rather than throw: this value
   // arrives from a form and from client-written signup metadata.
   test("anything unrecognised reads as English", () => {
-    assert.equal(asLocale("de"), "de");
+    assert.equal(asLocale("de"), "en");
     assert.equal(asLocale("fr"), "en");
     assert.equal(asLocale(undefined), "en");
     assert.equal(asLocale(42), "en");

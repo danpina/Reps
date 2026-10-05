@@ -13,7 +13,10 @@
  * waiting for the promise to be written.
  */
 
-export const LOCALES = ["en", "es", "de"] as const;
+// German is not offered yet. The database still allows "de" so adding it back
+// is a one-line change here, and a profile that already holds it reads as
+// English via `asLocale` rather than breaking.
+export const LOCALES = ["en", "es"] as const;
 export type Locale = (typeof LOCALES)[number];
 
 export const DEFAULT_LOCALE: Locale = "en";
@@ -32,7 +35,6 @@ export const LOCALE_COOKIE = "locale";
 export const LOCALE_NAMES: Record<Locale, string> = {
   en: "English",
   es: "Español",
-  de: "Deutsch",
 };
 
 /**
@@ -47,7 +49,6 @@ export const LOCALE_NAMES: Record<Locale, string> = {
 export const LOCALE_ENGLISH_NAMES: Record<Locale, string> = {
   en: "English",
   es: "Spanish",
-  de: "German",
 };
 
 export function isLocale(value: unknown): value is Locale {

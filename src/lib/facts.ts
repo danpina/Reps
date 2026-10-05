@@ -154,9 +154,9 @@ export function randomFact(random: () => number = Math.random): Fact {
 /**
  * Same as `randomFact`, in the reader's own language.
  *
- * Falls back to English for a locale without a translated set (German is not
- * covered yet) rather than throwing, matching the fallback rule the rest of
- * the app uses for untranslated content.
+ * Falls back to English for a locale without a translated set rather than
+ * throwing, matching the fallback rule the rest of the app uses for
+ * untranslated content.
  */
 export function factForLocale(
   locale: Locale,

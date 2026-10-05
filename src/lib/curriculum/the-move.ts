@@ -38,5 +38,7 @@ export function extractTheMove(theoryMd: string, fallback: string): string {
   if (!line) return fallback;
 
   // Capitalised, since it reads as a sentence on its own away from the card.
-  return line.charAt(0).toUpperCase() + line.slice(1);
+  // A Spanish question or exclamation opens on ¿ or ¡, so the capital belongs
+  // on the first letter after it rather than on the punctuation itself.
+  return line.replace(/^([¿¡"«“]*)(\p{L})/u, (_, open: string, first: string) => open + first.toUpperCase());
 }
