@@ -30,6 +30,9 @@ jobs:
             if [ -z "${!v}" ]; then echo "::error::Missing secret for $v"; exit 1; fi
           done
 
+      - name: Bundle the website's translations
+        run: sh scripts/sync-messages.sh
+
       - name: Install XcodeGen
         run: brew install xcodegen
 

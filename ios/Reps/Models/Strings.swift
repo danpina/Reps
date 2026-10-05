@@ -17,6 +17,16 @@ struct Strings {
         locale == .es ? es : en
     }
 
+    /// A sentence from the website's own catalog, in the reader's language. See `Messages`.
+    func t(_ key: String, _ args: [String: Any] = [:]) -> String {
+        Messages.text(key, locale: locale, args)
+    }
+
+    /// The same, for the few sentences that carry bold.
+    func rich(_ key: String, _ args: [String: Any] = [:]) -> AttributedString {
+        Messages.rich(key, locale: locale, args)
+    }
+
     // Sign in
     var tagline: String { pick("Talking to people is a skill, not a personality.", "Hablar con la gente es una habilidad, no una personalidad.") }
     var signIn: String { pick("Sign in", "Iniciar sesión") }
@@ -62,6 +72,31 @@ struct Strings {
     var correctAnswer: String { pick("This was the correct answer.", "Esta era la respuesta correcta.") }
     var yourAnswerWrong: String { pick("Your answer, which was not correct.", "Tu respuesta, que no era correcta.") }
     var lessonUnavailable: String { pick("This lesson could not be opened.", "No se ha podido abrir esta lección.") }
+
+    // Shared
+    var close: String { pick("Close", "Cerrar") }
+    var done: String { pick("Done", "Hecho") }
+    var cancel: String { pick("Cancel", "Cancelar") }
+    var save: String { pick("Save", "Guardar") }
+    var ok: String { pick("OK", "Vale") }
+
+    // Settings (the parts the website does not have)
+    var appVersion: String { pick("Version", "Versión") }
+    var privacyPolicy: String { pick("Privacy policy", "Política de privacidad") }
+    var support: String { pick("Support", "Soporte") }
+    var forgotPassword: String { pick("Forgot your password?", "¿Has olvidado tu contraseña?") }
+    var createAccountOnWeb: String { pick("Create an account", "Crear una cuenta") }
+    var deleteAccount: String { pick("Delete my account", "Eliminar mi cuenta") }
+    var deleteAccountTitle: String { pick("Delete your account?", "¿Eliminar tu cuenta?") }
+    var deleteAccountBody: String {
+        pick("This permanently deletes your account and everything in it: your reps, rehearsals, progress and badges. It cannot be undone. Enter your password to confirm.",
+             "Esto elimina para siempre tu cuenta y todo lo que contiene: tus repeticiones, ensayos, progreso e insignias. No se puede deshacer. Escribe tu contraseña para confirmar.")
+    }
+    var deleteAccountConfirm: String { pick("Delete everything", "Eliminarlo todo") }
+    var deleteAccountWrongPassword: String { pick("That is not your password.", "Esa no es tu contraseña.") }
+    var deleteAccountUnavailable: String { pick("Deleting accounts is unavailable right now. Please try again shortly, or contact support.", "Ahora mismo no se pueden eliminar cuentas. Inténtalo de nuevo en un rato, o contacta con soporte.") }
+    var dangerZone: String { pick("Delete account", "Eliminar cuenta") }
+    var dangerZoneHint: String { pick("Permanently removes your account and all of its data.", "Elimina para siempre tu cuenta y todos sus datos.") }
 
     // Errors
     var genericError: String { pick("Something went wrong. Please try again.", "Algo ha salido mal. Inténtalo de nuevo.") }

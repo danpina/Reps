@@ -1,0 +1,70 @@
+{
+  "id": "2412734a-73a8-45ef-9f28-542be9540969",
+  "mode": "beat",
+  "status": "open",
+  "lessonId": "111d6022-f108-4b27-97e0-6d43ff44036a",
+  "skillSlug": "going-deeper",
+  "lessonOrder": 1,
+  "lessonTitle": "La escalera de la curiosidad",
+  "setting": "Una mesa larga en la cena de cumpleaños de un amigo de un amigo. Estás sentado al lado de alguien a quien no conoces, entre platos.",
+  "partner": {
+    "name": "Ellis",
+    "role": "una amistad del anfitrión a la que no conoces",
+    "openness": 3
+  },
+  "showPartner": true,
+  "paid": true,
+  "usingRealModel": false,
+  "theMove": "Date cuenta de en qué peldaño estás, y sube uno.",
+  "rehearsalNote": null,
+  "criteria": [
+    {
+      "key": "noticed_the_rung",
+      "label": "Sabías en qué peldaño estabas",
+      "description": "Seguiste si la conversación intercambiaba datos, emociones o significado."
+    },
+    {
+      "key": "climbed",
+      "label": "Subiste un paso",
+      "description": "Pasaste de dato a emoción, o de emoción a por qué, en vez de quedarte al mismo nivel."
+    },
+    {
+      "key": "used_their_fact",
+      "label": "Subiste con su material",
+      "description": "Construiste la subida sobre algo que la otra persona ya había dicho."
+    },
+    {
+      "key": "did_not_rush",
+      "label": "No forzaste el peldaño de arriba",
+      "description": "Dejaste que la subida fuera al ritmo con el que la otra persona estaba cómoda."
+    }
+  ],
+  "mission": "Lleva hoy una conversación de un dato a una emoción. Usa sus propias palabras como escalón. Anota el dato del que partiste y qué te devolvieron.",
+  "examples": [
+    {
+      "why": "El dato eran los tres años. Subir es preguntar qué tal fue, que es la única parte sobre la que van a tener sentimientos de verdad.",
+      "line": "Tres años dan para tener una vida allí. ¿Qué tal fue volver?",
+      "situation": "Mencionan que acaban de volver de tres años fuera."
+    },
+    {
+      "why": "Se salta el segundo peldaño y aterriza en el tercero. A veces se puede saltar, y las preguntas de futuro son las que más halagan.",
+      "line": "¿Es lo que harías a jornada completa si pudieras?",
+      "situation": "Un compañero dice que los fines de semana lleva su propio negocio."
+    },
+    {
+      "why": "Nombra el peldaño de la emoción explícitamente y les da permiso para admitir la respuesta menos presentable, que suele ser la verdadera.",
+      "line": "Eso es gordo. ¿Estás bien con ello o calladamente no tan bien?",
+      "situation": "Alguien dice que tiene dos hijos y que uno empieza el colegio."
+    }
+  ],
+  "transcript": [],
+  "unavailable": false,
+  "line": null,
+  "choice": null,
+  "chat": {
+    "turnsLeft": 3,
+    "maxChars": 160,
+    "instruction": "Pregunta algo a nivel de dato — qué, dónde, cuál."
+  },
+  "result": null
+}

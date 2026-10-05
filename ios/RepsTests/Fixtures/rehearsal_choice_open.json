@@ -1,0 +1,104 @@
+{
+  "id": "93e63c12-8d80-40c1-b468-0f440fedb032",
+  "mode": "choice",
+  "status": "open",
+  "lessonId": "000c5aed-fe89-46d0-9875-8aa4024dd2be",
+  "skillSlug": "before-you-speak",
+  "lessonOrder": 1,
+  "lessonTitle": "Lo que cuesta de verdad un mal comienzo",
+  "setting": "La zona de cajas automáticas de un supermercado a las seis de la tarde. Una máquina está estropeada y tres personas esperan para las dos que funcionan.",
+  "partner": {
+    "name": "Erin",
+    "role": "alguien que espera delante de ti",
+    "openness": 3
+  },
+  "showPartner": false,
+  "paid": false,
+  "usingRealModel": false,
+  "theMove": "Dite el peor caso real, en voz baja y con palabras llanas, antes de hablar.",
+  "rehearsalNote": null,
+  "criteria": [],
+  "mission": "Hoy, antes de una conversación, dite el peor caso real con palabras llanas. Después ten la conversación y anota lo que pasó de verdad, al lado de lo que predijiste.",
+  "examples": [
+    {
+      "why": "Dicho para ti, no en voz alta. Nombrar el resultado real pone el número verdadero al lado del número sentido, y el sentido nunca sobrevive a la comparación.",
+      "line": "En el peor caso dice ya y vuelve a mirar el móvil.",
+      "situation": "Estás a punto de decirle algo a la persona que tienes al lado en la parada."
+    },
+    {
+      "why": "Casi siempre cierto. La gente recuerda lo que hizo ella en un intercambio, no lo que hiciste tú, porque estaba ocupada gestionándose.",
+      "line": "Esto ya lo han olvidado. Soy el único que lo sigue sosteniendo.",
+      "situation": "Una conversación quedó en nada hace veinte minutos y sigues dándole vueltas."
+    },
+    {
+      "why": "Lo incómodo es real. No se trata de fingir que estuvo bien, sino de ponerle el precio correcto en vez del que cotizó tu cuerpo.",
+      "line": "Ha sido incómodo y ha costado cuatro segundos.",
+      "situation": "Acaba de pasar algo genuinamente incómodo y quieres irte."
+    }
+  ],
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Nada. Así es una respuesta sosa normal.",
+      "correct": true
+    }
+  ],
+  "unavailable": false,
+  "line": null,
+  "choice": {
+    "total": 2,
+    "answered": [
+      {
+        "situation": "Le dices algo a la persona que tienes al lado en una cola. Dice ya, sonríe un segundo y vuelve al móvil.",
+        "chosen": "Nada. Así es una respuesta sosa normal.",
+        "correct": true,
+        "options": [
+          {
+            "text": "No quería que le hablaran.",
+            "correct": false,
+            "note": "Posible, imposible de saber con una respuesta, y en cualquier caso da igual. Leer una respuesta corta como un rechazo es como un suceso de cuatro segundos se convierte en una regla."
+          },
+          {
+            "text": "El comienzo era demasiado flojo para merecer una respuesta.",
+            "correct": false,
+            "note": "El comienzo rara vez es la variable. Muchísimos comienzos excelentes reciben exactamente esta respuesta de alguien que ya casi está en la caja."
+          },
+          {
+            "text": "Nada. Así es una respuesta sosa normal.",
+            "correct": true,
+            "note": "Es el resultado más común y no es un veredicto sobre ti. Estaba en una cola, no haciendo una selección de conversaciones."
+          },
+          {
+            "text": "Tendrías que haber añadido algo más.",
+            "correct": false,
+            "note": "Llenar el hueco después de una respuesta sosa es lo único que sí habría hecho que resultara incómodo."
+          }
+        ]
+      }
+    ],
+    "current": {
+      "situation": "Son las nueve de la noche y sigues pensando en ello.",
+      "prompt": "¿Dónde está la otra persona ahora mismo?",
+      "options": [
+        {
+          "index": 1,
+          "text": "Contándoselo a alguien."
+        },
+        {
+          "index": 3,
+          "text": "No pensando en ello, y no lo ha hecho desde la cola."
+        },
+        {
+          "index": 0,
+          "text": "Probablemente pensando que fue algo raro."
+        },
+        {
+          "index": 2,
+          "text": "Imposible de saber."
+        }
+      ]
+    }
+  },
+  "chat": null,
+  "result": null
+}

@@ -1,0 +1,473 @@
+{
+  "name": "Dani",
+  "email": "api-test-1791223139646@example.com",
+  "fact": "Las oportunidades viajan por conversación mucho antes de viajar por correo electrónico.",
+  "totals": {
+    "repsLogged": 1,
+    "totalXp": 95,
+    "currentStreak": 1,
+    "longestStreak": 1
+  },
+  "rank": {
+    "name": "Arranque en frío",
+    "note": "la primera es la única que de verdad es difícil",
+    "position": 1,
+    "total": 10,
+    "xp": 95,
+    "fraction": 0.6333333333333333,
+    "isMax": false,
+    "next": {
+      "name": "Presentarse",
+      "note": "más lejos de lo que la mayoría de la gente llega nunca",
+      "conversationsToGo": 2
+    }
+  },
+  "resume": null,
+  "review": {
+    "reps": 1,
+    "skillsTouched": 1
+  },
+  "heatmap": [
+    {
+      "date": "2026-07-20",
+      "count": 0
+    },
+    {
+      "date": "2026-07-21",
+      "count": 0
+    },
+    {
+      "date": "2026-07-22",
+      "count": 0
+    },
+    {
+      "date": "2026-07-23",
+      "count": 0
+    },
+    {
+      "date": "2026-07-24",
+      "count": 0
+    },
+    {
+      "date": "2026-07-25",
+      "count": 0
+    },
+    {
+      "date": "2026-07-26",
+      "count": 0
+    },
+    {
+      "date": "2026-07-27",
+      "count": 0
+    },
+    {
+      "date": "2026-07-28",
+      "count": 0
+    },
+    {
+      "date": "2026-07-29",
+      "count": 0
+    },
+    {
+      "date": "2026-07-30",
+      "count": 0
+    },
+    {
+      "date": "2026-07-31",
+      "count": 0
+    },
+    {
+      "date": "2026-08-01",
+      "count": 0
+    },
+    {
+      "date": "2026-08-02",
+      "count": 0
+    },
+    {
+      "date": "2026-08-03",
+      "count": 0
+    },
+    {
+      "date": "2026-08-04",
+      "count": 0
+    },
+    {
+      "date": "2026-08-05",
+      "count": 0
+    },
+    {
+      "date": "2026-08-06",
+      "count": 0
+    },
+    {
+      "date": "2026-08-07",
+      "count": 0
+    },
+    {
+      "date": "2026-08-08",
+      "count": 0
+    },
+    {
+      "date": "2026-08-09",
+      "count": 0
+    },
+    {
+      "date": "2026-08-10",
+      "count": 0
+    },
+    {
+      "date": "2026-08-11",
+      "count": 0
+    },
+    {
+      "date": "2026-08-12",
+      "count": 0
+    },
+    {
+      "date": "2026-08-13",
+      "count": 0
+    },
+    {
+      "date": "2026-08-14",
+      "count": 0
+    },
+    {
+      "date": "2026-08-15",
+      "count": 0
+    },
+    {
+      "date": "2026-08-16",
+      "count": 0
+    },
+    {
+      "date": "2026-08-17",
+      "count": 0
+    },
+    {
+      "date": "2026-08-18",
+      "count": 0
+    },
+    {
+      "date": "2026-08-19",
+      "count": 0
+    },
+    {
+      "date": "2026-08-20",
+      "count": 0
+    },
+    {
+      "date": "2026-08-21",
+      "count": 0
+    },
+    {
+      "date": "2026-08-22",
+      "count": 0
+    },
+    {
+      "date": "2026-08-23",
+      "count": 0
+    },
+    {
+      "date": "2026-08-24",
+      "count": 0
+    },
+    {
+      "date": "2026-08-25",
+      "count": 0
+    },
+    {
+      "date": "2026-08-26",
+      "count": 0
+    },
+    {
+      "date": "2026-08-27",
+      "count": 0
+    },
+    {
+      "date": "2026-08-28",
+      "count": 0
+    },
+    {
+      "date": "2026-08-29",
+      "count": 0
+    },
+    {
+      "date": "2026-08-30",
+      "count": 0
+    },
+    {
+      "date": "2026-08-31",
+      "count": 0
+    },
+    {
+      "date": "2026-09-01",
+      "count": 0
+    },
+    {
+      "date": "2026-09-02",
+      "count": 0
+    },
+    {
+      "date": "2026-09-03",
+      "count": 0
+    },
+    {
+      "date": "2026-09-04",
+      "count": 0
+    },
+    {
+      "date": "2026-09-05",
+      "count": 0
+    },
+    {
+      "date": "2026-09-06",
+      "count": 0
+    },
+    {
+      "date": "2026-09-07",
+      "count": 0
+    },
+    {
+      "date": "2026-09-08",
+      "count": 0
+    },
+    {
+      "date": "2026-09-09",
+      "count": 0
+    },
+    {
+      "date": "2026-09-10",
+      "count": 0
+    },
+    {
+      "date": "2026-09-11",
+      "count": 0
+    },
+    {
+      "date": "2026-09-12",
+      "count": 0
+    },
+    {
+      "date": "2026-09-13",
+      "count": 0
+    },
+    {
+      "date": "2026-09-14",
+      "count": 0
+    },
+    {
+      "date": "2026-09-15",
+      "count": 0
+    },
+    {
+      "date": "2026-09-16",
+      "count": 0
+    },
+    {
+      "date": "2026-09-17",
+      "count": 0
+    },
+    {
+      "date": "2026-09-18",
+      "count": 0
+    },
+    {
+      "date": "2026-09-19",
+      "count": 0
+    },
+    {
+      "date": "2026-09-20",
+      "count": 0
+    },
+    {
+      "date": "2026-09-21",
+      "count": 0
+    },
+    {
+      "date": "2026-09-22",
+      "count": 0
+    },
+    {
+      "date": "2026-09-23",
+      "count": 0
+    },
+    {
+      "date": "2026-09-24",
+      "count": 0
+    },
+    {
+      "date": "2026-09-25",
+      "count": 0
+    },
+    {
+      "date": "2026-09-26",
+      "count": 0
+    },
+    {
+      "date": "2026-09-27",
+      "count": 0
+    },
+    {
+      "date": "2026-09-28",
+      "count": 0
+    },
+    {
+      "date": "2026-09-29",
+      "count": 0
+    },
+    {
+      "date": "2026-09-30",
+      "count": 0
+    },
+    {
+      "date": "2026-10-01",
+      "count": 0
+    },
+    {
+      "date": "2026-10-02",
+      "count": 0
+    },
+    {
+      "date": "2026-10-03",
+      "count": 0
+    },
+    {
+      "date": "2026-10-04",
+      "count": 0
+    },
+    {
+      "date": "2026-10-05",
+      "count": 1
+    }
+  ],
+  "rehearsals": 4,
+  "topics": [
+    {
+      "slug": "small-talk",
+      "name": "Small talk",
+      "reps": 1,
+      "skills": [
+        {
+          "slug": "before-you-speak",
+          "name": "Before you say anything",
+          "level": 1,
+          "fraction": 0.1,
+          "isMax": false,
+          "nextLevel": "3 repeticiones más para el nivel 2"
+        },
+        {
+          "slug": "openers",
+          "name": "Openers",
+          "level": 1,
+          "fraction": 0.3333333333333333,
+          "isMax": false,
+          "nextLevel": "2 repeticiones más para el nivel 2"
+        },
+        {
+          "slug": "groups",
+          "name": "Groups: joining and holding the floor",
+          "level": 1,
+          "fraction": 0.1,
+          "isMax": false,
+          "nextLevel": "3 repeticiones más para el nivel 2"
+        }
+      ]
+    },
+    {
+      "slug": "meeting-someone",
+      "name": "Meeting someone",
+      "reps": 0,
+      "skills": [
+        {
+          "slug": "first-two-minutes",
+          "name": "The first two minutes",
+          "level": 1,
+          "fraction": 0.1,
+          "isMax": false,
+          "nextLevel": "3 repeticiones más para el nivel 2"
+        }
+      ]
+    }
+  ],
+  "openTopicSlug": "small-talk",
+  "badges": {
+    "earned": [
+      {
+        "id": "81727249-5ad4-412d-9c23-10ce51cfc097",
+        "name": "Primera repetición",
+        "description": "Registraste una conversación real. Esta es la parte que cuenta."
+      }
+    ],
+    "locked": [
+      {
+        "id": "b8591247-a18a-45bd-a16b-a3d1a7b5df85",
+        "name": "Registraste una mala",
+        "description": "Registraste una repetición que no salió bien. El registro solo vale algo si es honesto."
+      },
+      {
+        "id": "73c887d0-ec85-4ef9-b79f-be18a01d5ca0",
+        "name": "Diez en la calle",
+        "description": "Diez conversaciones reales registradas."
+      },
+      {
+        "id": "c79df95c-6ac5-45e1-81ac-e0b62d8f340d",
+        "name": "Siete días",
+        "description": "Una semana presentándote. Los días de descanso cuentan."
+      },
+      {
+        "id": "0592916a-6657-41cf-8f19-fed54a019bff",
+        "name": "Diez etiquetas en la calle",
+        "description": "Diez repeticiones registradas sobre escuchar y etiquetar."
+      },
+      {
+        "id": "f1bbcc75-7d2f-4da1-a864-9cf9bc90cc0c",
+        "name": "Primera misión de flirteo",
+        "description": "Practicaste la más difícil, a propósito."
+      },
+      {
+        "id": "8e5ad0db-a589-42ff-8327-16476bdbd7cb",
+        "name": "Leer el ambiente",
+        "description": "Una repetición registrada sobre notar que el interés no era mutuo, y despedirte con calidez."
+      },
+      {
+        "id": "a59db73c-3afe-4cf2-b839-390d2c7b030e",
+        "name": "Segundo borrador",
+        "description": "Volviste a una repetición que salió mal y averiguaste qué dirías en su lugar."
+      },
+      {
+        "id": "c064b3d3-7f85-446d-9d8a-c01a9a26c9a2",
+        "name": "Las nueve habilidades",
+        "description": "Al menos una repetición registrada en las nueve categorías."
+      },
+      {
+        "id": "ff9b4780-0913-479f-a3ac-6331a6fa7c9c",
+        "name": "Cincuenta repeticiones",
+        "description": "Cincuenta conversaciones reales. Vuelve atrás en el registro y lee la primera."
+      }
+    ]
+  },
+  "xpTable": [
+    {
+      "label": "Una conversación real, registrada",
+      "xp": 50,
+      "note": "Cuenta igual, saliera bien o mal."
+    },
+    {
+      "label": "Un ensayo terminado",
+      "xp": 15,
+      "note": "Buen calentamiento. Vale una fracción de lo real."
+    },
+    {
+      "label": "Una revisión semanal respondida",
+      "xp": 10,
+      "note": "Pensar qué dirías en su lugar."
+    },
+    {
+      "label": "Una tarjeta de teoría leída",
+      "xp": 5,
+      "note": "Una vez por tarjeta. Leer es la parte más barata."
+    }
+  ],
+  "theoryRatio": 10
+}

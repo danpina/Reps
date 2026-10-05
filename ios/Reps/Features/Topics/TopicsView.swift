@@ -2,24 +2,14 @@ import SwiftUI
 
 struct TopicsView: View {
     @EnvironmentObject private var store: SessionStore
-    @StateObject private var library = LibraryStore()
+    /// Loaded and shared by `MainTabView`.
+    @EnvironmentObject private var library: LibraryStore
 
     var body: some View {
         NavigationStack {
             content
-                .navigationTitle(store.strings.topics)
-                .toolbar {
-                    ToolbarItem(placement: .navigationBarTrailing) {
-                        Button(store.strings.signOut) { store.signOut() }
-                    }
-                }
+                .navigationTitle(store.strings.t("nav.learn"))
         }
-        // Shared with every screen pushed from here, so a lesson read in one place unlocks the next
-        // everywhere without another round trip.
-        .environmentObject(library)
-        // Re-runs when the account's language arrives after sign-in, so the list never stays in
-        // English for a Spanish reader.
-        .task(id: store.locale) { await library.load(session: store) }
     }
 
     @ViewBuilder private var content: some View {

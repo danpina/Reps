@@ -5,3 +5,6 @@ DerivedData/
 .build/
 *.xcuserstate
 .DS_Store
+
+# Copied from ../src/messages by scripts/sync-messages.sh at build time — one source of wording.
+Reps/Resources/Messages/

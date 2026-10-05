@@ -1,0 +1,81 @@
+{
+  "id": "47d6c4d8-4b4c-429b-bc0f-b91f54697b12",
+  "mode": "scene",
+  "status": "open",
+  "lessonId": "cbdee3d9-fc57-4d5f-8483-39592d39fad1",
+  "skillSlug": "groups",
+  "lessonOrder": 1,
+  "lessonTitle": "Primero quédate ahí",
+  "setting": "Una despedida en la sala reservada de un bar. Un grupo de cuatro está de pie en círculo, a mitad de una historia, y conoces un poco a una de ellas.",
+  "partner": {
+    "name": "el grupo",
+    "role": "cuatro personas a mitad de conversación, una de las cuales has visto una vez",
+    "openness": 3
+  },
+  "showPartner": true,
+  "paid": true,
+  "usingRealModel": false,
+  "theMove": "Únete al grupo físicamente, escucha, y no digas absolutamente nada durante un rato.",
+  "rehearsalNote": "Joining a group is a physical problem and this is a conversation with one person, so the entry itself cannot be rehearsed. Treat this scene as the moment after you have joined, and practise being comfortable saying nothing first.",
+  "criteria": [
+    {
+      "key": "physical_entry",
+      "label": "Entraste primero físicamente",
+      "description": "Te metiste en el círculo en vez de anunciarte de palabra."
+    },
+    {
+      "key": "listened_first",
+      "label": "Escuchaste antes de hablar",
+      "description": "Esperaste lo suficiente para entender cuál era la conversación de verdad."
+    },
+    {
+      "key": "no_interruption",
+      "label": "No paraste la conversación",
+      "description": "Te uniste sin obligar al grupo a detenerse y atenderte."
+    },
+    {
+      "key": "comfortable_quiet",
+      "label": "Estuviste cómodo en silencio",
+      "description": "No corriste a justificar tu presencia con una aportación."
+    }
+  ],
+  "mission": "Únete hoy a una conversación de grupo quedándote dentro y escuchando primero. No digas nada durante treinta segundos. Anota cuánto esperaste y qué acabaste diciendo.",
+  "examples": [
+    {
+      "why": "Entrada física sin ninguna exigencia verbal. Mirar a quien habla en vez de a tu conocido te marca como parte del público y no como visita.",
+      "line": "(entra en el círculo al lado de quien conoces y mira a quien esté hablando)",
+      "situation": "Cuatro personas están a mitad de conversación y conoces a una."
+    },
+    {
+      "why": "Estar en el grupo ya es un éxito. El hueco va a llegar, y llegar dentro de él es mucho mejor que fabricar uno.",
+      "line": "(todavía nada — espera un hueco natural)",
+      "situation": "Llevas treinta segundos en el círculo y ya entiendes el tema."
+    },
+    {
+      "why": "Les reconoce sin convertirlo en una presentación que pare la conversación. Un gesto no le cuesta nada al grupo.",
+      "line": "(gesto pequeño, y sigue escuchando)",
+      "situation": "Alguien del grupo te mira un segundo al entrar."
+    }
+  ],
+  "transcript": [
+    {
+      "role": "user",
+      "content": "Hola, perdona, ¿tienes un segundo?",
+      "correct": null
+    },
+    {
+      "role": "partner",
+      "content": "Something like that.",
+      "correct": null
+    }
+  ],
+  "unavailable": false,
+  "line": null,
+  "choice": null,
+  "chat": {
+    "turnsLeft": 13,
+    "maxChars": 160,
+    "instruction": null
+  },
+  "result": null
+}

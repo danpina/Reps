@@ -2,6 +2,7 @@ import { logRep } from "@/app/(app)/log/actions";
 import { formOf, readBody } from "@/lib/api/forms";
 import { apiRoute, ApiError, redirectTarget } from "@/lib/api/route";
 import { getBadges } from "@/lib/progress/queries";
+import { XP_AWARD } from "@/lib/progress/rules";
 
 /**
  * Logs a rep.
@@ -37,12 +38,12 @@ export async function POST(request: Request) {
       if (!target) throw error;
 
       const slugs = new URL(target, "https://x.invalid").searchParams.get("badges")?.split(",") ?? [];
-      if (slugs.length === 0) return { badges: [] };
+      if (slugs.length === 0) return { xp: XP_AWARD.mission, badges: [] };
 
       const earned = (await getBadges()).earned.filter((b) => slugs.includes(b.slug));
-      return { badges: earned.map((b) => ({ id: b.id, name: b.name, description: b.description })) };
+      return { xp: XP_AWARD.mission, badges: earned.map((b) => ({ id: b.id, name: b.name, description: b.description })) };
     }
 
-    return { badges: [] };
+    return { xp: XP_AWARD.mission, badges: [] };
   });
 }

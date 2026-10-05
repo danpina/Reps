@@ -6,6 +6,7 @@ on:
   push:
     paths:
       - 'ios/**'
+      - 'src/messages/**'
       - '.github/workflows/ios-build.yml'
   pull_request:
     paths:
@@ -20,6 +21,9 @@ jobs:
         working-directory: ios
     steps:
       - uses: actions/checkout@v4
+
+      - name: Bundle the website's translations
+        run: sh scripts/sync-messages.sh
 
       - name: Install XcodeGen
         run: brew install xcodegen

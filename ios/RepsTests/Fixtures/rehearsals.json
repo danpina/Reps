@@ -1,0 +1,114 @@
+{
+  "topics": [
+    {
+      "slug": "small-talk",
+      "name": "Charla trivial",
+      "total": 3,
+      "skills": [
+        {
+          "slug": "before-you-speak",
+          "name": "Antes de decir nada",
+          "total": 1,
+          "lessons": [
+            {
+              "lessonId": "000c5aed-fe89-46d0-9875-8aa4024dd2be",
+              "sortOrder": 1,
+              "title": "Lo que cuesta de verdad un mal comienzo",
+              "rehearsals": [
+                {
+                  "id": "93e63c12-8d80-40c1-b468-0f440fedb032",
+                  "status": "complete",
+                  "mode": "choice",
+                  "startedAt": "2026-10-05T17:59:12.343255+00:00",
+                  "lines": 2,
+                  "average": null,
+                  "landed": true,
+                  "fix": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "going-deeper",
+          "name": "Ir más adentro",
+          "total": 1,
+          "lessons": [
+            {
+              "lessonId": "111d6022-f108-4b27-97e0-6d43ff44036a",
+              "sortOrder": 1,
+              "title": "La escalera de la curiosidad",
+              "rehearsals": [
+                {
+                  "id": "2412734a-73a8-45ef-9f28-542be9540969",
+                  "status": "open",
+                  "mode": "beat",
+                  "startedAt": "2026-10-05T17:59:22.915596+00:00",
+                  "lines": 0,
+                  "average": null,
+                  "landed": null,
+                  "fix": null
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "slug": "groups",
+          "name": "Grupos: entrar y tener turno",
+          "total": 1,
+          "lessons": [
+            {
+              "lessonId": "cbdee3d9-fc57-4d5f-8483-39592d39fad1",
+              "sortOrder": 1,
+              "title": "Primero quédate ahí",
+              "rehearsals": [
+                {
+                  "id": "47d6c4d8-4b4c-429b-bc0f-b91f54697b12",
+                  "status": "complete",
+                  "mode": "scene",
+                  "startedAt": "2026-10-05T17:59:18.983623+00:00",
+                  "lines": 1,
+                  "average": 1.75,
+                  "landed": null,
+                  "fix": "You asked a question nearly every turn. Put something of your own in before the third one."
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "slug": "meeting-someone",
+      "name": "Conocer a alguien",
+      "total": 1,
+      "skills": [
+        {
+          "slug": "first-two-minutes",
+          "name": "Los dos primeros minutos",
+          "total": 1,
+          "lessons": [
+            {
+              "lessonId": "ceb98752-6192-4b86-ab6e-6d742c4f2d6a",
+              "sortOrder": 1,
+              "title": "No te disculpes por estar ahí",
+              "rehearsals": [
+                {
+                  "id": "eccbae1f-d78b-4180-9ebf-9ead65399264",
+                  "status": "complete",
+                  "mode": "line",
+                  "startedAt": "2026-10-05T17:59:05.308572+00:00",
+                  "lines": 1,
+                  "average": null,
+                  "landed": true,
+                  "fix": null
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

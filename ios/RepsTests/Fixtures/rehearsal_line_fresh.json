@@ -1,0 +1,59 @@
+{
+  "id": "eccbae1f-d78b-4180-9ebf-9ead65399264",
+  "mode": "line",
+  "status": "open",
+  "lessonId": "ceb98752-6192-4b86-ab6e-6d742c4f2d6a",
+  "skillSlug": "first-two-minutes",
+  "lessonOrder": 1,
+  "lessonTitle": "No te disculpes por estar ahí",
+  "setting": "Un bar concurrido un viernes. Has acabado al lado de alguien en la barra, los dos esperando a que os atiendan.",
+  "partner": {
+    "name": "Talise",
+    "role": "alguien esperando en el mismo bar",
+    "openness": 4
+  },
+  "showPartner": true,
+  "paid": false,
+  "usingRealModel": false,
+  "theMove": "Quédate quieto, habla a tu ritmo normal, y deja que la apertura llegue sin preámbulo.",
+  "rehearsalNote": null,
+  "criteria": [],
+  "mission": "Hoy, abre una conversación sin ningún preámbulo. Sin perdón, sin explicación, sin aviso. Apunta qué cortaste y si te notaste acelerando.",
+  "examples": [
+    {
+      "why": "Sin preámbulo. El comentario llega solo y se le permite ser lo que es: una cosa corriente que se dice una persona a otra.",
+      "line": "Vaya nochecita de gente aquí.",
+      "situation": "Has decidido decirle algo a alguien en un bar."
+    },
+    {
+      "why": "La disculpa es casi siempre la primera oración. Quitarla suele dejar una apertura perfectamente buena que estaba escondida detrás.",
+      "line": "(corta la primera frase y empieza en la segunda)",
+      "situation": "Te pillas a punto de abrir con «perdona»."
+    },
+    {
+      "why": "Retirarte después de hablar les pide que decidan si te llaman de vuelta. Quedarte quieto deja que el comentario sea lo que era.",
+      "line": "(quédate donde estás)",
+      "situation": "Has dicho tu frase y de inmediato has dado medio paso atrás."
+    }
+  ],
+  "transcript": [],
+  "unavailable": false,
+  "line": {
+    "says": "(el camarero atiende a otra persona primero, y os quedáis los dos esperando)",
+    "maxChars": 160,
+    "maxAttempts": 8,
+    "requirements": [
+      "Sin preámbulo, sin disculpa, sin aviso",
+      "Lo bastante corto como para llegar a ritmo normal",
+      "Una línea. Déjala estar."
+    ],
+    "attempts": [],
+    "model": {
+      "why": "Seis palabras sin nada delante. Sin perdón, sin explicación, sin aviso: se le permite ser una cosa corriente que se dice una persona a otra.",
+      "line": "Vaya nochecita de gente aquí."
+    }
+  },
+  "choice": null,
+  "chat": null,
+  "result": null
+}

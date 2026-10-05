@@ -107,6 +107,7 @@ private struct LessonContent: View {
     let topicName: String
 
     @Environment(\.dismiss) private var dismiss
+    @State private var showLog = false
 
     var body: some View {
         ScrollView {
@@ -120,11 +121,16 @@ private struct LessonContent: View {
                         label: lesson.checks.count > 1 ? strings.checkOf(i + 1, lesson.checks.count) : strings.oneCheck,
                         strings: strings)
                 }
+                // The test: a drill or a scene, whichever the lesson was written for.
+                RehearsalBoxView(lessonID: lesson.id)
                 if !lesson.mission.isEmpty { mission }
                 navigation
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 24)
+        }
+        .sheet(isPresented: $showLog) {
+            LogRepView(preset: LogPreset(skillID: skill.id, lessonID: lesson.id, missionText: lesson.mission)) {}
         }
     }
 
@@ -179,6 +185,11 @@ private struct LessonContent: View {
                 .foregroundColor(.accentColor)
             Text(lesson.mission).font(.body).fixedSize(horizontal: false, vertical: true)
             Text(strings.goAndDoIt).font(.footnote).foregroundColor(.secondary)
+            HStack(spacing: 12) {
+                PrimaryButton(title: strings.t("lessonPage.logThisRep")) { showLog = true }
+                Text("+50 XP").font(.caption.monospacedDigit()).foregroundColor(.secondary).fixedSize()
+            }
+            .padding(.top, 4)
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)

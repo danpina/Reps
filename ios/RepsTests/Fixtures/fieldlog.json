@@ -1,0 +1,32 @@
+{
+  "entries": [
+    {
+      "id": "77ceeb91-0267-48cc-89a5-ff48a5471e64",
+      "skill_id": "a516212f-cc6c-4f07-a320-fb5c5553d52a",
+      "lesson_id": null,
+      "mission_text": null,
+      "context_note": "café",
+      "went": 3,
+      "reflection": "fue bien",
+      "xp_awarded": 50,
+      "logged_at": "2026-10-05T17:59:21.824+00:00",
+      "logged_date": "2026-10-05",
+      "other_sex": "female",
+      "other_age_group": "25-34",
+      "skills": {
+        "name": "Openers",
+        "slug": "openers",
+        "topics": {
+          "name": "Small talk",
+          "slug": "small-talk"
+        }
+      }
+    }
+  ],
+  "totals": {
+    "repsLogged": 1,
+    "totalXp": 95,
+    "currentStreak": 1,
+    "longestStreak": 1
+  }
+}
