@@ -58,9 +58,21 @@ struct LoginView: View {
                 }
                 .padding(.top, 8)
 
-                Text(strings.noAccountHint)
+                Link(strings.t("auth.signIn.forgotPassword"),
+                     destination: BackendConfig.siteURL.appendingPathComponent("forgot-password"))
                     .font(.footnote)
-                    .foregroundColor(.secondary)
+
+                Divider().padding(.vertical, 4)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text(strings.t("auth.signIn.newHereHeading")).font(.subheadline.weight(.semibold))
+                    Text(strings.t("auth.signIn.newHereBody")).font(.footnote).foregroundColor(.secondary)
+                    // Accounts are made on the website, which also sends the confirmation email and
+                    // handles the link in it. Signing in with one made there works here the same.
+                    Link(strings.t("auth.signIn.createAccount"),
+                         destination: BackendConfig.siteURL.appendingPathComponent("sign-up"))
+                        .font(.footnote.weight(.semibold))
+                }
             }
             .padding(.horizontal, 24)
         }

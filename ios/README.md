@@ -19,34 +19,62 @@ The `.xcodeproj` is **not** checked in. It is generated from `project.yml` by
 
 ## Where it is
 
-**Milestone 1 — pipeline and first slice (done).** Sign in, then browse topics → skills → lesson titles,
-in the account's own language (`profiles.locale`, same as the website; English and Spanish — German is
-not offered yet).
+Five tabs, the same places the website's navigation offers, and a first-run Welcome:
 
-**Milestone 2 — lessons (this commit).** Open a lesson and read it: theory, worked examples, the
-comprehension questions (answer once, see why), and today's mission. Everything the website decides
-about a lesson is decided the same way here:
+- **Today** — the landing screen: the reason this is worth doing, log-a-rep, reps and streak, your rank and
+  what it takes to reach the next, "pick up where you left off", the twelve-week activity grid, where you are
+  in each topic, and badges.
+- **Learn** — topics → skills → lessons. A lesson is the theory, worked examples, the comprehension questions
+  (answer once, see why), **the test** — the lesson's rehearsal — and today's mission with a **Log this rep**
+  button.
+- **Field log** — every rep logged, by day, with edit and delete. Moving a rep to another skill moves its XP;
+  deleting one takes it back and works the streak out again.
+- **Rehearsals** — every rehearsal done, in the order the curriculum runs, each one re-openable.
+- **Settings** — About you, Language, Appearance (stored on the account, so it follows you), Change password,
+  Sign out, and **Delete account**.
 
-- **Locks.** A track unlocks forwards (lesson two needs lesson one read), and past the free sample a
-  lesson needs a subscription. Both rules are ports of `progression.ts` and the `is_pro` database
-  function, with unit tests mirroring the website's.
-- **Tailoring.** The few lessons written differently by who is reading use the same variant matcher as
-  the web, including its rule that an unanswered question is a miss and never a guess.
-- **Reading counts.** Opening a lesson records it and awards its XP through `POST /api/lessons/{id}/read`
-  — the website's own function behind a bearer token, so the XP rules live in one place.
+**Welcome** appears until the profile says onboarding is done: a name, where to start, three optional answers.
 
-**Not in yet:** the rehearsal drills and "log this rep" (nothing is shown for them until they work), the
-end-of-track recap, progress and ranks.
+### The rehearsal, in its four forms
 
-**Next, in roughly this order:** the line and choice drills (no AI, so no new API) → logging a rep,
-progress, XP and ranks → the AI rehearsal and the coach (more of the JSON API) → settings, language and
-**account deletion** (App Store rule 5.1.1(v), needed as soon as there is sign-up in the app) → in-app
-sign-up and Sign in with Apple.
+The lesson says which one it is. **Line** and **read-and-decide** never call the model, so they are free and
+repeatable; **short sequence** and **open scene** use the AI partner and are scored against the lesson's
+rubric when ended.
 
-Until in-app sign-up exists, accounts are created on the website and the login screen says so.
+### Where the rules live
 
-The API routes live in the Next app (`src/app/api`) and deploy with the website, so a new app build that
-calls one needs that route to be live first.
+Nowhere in this app. Every verdict, every cap, every score, the free allowance, XP and the streak are decided
+by the website's own code, behind a JSON API (`src/app/api`) that runs it unchanged. A request carrying the
+Supabase access token runs *as that person*: `createClient()` and `getSessionUser()` consult a per-request
+`AsyncLocalStorage` (`lib/api/context`) before the cookie, so the website's queries and server actions work as
+they are and the app cannot disagree with the web about a rule. Row level security still decides what any of
+it may touch.
+
+Reads of the curriculum go straight to Supabase under row level security. The few ports that are pure logic —
+forward-only unlocking, the audience-variant matcher, the markdown subset — have unit tests mirroring the
+website's.
+
+### Wording
+
+The app bundles the website's translation catalogs (`scripts/sync-messages.sh` copies `src/messages/*.json` in at
+build time), so it says everything in exactly the website's words, English and Spanish, with a small ICU
+formatter for plurals. A website test (`tests/ios-messages.test.ts`) checks that every catalog key the Swift
+code uses exists in both languages.
+
+### Not in the app yet
+
+The weekly review and the coach (both AI reads of the log), the end-of-track recap, topic cheat sheets, and the
+admin screens (use the website). **Sign-up and password reset** open the website: they send an email whose link
+the website handles, and an account made there signs in here the same.
+
+The API routes deploy with the website, so a new app build that calls a route needs that route to be live first.
+
+## What an account deletion needs
+
+`DELETE /api/account` asks for the current password and then deletes that one user with the privileged client,
+which needs `SUPABASE_SECRET_KEY` in the **Vercel** environment. Without it the route answers 503 and the app says
+deletion is unavailable. Every table that refers to a user cascades from `auth.users`, so that one delete takes
+the profile, reps, rehearsals, progress and badges with it.
 
 ## No Mac? CI is the compiler
 
